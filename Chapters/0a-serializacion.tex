@@ -1,0 +1,99 @@
+% Apéndice A Serialización
+
+\chapter{Serialización}
+\label{ch:serializacion}
+
+Siendo una aplicación cliente-servidor remotebot requiere algún método de
+serialización para intercambiar datos entre los clientes y el servidor,
+considerando que el servidor no es más que un servidor web que usa websockets
+como protocolo, el método de serialización más adecuado parece ser JSON
+(Javascript Serialization Object Notation).
+
+JSON cuenta con las siguientes características:
+
+\begin{enumerate}
+    \item Está estandarizado (ECMA-404 http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)
+        y (rfc http://tools.ietf.org/html/rfc7159) el último es una propuesta de estándar (http://www.rfc-editor.org/info/rfc7159)
+    \item Soporta los tipos de datos necesarios para intercambiar mensajes con
+        los datos necesarios para controlar los robots usando un nivel de
+        abstracción adecuado.
+    \item Al ser un formato de texto es simple analizar el tráfico entre los
+        clientes y el servidor para detectar posibles errores.
+    \item Está soportado de forma nativa por los navegadores más utilizados
+        (http://caniuse.com/#search=json).
+\end{enumerate}
+
+Pero también existen otras alternativas cuyos objetivos son serialización
+y desserialización rápida, y datos serializados más compactos
+como BSON (Binary JSON) y (CBOR Concise Binary Object Representation).
+
+Algunas características de BSON y CBOR son:
+
+\begin{enumerate}
+    \item Codifican la información en formato binario.
+    \item Son tan fáciles de usar como JSON.
+    \item Ambos formatos proveen un superset de los tipos de datos provistos
+        por JSON.
+    \item CBOR tiene una especificación propuestas como estándar (CBOR http://tools.ietf.org/html/rfc7049)
+    \item BSON tiene una especificación y una implementación bien conocida en MongoDB
+    \item Por estar en formato binario decodificar una captura de tráfico
+        para depurar un programa es más laborioso.
+    \item En algunos casos estos formatos binarios generarán mensajes más
+        chicos que JSON, pero no siempre.
+    \item Requieren usar librerías Javascript en los clientes web ya que los
+        navegadores no lo implementan de forma nativa.
+\end{enumerate}
+
+Para tomar un decisión respecto al formato a utilizar se decidió generar
+16 archivos \texttt{JSON} con datos aleatorios, estos archivos se cargaron
+con una cantidad de entradas múltiplo de 1024 desde 1024 hasta 16384, donde
+cada una de estas entradas es un objeto \texttt{JSON} con 5 entradas de tipo
+numérico, 5 strings, 5 objetos (cada uno con una entrada numérica) y 5
+arrays (cada uno con 2 entradas de tipo string).
+
+Estos archivos se cargaron desde scripts similares en Python y Javascript que
+desserializaron y serializaron estos datos repetidas veces calculando el tiempo
+promedio que llevó hacer cada una de estas acciones para cada formato.
+
+Se eligió hacer las pruebas con Python y Javascript porque el primero es el
+lenguaje de implementación del servidor y del cliente que probablemente tenga
+más uso en un futuro, mientras que Javascript es el lenguaje de implementación
+del cliente que se ejecutará en los navegadores web y que puede servir como
+base para implementaciones con Brython, Skulp, Opal, etc...
+
+Para hacer el experimento repetible y automatizable la implementación en
+Javascript se ejecutó con el intérprete \textbf{nodejs} basado en
+el motor \textbf{v8} usado por \textbf{Chrome} y además se crearon
+scripts de apoyo para generar los datos de prueba, ejecutar los scripts
+con los distintos formatos de forma automatizada y formatear los datos
+resultantes en archivos csv.
+
+Todas las pruebas se realizaron sobre Lihuen 6 beta (basado en Debian Jessie)
+en una notebook con procesador ``Intel(R) Core(TM) i3 CPU M 370 @ 2.40GHz''
+y 4GB de RAM % NOTA: son 4GB no 4GiB
+usando Python 3.4.2 y NodeJS 0.10.35 (ya que la versión 0.10.29 distribuida al
+momento con Debian Jessie tenía un bug que generaba un error de memoria al
+desserializar strings largos con \texttt{JSON.load}~%
+\footnote{\url{https://security-tracker.debian.org/tracker/CVE-2014-5256}}).
+
+De estas pruebas se desprenden las mediciones de las figuras%
+\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
+
+\begin{figure}
+
+    \caption{Cantidad de entradas versus tiempo de serialización y desserialización en Python}
+    \label{fig:ser-time-py}
+\end{figure}
+
+\begin{figure}
+
+    \caption{Cantidad de entradas versus tiempo de serialización y desserialización en Javascript (nodejs)}
+    \label{fig:ser-time-js}
+\end{figure}
+
+\begin{figure}
+
+    \caption{Cantidad de entradas versus tamaño del archivo serializado}
+    \label{fig:ser-size}
+\end{figure}
+
