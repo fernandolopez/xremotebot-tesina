@@ -29,8 +29,17 @@
 \usepackage[spanish,es-tabla,es-noquoting]{babel} % Idioma y codificación del texto
 \usepackage[utf8x]{inputenc} % Codificación del archivo
 \usepackage{hyperref}
-
-\hypersetup{ colorlinks=true }
+\hypersetup{%
+    colorlinks=true
+}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{%
+    /pgf/number format/use comma,
+    /pgf/number format/set thousands separator = {},
+}
+\usepackage[justification=centering]{caption}
+\usepackage{framed}
 
 %\usepackage{draftwatermark}
 %\SetWatermarkText{DRAFT}
@@ -40,6 +49,7 @@
 
 %% La tipografía tiene que soportar tildes, no todas lo hacen %%
 \usepackage{courier}    % Courier para tipografía monoespaciada
+\usepackage{lmodern}
 \usepackage[T1]{fontenc}
  
 %% Si se usa hyperref + utf8x para establecer el título, autor, etc... %%
