@@ -12,15 +12,15 @@ como protocolo, el método de serialización más adecuado parece ser JSON
 JSON cuenta con las siguientes características:
 
 \begin{enumerate}
-    \item Está estandarizado (ECMA-404 http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)
-        y (rfc http://tools.ietf.org/html/rfc7159) el último es una propuesta de estándar (http://www.rfc-editor.org/info/rfc7159)
+    \item Es un formato estandarizado por ECMA~\citep{ecma-404}
+        y está especificado por la rfc-7159~\citep{rfc-7159}.
     \item Soporta los tipos de datos necesarios para intercambiar mensajes con
         los datos necesarios para controlar los robots usando un nivel de
         abstracción adecuado.
     \item Al ser un formato de texto es simple analizar el tráfico entre los
         clientes y el servidor para detectar posibles errores.
-    \item Está soportado de forma nativa por los navegadores más utilizados
-        (http://caniuse.com/#search=json).
+    \item Está soportado de forma nativa por los navegadores más
+        utilizados%~\footnote{\url{http://caniuse.com/#search=json}}.
 \end{enumerate}
 
 Pero también existen otras alternativas cuyos objetivos son serialización
@@ -34,8 +34,10 @@ Algunas características de BSON y CBOR son:
     \item Son tan fáciles de usar como JSON.
     \item Ambos formatos proveen un superset de los tipos de datos provistos
         por JSON.
-    \item CBOR tiene una especificación propuestas como estándar (CBOR http://tools.ietf.org/html/rfc7049)
-    \item BSON tiene una especificación y una implementación bien conocida en MongoDB
+    \item CBOR está especificado por la rfc-7049~\citep{rfc-7049}.
+    \item BSON tiene una especificación informal pero cuenta una
+        implementación bien conocida siendo la representación de datos primaria en
+        MongoDB~\footnote{\url{http://bsonspec.org/}}.
     \item Por estar en formato binario decodificar una captura de tráfico
         para depurar un programa es más laborioso.
     \item En algunos casos estos formatos binarios generarán mensajes más
@@ -74,25 +76,22 @@ y 4GB de RAM % NOTA: son 4GB no 4GiB
 usando Python 3.4.2 y NodeJS 0.10.35 (ya que la versión 0.10.29 distribuida al
 momento con Debian Jessie tenía un bug que generaba un error de memoria al
 desserializar strings largos con \texttt{JSON.load}~%
-\footnote{\url{https://security-tracker.debian.org/tracker/CVE-2014-5256}}).
+%\footnote{\url{https://security-tracker.debian.org/tracker/CVE-2014-5256}}).
 
 De estas pruebas se desprenden las mediciones de las figuras%
 \ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
 
 \begin{figure}
-
     \caption{Cantidad de entradas versus tiempo de serialización y desserialización en Python}
     \label{fig:ser-time-py}
 \end{figure}
 
 \begin{figure}
-
     \caption{Cantidad de entradas versus tiempo de serialización y desserialización en Javascript (nodejs)}
     \label{fig:ser-time-js}
 \end{figure}
 
 \begin{figure}
-
     \caption{Cantidad de entradas versus tamaño del archivo serializado}
     \label{fig:ser-size}
 \end{figure}

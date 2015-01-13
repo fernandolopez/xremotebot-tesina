@@ -1,128 +1,78 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Classicthesis Typographic Thesis
-% LaTeX Template
-% Version 1.3 (15/2/14)
-%
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% Original author:
-% André Miede (http://www.miede.de)
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-% General Tips:
-% 1) Make sure to edit the classicthesis-config.file
-% 2) New enumeration (A., B., C., etc in small caps): \begin{aenumerate} \end{aenumerate}
-% 3) For margin notes: \marginpar or \graffito{}
-% 4) Do not use bold fonts in this style, it is designed around them
-% 5) Use tables as in the examples
-% 6) See classicthesis-preamble.sty for useful commands
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% -*- Mode:TeX -*-
 
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
+%% IMPORTANT: The official thesis specifications are available at:
+%%            http://libraries.mit.edu/archives/thesis-specs/
+%%
+%%            Please verify your thesis' formatting and copyright
+%%            assignment before submission.  If you notice any
+%%            discrepancies between these templates and the 
+%%            MIT Libraries' specs, please let us know
+%%            by e-mailing thesis@mit.edu
 
-\documentclass[
-		twoside,openright,titlepage,numbers=noenddot,headinclude,%1headlines,
-                footinclude=true,cleardoublepage=empty,
-                BCOR=5mm,paper=a4,fontsize=11pt, % Binding correction, paper type and font size
-                ngerman,american, % Languages
-                ]{scrreprt} 
-                
-% Includes the file which contains all the document configurations and packages - make sure to edit this file
-\input{classicthesis-config}
+%% The documentclass options along with the pagestyle can be used to generate
+%% a technical report, a draft copy, or a regular thesis.  You may need to
+%% re-specify the pagestyle after you \include  cover.tex.  For more
+%% information, see the first few lines of mitthesis.cls. 
+
+%\documentclass[12pt,vi,twoside]{mitthesis}
+%%
+%%  If you want your thesis copyright to you instead of MIT, use the
+%%  ``vi'' option, as above.
+%%
+%\documentclass[12pt,twoside,leftblank]{mitthesis}
+%%
+%% If you want blank pages before new chapters to be labelled ``This
+%% Page Intentionally Left Blank'', use the ``leftblank'' option, as
+%% above. 
+
+\documentclass[12pt,twoside]{mitthesis}
+\usepackage[spanish,es-tabla,es-noquoting]{babel} % Idioma y codificación del texto
+\usepackage[utf8x]{inputenc} % Codificación del archivo
+\usepackage{hyperref}
+
+\hypersetup{ colorlinks=true }
+
+%\usepackage{draftwatermark}
+%\SetWatermarkText{DRAFT}
+%\SetWatermarkScale{5}
+%\SetWatermarkColor[rgb]{0.97,0.97,0.97}
+
+
+%% La tipografía tiene que soportar tildes, no todas lo hacen %%
+\usepackage{courier}    % Courier para tipografía monoespaciada
+\usepackage[T1]{fontenc}
+ 
+%% Si se usa hyperref + utf8x para establecer el título, autor, etc... %%
+\PrerenderUnicode{á}
+\PrerenderUnicode{é}
+\PrerenderUnicode{í}
+\PrerenderUnicode{ó}
+\PrerenderUnicode{ú}
+\PrerenderUnicode{ñ}
+
+\usepackage{lgrind}
+%% These have been added at the request of the MIT Libraries, because
+%% some PDF conversions mess up the ligatures.  -LB, 1/22/2014
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+
+%% Citas con un formato más moderno
+\usepackage[square]{natbib}
+
+\pagestyle{plain}
 
 \begin{document}
 
-\frenchspacing % Reduces space after periods to make text more compact
-
-\raggedbottom % Makes all pages the height of the text on that page
-
-\selectlanguage{american} % Select your default language - e.g. american or ngerman
-
-%\renewcommand*{\bibname}{new name} % Uncomment to change the name of the bibliography
-%\setbibpreamble{} % Uncomment to include a preamble to the bibliography - some text before the reference list starts
-
-\pagenumbering{roman} % Roman page numbering prior to the start of the thesis content (i, ii, iii, etc)
-
-\pagestyle{plain} % Suppress headers for the pre-content pages
-
-%----------------------------------------------------------------------------------------
-%	PRE-CONTENT THESIS PAGES
-%----------------------------------------------------------------------------------------
-
-\include{FrontBackMatter/Titlepage} % Main title page
-
-\include{FrontBackMatter/Titleback} % Back of the title page
-
-\cleardoublepage\include{FrontBackMatter/Dedication} % Dedication page
-
-%\cleardoublepage\include{FrontBackMatter/Foreword} % Uncomment and create a Foreword.tex to include a foreword
-
-\cleardoublepage\include{FrontBackMatter/Abstract} % Abstract page
-
-\cleardoublepage\include{FrontBackMatter/Publication} % Publications from the thesis page
-
-\cleardoublepage\include{FrontBackMatter/Acknowledgments} % Acknowledgements page
-
-\pagestyle{scrheadings} % Show chapter titles as headings
-
-\cleardoublepage\include{FrontBackMatter/Contents} % Contents, list of figures/tables/listings and acronyms
-
-\cleardoublepage
-
-\pagenumbering{arabic} % Arabic page numbering for thesis content (1, 2, 3, etc)
-%\setcounter{page}{90} % Uncomment to manually start the page counter at an arbitrary value (for example if you wish to count the pre-content pages in the page count)
-
-\cleardoublepage % Avoids problems with pdfbookmark
-
-%----------------------------------------------------------------------------------------
-%	THESIS CONTENT - CHAPTERS
-%----------------------------------------------------------------------------------------
-
-\ctparttext{You can put some informational part preamble text here. Illo principalmente su nos. Non message \emph{occidental} angloromanic da. Debitas effortio simplificate sia se, auxiliar summarios da que, se avantiate publicationes via. Pan in terra summarios, capital interlingua se que. Al via multo esser specimen, campo responder que da. Le usate medical addresses pro, europa origine sanctificate nos se.} % Text on the Part 1 page describing  the content in Part 1
-
-\part{Some Kind of Manual} % First part of the thesis
-
-\include{Chapters/Chapter01} % Chapter 1
-
-\cleardoublepage % Empty page before the start of the next part
-
-%------------------------------------------------
-
-\ctparttext{You can put some informational part preamble text here. Illo principalmente su nos. Non message \emph{occidental} angloromanic da. Debitas effortio simplificate sia se, auxiliar summarios da que, se avantiate publicationes via. Pan in terra summarios, capital interlingua se que. Al via multo esser specimen, campo responder que da. Le usate medical addresses pro, europa origine sanctificate nos se.} % Text on the Part 2 page describing the content in Part 2
-
-\part{The Showcase} % Second part of the thesis
-
-\include{Chapters/Chapter02} % Chapter 2
-\include{Chapters/Chapter03} % Chapter 3
-%\include{Chapters/Chapter04} % Chapter 4 - empty template
-
-%----------------------------------------------------------------------------------------
-%	THESIS CONTENT - APPENDICES
-%----------------------------------------------------------------------------------------
-
+\include{cover}
+% Some departments (e.g. 5) require an additional signature page.  See
+% signature.tex for more information and uncomment the following line if
+% applicable.
+% \include{signature}
+\pagestyle{plain}
+\include{contents}
+\include{chap1}
 \appendix
-
-\part{Appendix} % New part of the thesis for the appendix
-
-\include{Chapters/Chapter0A} % Appendix A
-%\include{Chapters/Chapter0B} % Appendix B - empty template
-
-%----------------------------------------------------------------------------------------
-%	POST-CONTENT THESIS PAGES
-%----------------------------------------------------------------------------------------
-
-\cleardoublepage\include{FrontBackMatter/Bibliography} % Bibliography
-
-\cleardoublepage\include{FrontBackMatter/Colophon} % Colophon
-
-\cleardoublepage\include{FrontBackMatter/Declaration} % Declaration
-
-%----------------------------------------------------------------------------------------
-
+\include{contents/0a-serializacion}
+\include{biblio}
 \end{document}
+
