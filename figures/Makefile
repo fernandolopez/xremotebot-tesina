@@ -8,9 +8,11 @@ all: $(DOCUMENTS)
 
 %.svg: %.dia
 	dia -e $@ $<
-	sleep 10m
+
+diagrama_myro.pdf: diagrama_myro.svg
+	convert $< $@
 
 clean:
 	rm -f $(DOCUMENTS)
 
-.PHONY: clean
+.PHONY: clean all
