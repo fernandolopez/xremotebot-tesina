@@ -1,0 +1,129 @@
+\chapter{Arquitecturas}
+
+%El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
+%XRemotebot detallando las mejoras provistas por XRemotebot.
+
+Tanto Remotebot como XRemotebot tiene arquitecturas complejas que
+dependen de otras librerías y de software instalado en los robots,
+el objetivo de este capítulo es describir la interacción entre los
+distintos dispositivos y aplicaciones utilizadas, demarcando el límite
+entre el desarrollo realizado para esta tesina, XRemotebot, con el software ya
+existente con el que interactua.
+
+\section{Myro}\label{ch2:myro}
+
+Myro es la biblioteca utilizada para controlar a los robots ``Scribbler''
+desde un script Python, esta biblioteca puede interactuar con los robots de 2
+formas diferentes, a través de un cable serial (RS323) o bien usando bluetooth
+con RFCOMM. El funcionamiento de Myro requiere que el robot tenga
+cargado un firmware determinado que espera las instrucciones desde el puerto
+serial con el que cuenta el robot (el adaptador bluetooth se conecta en ese
+mismo puerto serial).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{figures/diagrama_myro}
+    \caption{Diagrama de bloques de Myro}
+    \label{fig:diagrama_myro}
+\end{figure}
+
+\section{Duinobot}\label{ch2:duinobot}
+
+La biblioteca de Python Duinobot desarrollada en conjunto entre un grupo
+de becarios del laboratorio LINTI de esta Facultad y la empresa RobotGroup
+cuenta con un modo de operación similar al de Myro, conectandose con
+los robots a través de un dongle XBee (que utiliza el protocolo ZigBee)
+conectado a través de un puerto USB con el dispositivo controlante.
+Para que esta biblioteca pueda controlar a los robots estos últimos
+deberán tener instalado también un firmware especial, en este caso
+es un una versión modificada de un firmware que implementa el protocolo
+Firmata de uso amplio para controlar dispositivos Arduino a través de una
+interfaz serial que habitualmente es el puerto USB, pero en este caso
+la interfaz serial está conectada a un dongle XBee en el robot, la interacción
+entre las distintas capas de software y hardware se ilustra en la
+figura~\ref{fig:funcionamiento_duinobot_diagrama}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.7\textwidth}
+        \includegraphics[width=.95\textwidth]{figures/diagrama_duinobot}
+        \subcaption{Diagrama de bloques de DuinoBot}
+        \label{fig:funcionamiento_duinobot_diagrama}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.29\textwidth}
+        \includegraphics[width=\textwidth]{figures/arquitectura_actual}
+        \subcaption{Esquema de conexión típico}
+        \label{fig:funcionamiento_duinobot_conexion}
+    \end{subfigure}
+    \caption{Funcionamiento de DuinoBot}
+    \label{fig:funcionamiento_duinobot}
+\end{figure}
+
+La modalidad de uso esperada con DuinoBot consiste en que cada usuario
+debe contar con una computadora, conectada por USB a un dongle XBee,
+y desde esa computadora puede controlar uno o más robots. Con esa modalidad
+fueron utilizados los robots en los cursos del proyecto
+``Programando con robots y software libre'' y en actividades similares
+planteadas posteriormente, generalmente además cada alumno controla
+un único robot, el esquema de conexión típico en estos cursos se encuentra
+ilustrado en la figura~\ref{fig:funcionamiento_duinobot_conexion}.
+
+\section{Remotebot}\label{ch2:remotebot}
+
+La versión original de Remotebot fue presentada como trabajo práctico
+de la materia Laboratorio de Software, este trabajo práctico consistía
+en una implementación en Java de una aplicación para dispositivos Android,
+el producto principal de este trabajo fue el cliente
+Remotebot4Android~\footnote{\url{https://github.com/fernandolopez/remotebot4Android}}
+pero adicionalmente fue necesario especificar un protocolo de comunicaciones
+y un servidor básico que atienda los requerimientos y se los envíe al
+robot, respondiendo también a peticiones de datos de los sensores del
+robot, ésta fue la primer implementación del servidor
+Remotebot~\footnote{\url{https://github.com/fernandolopez/remotebot}}
+en cuyo concepto está basado XRemotebot.
+
+Remotebot provee una API JSON a través de HTTP que permite controlar a los
+robots de forma local, si bien es posible poner el servicio público
+el mismo no cuenta con autenticación, no soporta bien la concurrencia
+y no provee ningún mecanismo de seguridad. La implementación del servidor
+usa el módulo ``SimpleHTTPServer'' de la biblioteca estándar de Python para
+proveer el soporte del protocolo HTTP e introspection para convertir los
+mensajes enviados por los clientes en invocaciones a métodos.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.78\textwidth}
+        \includegraphics[width=.95\textwidth]{figures/diagrama_remotebot}
+        \subcaption{Diagrama de bloques de Remotebot}
+        \label{fig:diagrama_remotebot}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/cliente_remotebot}
+        \subcaption{Cliente de Remotebot}
+        \label{fig:cliente_remotebot}
+    \end{subfigure}
+    \caption{Diagrama de bloques e imagen del cliente Remotebot}
+    \label{fig:diagrama_y_cliente_remotebot}
+\end{figure}
+
+Como se ve en la figura~\ref{fig:diagrama_remotebot} Remotebot utiliza la
+biblioteca DuinoBot para comunicarse con los robots y el cliente para el cuál
+fue diseñado es una aplicación Android que permite controlar los robots
+y ver los valores del sensor de distancia usando una interfaz con botones,
+además de poder controlar el robot usando los acelerómetros del dispositivo
+(inclinar el dispositivo en una dirección dada hace que el robot se mueva
+en esa dirección).
+
+\section{XRemotebot}\label{ch2:xremotebot}
+
+La interacción de XRemotebot a nivel arquitectura es idéntica a la de Remotebot
+con la salvedad que el primero además soporta robots Scribbler y puede ser
+ampliado para interactuar con otros robots, desde el punto de vista del cliente
+XRemotebot tiene varias diferencias, entre ellas la elección del protocolo,
+usandose Websockets en lugar de peticiones HTTP y la definición del protocolo
+de capa de aplicación que si bien es similar, ahora cuenta con un saludo y
+un paso de autenticación a través de una ``API key''.
+
+
+

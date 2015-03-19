@@ -6,245 +6,229 @@
 %% prompt when you run the file main.tex through LaTeX.
 \chapter{Introduction}
 
-Micro-optimization is a technique to reduce the overall operation count of
-floating point operations.  In a standard floating point unit, floating
-point operations are fairly high level, such as ``multiply'' and ``add'';
-in a micro floating point unit ($\mu$FPU), these have been broken down into
-their constituent low-level floating point operations on the mantissas and
-exponents of the floating point numbers.
+XRemotebot es un servidor Web que provee una API JSON para interactuar
+con robots didácticos de forma remota y compartiendo un único enlace
+físico con los robots. Está implementado en Python usando principalmente el
+framework web Tornado, SQLAlchemy para acceder a la base de datos, Celery
+para manejar las tareas que pueden generar una demora innecesaria en el
+procesamiento de requerimientos HTTP y los módulos DuinoBot y Myro para
+la comunicación con los robots. El cliente Javascript se encuentra
+integrado con el servidor y la intensión es que sea utilizado desde una
+vista web provista por el mismo, mientras que los clientes Python y Ruby
+son independientes y la intensión es que sean utilizados en programas
+tradicionales que se ejecuten desde fuera del navegador para enseñar
+a programar en estos lenguajes usando un entorno habitual. XRemotebot
+es un rediseño y una reescritura completa de Remotebot 1, un servidor
+simple realizado como aplicación auxiliar de una aplicación Android
+desarrollada
+como trabajo práctico para la materia Laboratorio de Software.
 
-Chapter two describes the architecture of the $\mu$FPU unit, and the
-motivations for the design decisions made.
+El capítulo 1 relata la motivación para el desarrollo de XRemotebot
+y alternativas similares en existencia en la actualidad.
 
-Chapter three describes the design of the compiler, as well as how the
-optimizations discussed in section~\ref{ch1:opts} were implemented.
+El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
+XRemotebot detallando las mejoras provistas por XRemotebot.
 
-Chapter four describes the purpose of test code that was compiled, and which
-statistics were gathered by running it through the simulator.  The purpose
-is to measure what effect the micro-optimizations had, compared to
-unoptimized code.  Possible future expansions to the project are also
-discussed.
+El capítulo 3 describe el protocolo de capa de aplicación diseñado para
+este servidor y las modalidades de operación del servidor.
 
-\section{Motivations for micro-optimization}
+El capítulo 4 describe la implementación de los clientes y el modo de uso
+de cada uno destacando algunas diferencias y desiciones de diseño en la
+implementación en Javascript.
 
-The idea of micro-optimization is motivated by the recent trends in computer
-architecture towards low-level parallelism and small, pipelineable
-instruction sets \cite{patterson:risc,rad83}.  By getting rid of more
-complex instructions and concentrating on optimizing frequently used
-instructions, substantial increases in performance were realized.
+El anexo A muestra las pruebas realizadas para seleccionar un método
+de serialización para el protocolo de capa de aplicación desarrollado.
 
-Another important motivation was the trend towards placing more of the
-burden of performance on the compiler.  Many of the new architectures depend
-on an intelligent, optimizing compiler in order to realize anywhere near
-their peak performance
-\cite{ellis:bulldog,pet87,coutant:precision-compilers}.  In these cases, the
-compiler not only is responsible for faithfully generating native code to
-match the source language, but also must be aware of instruction latencies,
-delayed branches, pipeline stages, and a multitude of other factors in order
-to generate fast code \cite{gib86}.
 
-Taking these ideas one step further, it seems that the floating point
-operations that are normally single, large instructions can be further broken
-down into smaller, simpler, faster instructions, with more control in the
-compiler and less in the hardware.  This is the idea behind a
-micro-optimizing FPU; break the floating point instructions down into their
-basic components and use a small, fast implementation, with a large part of
-the burden of hardware allocation and optimization shifted towards
-compile-time.
+\section{Motivación del diseño y desarrollo de XRemotebot}\label{ch1:motivacion}
 
-Along with the hardware speedups possible by using a $\mu$FPU, there are
-also optimizations that the compiler can perform on the code that is
-generated.  In a normal sequence of floating point operations, there are
-many hidden redundancies that can be eliminated by allowing the compiler to
-control the floating point operations down to their lowest level.  These
-optimizations are described in detail in section~\ref{ch1:opts}.
+Desde hace años desde la Secretaría de Extensión de la Facultad de Informática
+se brindan cursos de programación en Python para alumnos de escuelas
+secundarias utilizando robots didácticos, aunque se han utilizado a la fecha
+dos modelos distintos de robots en escencia las características principales
+de ambos son las mismas y coinciden con las de otros robots usados en la
+Argentina para enseñar a programar, a saber:
+\begin{itemize}
+    \item El medio de locomoción es con 2 motores continuos que mueven cada
+        uno una de las ruedas laterales.
+    \item Cuentan con algún sensor o sensores que permiten detectar obstáculos.
+    \item Cuentan con algún sensor o snesores que permiten detectar líneas.
+    \item Operan sin el uso de cables
+\end{itemize}
 
-\section{Description of micro-optimization}\label{ch1:opts}
+Cabe destacar sobre este último ítem que algunos de los robots no requieren
+cables para operar ya que son programados con anterioridad a través de un
+cable (usualmente USB o Serial) normalmente en algún lenguaje como C, Assembler
+o Basic. Pero los robots usados durante los cursos
+de Python no requieren cables ya que son controlados a través de señales
+inalámbricas lo que permite controlarlos en tiempo real y utilizando
+un intérprete Python estándar (cPython) instalado en el dispositivo
+controlante.
 
-In order to perform a sequence of floating point operations, a normal FPU
-performs many redundant internal shifts and normalizations in the process of
-performing a sequence of operations.  However, if a compiler can
-decompose the floating point operations it needs down to the lowest level,
-it then can optimize away many of these redundant operations.  
+Dado el costo y fragilidad de los robots habitualmente los alumnos interactúan
+con los mismos solamente en el aula, ya sea en su escuela si la misma tuvo
+el privilegio de adquirir los robots o en nuestra Facultad si el alumno
+realiza alguna pasantía en la misma. Esto tiene varias consecuencias:
+\begin{itemize}
+    \item El alumno al estar en una situación formal en la escuela
+        compartiendo el recurso límitado que es el robot con otros
+        alumnos posiblemente no tenga el tiempo o el ambiente más apropiado
+        para experimentar de forma lúdica con el robot.
+    \item La tarea para casa solamente es realizable a través de un simulador
+        que puede ser lo suficientemente completo y fiel como para aprender
+        a programar, pero resulta menos estimulante y realista que manipular
+        un robot real.
+    \item Alumnos de escuelas que no tienen los recursos necesarios para
+        adquirir el equipamento o de escuelas alejadas de la plata que
+        no tienen la posibilidad de realizar una pasantía en nuestra
+        Facultad no pueden interactuar con robots reales
+        (a lo sumo podrán usar un simulador).
+\end{itemize}
 
-If there is some additional hardware support specifically for
-micro-optimization, there are additional optimizations that can be
-performed.  This hardware support entails extra ``guard bits'' on the
-standard floating point formats, to allow several unnormalized operations to
-be performed in a row without the loss information\footnote{A description of
-the floating point format used is shown in figures~\ref{exponent-format}
-and~\ref{mantissa-format}.}.  A discussion of the mathematics behind
-unnormalized arithmetic is in appendix~\ref{unnorm-math}.
+Por otro lado los dongles XBee que permiten conectarse con los robots
+Multiplo N6
+son relativamente costosos, el esquema normal de conexionado entre dispositivos
+controladores y robots descripto en el capítulo~\ref{cha:arquitectura} requiere
+2 dogles XBee por robot, uno conectado directamente al robot y el otro
+conectado por USB al dispositivo controlante. En consecuencia:
+\begin{itemize}
+    \item El dispositivo controlante debe tener un puerto USB y los drivers
+        necesarios para detectar la interfaz serial con el XBee, esto deja
+        fuera de juego celulares y tablets.
+    \item El costo de operar cada robot en este esquema es sensiblemente
+        superior al costo que tendría si varios alumnos pudieran
+        controlar varios robots usando un solo dispositivo XBee compartido
+        entre varios dispositivos controlantes.
+\end{itemize}
 
-The optimizations that the compiler can perform fall into several categories:
+Tomando estos dos grupos de problemáticas intenté implementar una solución
+que permita
+superarlos de forma simultánea, esta solución permite controlar los
+robots a través de una red como puede ser Internet permitiendo a los alumnos
+conectarse a los robots desde sus hogares y a las instituciones a compartir
+el uso de sus robots. Por otro lado es posible también usar el servidor
+en un ámbito local deshabilitando la necesidad de requerir un login
+para poder compartir un solo dispositivo XBee entre varios alumnos.
 
-\subsection{Post Multiply Normalization}
+Como consecuencia de estos requerimientos quedaba claro que el servidor
+debía tener una interfaz web y proveer acceso concurrente con relativa
+baja latencia para permitir a múltiples alumnos acceder a múltiples robots
+al mismo tiempo. Tener un servidor web basado en protocolos estándar hizo
+que el requerimiento de que el cliente estuviera escrito en Python fuera
+artificial, lo que me hizo pensar en aprovechar la oportunidad para
+implementar otros clientes que permitieran usar los robots en cursos
+de programación de distintos lenguajes sin reimplementar el protocolo
+de bajo nivel, la falta de necesidad de acceder al hardware directamente
+por una interfaz serial a través del USB habilita a la posiblidad de
+implementar un cliente Javascript que se ejecute en un navegador web
+normal y el hecho de no requerir reimplementar el protocolo de bajo nivel
+habilita a que este servidor pueda ser fácilmente adaptado para controlar
+otros robots de naturaleza similar a los utilizados en los cursos ya
+descriptos.
 
-When more than two multiplications are performed in a row, the intermediate
-normalization of the results between multiplications can be eliminated.
-This is because with each multiplication, the mantissa can become
-denormalized by at most one bit.  If there are guard bits on the mantissas
-to prevent bits from ``falling off'' the end during multiplications, the
-normalization can be postponed until after a sequence of several
-multiplies\footnote{Using unnormalized numbers for math is not a new idea; a
-good example of it is the Control Data CDC 6600, designed by Seymour Cray.
-\cite{thornton:cdc6600} The CDC 6600 had all of its instructions performing
-unnormalized arithmetic, with a separate {\tt NORMALIZE} instruction.}.
+El servidor Remotebot original tenía algunas de estas características, pero
+estaba probremente implementado ya que no era más que una herramienta auxiliar
+para un cliente muy específico y era meramente un intermediario entre el
+cliente original implementado en Java y el módulo Duinobot. Este servidor
+estaba severamente limitado
+ya que no era configurable, no contaba con ninguna forma de visualizar a los
+robots de forma remota, no permitía autenticación, no disponía un sistema
+de reserva de robots por lo que un cliente podía interferir en la operación
+de un robot de otro cliente y las operaciones bloqueantes de un cliente
+impedían el uso de los robots al resto de los clientes hasta que esa operación
+terminase.
 
-% This is an example of how you would use tgrind to include an example
-% of source code; it is commented out in this template since the code
-% example file does not exist.  To use it, you need to remove the '%' on the
-% beginning of the line, and insert your own information in the call.
-%
-%\tagrind[htbp]{code/pmn.s.tex}{Post Multiply Normalization}{opt:pmn}
+\section{Alternativas similares a XRemotebot}
 
-As you can see, the intermediate results can be multiplied together, with no
-need for intermediate normalizations due to the guard bit.  It is only at
-the end of the operation that the normalization must be performed, in order
-to get it into a format suitable for storing in memory\footnote{Note that
-for purposed of clarity, the pipeline delays were considered to be 0, and
-the branches were not delayed.}.
+\subsection{Educabot}
 
-\subsection{Block Exponent}
+El proyecto Educabot tiene por objetivos enseñar tecnología a niños a través
+del uso, programación y construcción de robots.
 
-In a unoptimized sequence of additions, the sequence of operations is as
-follows for each pair of numbers ($m_1$,$e_1$) and ($m_2$,$e_2$).
-\begin{enumerate}
-  \item Compare $e_1$ and $e_2$.
-  \item Shift the mantissa associated with the smaller exponent $|e_1-e_2|$
-        places to the right.
-  \item Add $m_1$ and $m_2$.
-  \item Find the first one in the resulting mantissa.
-  \item Shift the resulting mantissa so that normalized
-  \item Adjust the exponent accordingly.
-\end{enumerate}
+En la parte de construcción este proyecto plantea un modelo de robot denominado
+``Rolo'' para los jóvenes de más de 10 años, mientras que para los más chicos
+se plantean actividades con el robot ``elBrian'' que consisten en programarlo
+a través de un lenguaje de programación visual usando bloques y también
+controlarlo a través de una interfaz web que muestra las imágenes emitidas
+por la cámara incorporada en este robot y además permite controlarlo con
+botones en pantalla que determinan en qué dirección debe moverse el robot.
+Las tecnologías utilizadas en la interfaz web de ``elBrian'' coinciden en gran
+parte con las utilizadas en el desarrollo de XRemotebot, pero el objetivo del
+servidor es controlar un único robot en un ambiente local y además este servidor
+se instala en el robot cuestión que sería imposible en los robots basados en
+microcontroladores AVR y Parallax a los que XRemotebot se encuentra dirigido.
 
-Out of 6 steps, only one is the actual addition, and the rest are involved
-in aligning the mantissas prior to the add, and then normalizing the result
-afterward.  In the block exponent optimization, the largest mantissa is
-found to start with, and all the mantissa's shifted before any additions
-take place.  Once the mantissas have been shifted, the additions can take
-place one after another\footnote{This requires that for n consecutive
-additions, there are $\log_{2}n$ high guard bits to prevent overflow.  In
-the $\mu$FPU, there are 3 guard bits, making up to 8 consecutive additions
-possible.}.  An example of the Block Exponent optimization on the expression
-X = A + B + C is given in figure~\ref{opt:be}.
+El servidor web de ``elBrian'' está implementado usando el framework Tornado,
+Websockets, mjpg-streamer, opencv y JSON. El mismo está diseñado para ejecutarse
+en el robot ya que el mismo está basado en una placa RaspberryPi, la cuál
+cuenta con un procesador ARM perfectamente capaz de ejecutar un sistema
+operativo completo como GNU/Linux y de soportar el intérprete oficial de Python.
 
-% This is an example of how you would use tgrind to include an example
-% of source code; it is commented out in this template since the code
-% example file does not exist.  To use it, you need to remove the '%' on the
-% beginning of the line, and insert your own information in the call.
-%
-%\tgrind[htbp]{code/be.s.tex}{Block Exponent}{opt:be}
+Mientras que este servidor coincide en gran medida en la elección de lenguaje
+y bibliotecas utilizadas su implementación es específica para el robot ``elBrian''
+y no podría ser portada para robots con menores capacidades de procesamiento
+sin una reescritura significativa. Además el protocolo utilizado no contempla
+el acceso a valores de sensores, los únicos mensajes que permite enviar
+al robot son movimientos.
 
-\section{Integer optimizations}
+\begin{itemize}
+    \item Educabot \url{http://www.educabot.org/}
+    \item Código fuente de ``elBrian'' \url{https://github.com/educabot/elBraian}
+\end{itemize}
 
-As well as the floating point optimizations described above, there are
-also integer optimizations that can be used in the $\mu$FPU.  In concert
-with the floating point optimizations, these can provide a significant
-speedup.  
+\subsection{Gobot con cppp-io}
 
-\subsection{Conversion to fixed point}
+Gobot es una biblioteca que permite controlar robots programando en el lenguaje
+Go, esta biblioteca soporta el protocolo Firmata para controlar robots
+conectados directamente a través de una interfaz serial, como es el caso
+de los robots Multiplo N6, y soporta la API cppp-io que define una API JSON
+que permite el acceso a la información y control de robots a través de la Web.
 
-Integer operations are much faster than floating point operations; if it is
-possible to replace floating point operations with fixed point operations,
-this would provide a significant increase in speed.
+Gobot además tiene compatibilidad con distintos sensores y robots, además de
+placas utilizadas normalmente en la construcción de robots como Arduino,
+Raspberry Pi, Intel Edison y Beaglebone Black.
 
-This conversion can either take place automatically or or based on a
-specific request from the programmer.  To do this automatically, the
-compiler must either be very smart, or play fast and loose with the accuracy
-and precision of the programmer's variables.  To be ``smart'', the computer
-must track the ranges of all the floating point variables through the
-program, and then see if there are any potential candidates for conversion
-to floating point.  This technique is discussed further in
-section~\ref{range-tracking}, where it was implemented.
+Este proyecto es interesante como base para desarrollar algún proyecto
+similar a XRemotebot en Go, pero requeriría además la reimplementación
+del módulo de Python DuinoBot que controla, a través de una versión
+modificada del protocolo Firmata, a los robots Multiplo N6 y por otro
+lado los robots Scribbler tampoco aparecen en la lista de robots soportados.
 
-The other way to do this is to rely on specific hints from the programmer
-that a certain value will only assume a specific range, and that only a
-specific precision is desired.  This is somewhat more taxing on the
-programmer, in that he has to know the ranges that his values will take at
-declaration time (something normally abstracted away), but it does provide
-the opportunity for fine-tuning already working code.
+\begin{itemize}
+    \item Gobot \url{http://gobot.io}
+    \item Especificación de cppp-io \url{https://github.com/hybridgroup/cppp-io/}
+\end{itemize}
 
-Potential applications of this would be simulation programs, where the
-variable represents some physical quantity; the constraints of the physical
-system may provide bounds on the range the variable can take.
-\subsection{Small Constant Multiplications}
+\subsection{Tele Toyland}
 
-One other class of optimizations that can be done is to replace
-multiplications by small integer constants into some combination of
-additions and shifts.  Addition and shifting can be significantly faster
-than multiplication.  This is done by using some combination of
-\begin{eqnarray*}
-a_i & = & a_j + a_k \\
-a_i & = & 2a_j + a_k \\
-a_i & = & 4a_j + a_k \\
-a_i & = & 8a_j + a_k \\
-a_i & = & a_j - a_k \\
-a_i & = & a_j \ll m \mbox{shift}
-\end{eqnarray*}
-instead of the multiplication.  For example, to multiply $s$ by 10 and store
-the result in $r$, you could use:
-\begin{eqnarray*}
-r & = & 4s + s\\
-r & = & r + r
-\end{eqnarray*}
-Or by 59:
-\begin{eqnarray*}
-t & = & 2s + s \\
-r & = & 2t + s \\
-r & = & 8r + t
-\end{eqnarray*}
-Similar combinations can be found for almost all of the smaller
-integers\footnote{This optimization is only an ``optimization'', of course,
-when the amount of time spent on the shifts and adds is less than the time
-that would be spent doing the multiplication.  Since the time costs of these
-operations are known to the compiler in order for it to do scheduling, it is
-easy for the compiler to determine when this optimization is worth using.}.
-\cite{magenheimer:precision}
+Este sitio provee acceso a varios dispositivos a través de una interfaz web,
+por ejemplo es posible controlar un cabezal con una punta que dibuja sobre
+una caja de arena, basta con hacer clic sobre las posiciones sobre las cuales
+se quiere que pase la punta y presionar el botón ``go'' para que el cabezal
+empiece a moverse dibujando lo pedido, en este y el resto de los experimentos
+disponibles en el sitio los resultados se pueden ver a través de un streaming
+de video.
 
-\section{Other optimizations}
+El sitio no provee detalles del software, ni el protocolo utilizado.
 
-\subsection{Low-level parallelism}
+\begin{itemize}
+    \item \url{http://www.teletoyland.com}
+\end{itemize}
 
-The current trend is towards duplicating hardware at the lowest level to
-provide parallelism\footnote{This can been seen in the i860; floating point
-additions and multiplications can proceed at the same time, and the RISC
-core be moving data in and out of the floating point registers and providing
-flow control at the same time the floating point units are active. \cite{byte:i860}}
-
-Conceptually, it is easy to take advantage to low-level parallelism in the
-instruction stream by simply adding more functional units to the $\mu$FPU,
-widening the instruction word to control them, and then scheduling as many
-operations to take place at one time as possible.
-
-However, simply adding more functional units can only be done so many times;
-there is only a limited amount of parallelism directly available in the
-instruction stream, and without it, much of the extra resources will go to
-waste.  One process used to make more instructions potentially schedulable
-at any given time is ``trace scheduling''.  This technique originated in the
-Bulldog compiler for the original VLIW machine, the ELI-512.
-\cite{ellis:bulldog,colwell:vliw}  In trace scheduling, code can be
-scheduled through many basic blocks at one time, following a single
-potential ``trace'' of program execution.  In this way, instructions that
-{\em might\/} be executed depending on a conditional branch further down in
-the instruction stream are scheduled, allowing an increase in the potential
-parallelism.  To account for the cases where the expected branch wasn't
-taken, correction code is inserted after the branches to undo the effects of
-any prematurely executed instructions.
-
-\subsection{Pipeline optimizations}
-
-In addition to having operations going on in parallel across functional
-units, it is also typical to have several operations in various stages of
-completion in each unit.  This pipelining allows the throughput of the
-functional units to be increased, with no increase in latency.
-
-There are several ways pipelined operations can be optimized.  On the
-hardware side, support can be added to allow data to be recirculated back
-into the beginning of the pipeline from the end, saving a trip through the
-registers.  On the software side, the compiler can utilize several tricks to
-try to fill up as many of the pipeline delay slots as possible, as
-seendescribed by Gibbons. \cite{gib86}
-
+% FIXME
+%\subsection{}
+%http://www3.uji.es/~pnebot/Files/Articuls/RemoteProgramming.pdf
+%Otro
+%http://telerobot.mech.uwa.edu.au/Telerobot/instructions.html
+\subsection{DIY}
+% www.linuxuser.co.uk/tutorials/control-your-raspberry-pi-robot-from-a-web-connected-device
+Finalmente en la consigna de ``do it yourself'' existen diversas guias para
+programar servidores que permitan controlar robots o microcontroladores
+en general, se puede encontrar un caso muy bien explicado en el sitio
+de Adafruit~\url{https://learn.adafruit.com/wifi-controlled-mobile-robot/building-the-web-interface},
+este es un buen ejercicio de programación, sobre todo para aprender a
+programar servidores que provean una API web y clientes que la consuman. Sin
+embargo estas guías son introductorias y el objetivo es crear un servidor
+muy simple, similar a lo que fue el servidor Remotebot, pensados para ser
+usados en un ambiente local ya que no proveen autenticación en general.
 
