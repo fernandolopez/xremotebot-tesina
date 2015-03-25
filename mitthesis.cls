@@ -450,32 +450,21 @@ reserved.\par\permission}}
 \def\maketitle{\begin{titlepage}
 \large
 {\def\baselinestretch{1.2}\Large\bf \choosecase{\@title} \par}
-by\par
+{\large Tesis de grado de la Licenciatura en Inform\'atica}
+por\par
 {\Large  \choosecase{\@author}}
-\par
-\@prevdegrees
-\par
-\choosecase{Submitted to the} \choosecase{\@department} \\
-\choosecase{in partial fulfillment of the requirements for the}
-\choosecase{\@degreeword} 
-\choosecase{of}
 \par
 \choosecase{\@degree}
 \par
-at the
-\par\MIT\par
-\@degreemonth\ \@degreeyear
-\par
-\@copyrightnotice
+\@degreeyear
 \par
 \vskip 3\baselineskip
-\signature{Author}{\@department \\ \@thesisdate}
 \par
 \vfill
-\unvbox\@titlesupervisor
-\par
-\vfill
-\signature{Accepted by}{\@chairmanname \\ \@chairmantitle}
+{\Large
+\raggedleft{Directora}\hfill \raggedright{Claudia Banchoff (Licenciada en Inform\'atica)}
+
+\raggedleft{Directora}\hfill \raggedright{Claudia Queiruga (Licenciada en Inform\'atica)}}
 \vfill
 \end{titlepage}}
 
@@ -484,14 +473,8 @@ at the
 % basic abstract environment
 \def\abstractpage{\cleardoublepage
 \begin{center}{\large{\bf \@title} \\
-by \\
+por \\
 \@author \\[\baselineskip]}
-\par
-\def\baselinestretch{1}\@normalsize
-Submitted to the \@department \\
-on \@thesisdate, in partial fulfillment of the \\
-requirements for the \@degreeword\ of \\
-\@degree
 \end{center}
 \par
 \begin{abstract}}
@@ -500,7 +483,7 @@ requirements for the \@degreeword\ of \\
 %% page.
 %% Krishna Sethuraman (1990)
 \def\endabstractpage{\end{abstract}\noindent
- \unvcopy\@abstractsupervisor \newpage}
+\newpage}
 
 %% This counter is used to save the page number for the second copy of
 %% the abstract.
@@ -518,9 +501,6 @@ requirements for the \@degreeword\ of \\
 % The \kern0pt pushes any depth into the height.  Thanks to Richard Stone.
 \def\endtitlepage{\par\kern 0pt\egroup\vss\egroup\newpage}
 
-\def\MIT{MASSACHUSETTS INSTITUTE OF TECHNOLOGY}
-\def\Mit{Massachusetts Institute of Technology}
-
 \def\permission{\par\noindent{\centering
    The author hereby grants to MIT permission to reproduce and to
    distribute publicly paper and electronic copies of this thesis
@@ -530,6 +510,6 @@ requirements for the \@degreeword\ of \\
 \def\signature#1#2{\par\noindent#1\dotfill\null\\*
   {\raggedleft #2\par}}
 
-\def\abstract{\subsection*{Abstract}\small\def\baselinestretch{1}\@normalsize}
+\def\abstract{\subsection*{Resumen}\small\def\baselinestretch{1}\@normalsize}
 \def\endabstract{\par}
 

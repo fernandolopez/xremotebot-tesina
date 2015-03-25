@@ -1,0 +1,36 @@
+\chapter*{Prólogo}\label{prologo}
+
+XRemotebot es un servidor web que provee una API JSON para interactuar
+con robots didácticos de forma remota y compartiendo un único enlace
+físico con los robots. Está implementado en Python usando principalmente el
+framework web Tornado, SQLAlchemy para acceder a la base de datos, Celery
+para manejar las tareas que pueden generar una demora innecesaria en el
+procesamiento de requerimientos HTTP y los módulos DuinoBot y Myro para
+la comunicación con los robots. El cliente Javascript se encuentra
+integrado con el servidor y la intensión es que sea utilizado desde una
+vista web provista por el mismo, mientras que los clientes Python y Ruby
+son independientes y la intensión es que sean utilizados en programas
+tradicionales que se ejecuten desde fuera del navegador para enseñar
+a programar en estos lenguajes usando un entorno habitual. XRemotebot
+es un rediseño y una reescritura completa de Remotebot 1, un servidor
+simple realizado como aplicación auxiliar de una aplicación Android
+desarrollada
+como trabajo práctico para la materia Laboratorio de Software.
+
+El capítulo 1 relata la motivación para el desarrollo de XRemotebot
+y alternativas similares en existencia en la actualidad.
+
+El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
+XRemotebot detallando las mejoras provistas por XRemotebot.
+
+El capítulo 3 describe el protocolo de capa de aplicación diseñado para
+este servidor y las modalidades de operación del servidor.
+
+El capítulo 4 describe la implementación de los clientes y el modo de uso
+de cada uno destacando algunas diferencias y decisiones de diseño en la
+implementación en Javascript.
+
+El anexo A muestra las pruebas realizadas para seleccionar un método
+de serialización para el protocolo de capa de aplicación desarrollado.
+
+

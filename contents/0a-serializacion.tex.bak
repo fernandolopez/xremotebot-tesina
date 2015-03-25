@@ -24,7 +24,7 @@ JSON cuenta con las siguientes características:
 \end{enumerate}
 
 Pero también existen otras alternativas cuyos objetivos son serialización
-y desserialización rápida, y datos serializados más compactos
+y deserialización rápida, y datos serializados más compactos
 como BSON (Binary JSON) y (CBOR Concise Binary Object Representation).
 
 Algunas características de BSON y CBOR son:
@@ -76,7 +76,7 @@ y 4GB de RAM % NOTA: son 4GB no 4GiB
 usando Python 3.4.2 y NodeJS 0.10.35~\footnote{Se usó NodeJS 0.10.35 ya que
 la versión 0.10.29 distribuida al momento con Debian Jessie tenía un bug que
 generaba un error de memoria al
-desserializar strings largos con \texttt{JSON.load} (CVE-2014-5256)}
+deserializar strings largos con \texttt{JSON.load} (CVE-2014-5256)}
 
 De estas pruebas se desprenden las mediciones de las
 figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
@@ -114,7 +114,7 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
         \end{tikzpicture}
     \end{framed}
 
-    \caption{Cantidad de entradas versus tiempo de serialización y desserialización en Python}
+    \caption{Cantidad de entradas versus tiempo de serialización y deserialización en Python}
     \label{fig:ser-time-py}
 \end{figure}
 
@@ -150,7 +150,7 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
             \end{axis}
         \end{tikzpicture}
     \end{framed}
-    \caption{Cantidad de entradas versus tiempo de serialización y desserialización en Javascript (nodejs)}
+    \caption{Cantidad de entradas versus tiempo de serialización y deserialización en Javascript (nodejs)}
     \label{fig:ser-time-js}
 \end{figure}
 
@@ -189,3 +189,23 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
     \label{fig:ser-size}
 \end{figure}
 
+De la figura~\ref{fig:ser-size} se desprende que los distintos métodos de
+serialización no ofrecen diferencias significativas en el tamaño de los
+strings generados para los volumenes de datos probados. Por otro lado
+se puede observar en la figura~\ref{fig-ser-time-py} que al menos en
+Python y con la librería usada CBOR tiene los mejores tiempos, sin
+embargo en las pruebas con Javascript en la figura~\ref{fig:ser-time-js}
+se puede observar que los mejores tiempos son para el formato JSON,
+esto es entendible ya que este es el único formato procesado de forma
+nativa~\footnote{Si bien es posible encontrar parsers nativos para los
+otros formatos y usarlos desde NodeJS no se utilizó esta modalidad porque
+no sería una prueba realista dado que los motores Javascript de los
+navegadores no permiten esto.}.
+
+Teniendo en cuenta que las diferencias de tiempo al procesar los datos
+en Python son, en comparación con la versión en Javascript, marginales
+(apenas alrededor de $0.25$ segundos para $2^{14}$
+entradas entre el mejor y peor tiempo de deserialización) y las diferencias
+en cuanto a tamaño del string generado al
+serializar también son pequeñas (aproximadamente 2MiB de diferencia para
+$2^{14}$ entradas entre el mejor y el peor método

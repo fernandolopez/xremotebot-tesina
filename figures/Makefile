@@ -1,18 +1,15 @@
 DOCUMENTS=$(patsubst %.svg,%.pdf,$(wildcard *.svg))
-DOCUMENTS+=$(patsubst %.dia,%.pdf,$(wildcard *.dia))
+EPS=$(patsubst %.dia,%.eps,$(wildcard *.dia))
 
-all: $(DOCUMENTS)
+all: $(DOCUMENTS) $(EPS)
 
 %.pdf: %.svg
-	inkscape -z $< -A $@
+	inkscape -z -A $@ $<
 
-%.svg: %.dia
+%.eps: %.dia
 	dia -e $@ $<
 
-diagrama_myro.pdf: diagrama_myro.svg
-	convert $< $@
-
 clean:
-	rm -f $(DOCUMENTS)
+	rm -f $(DOCUMENTS) $(EPS)
 
 .PHONY: clean all

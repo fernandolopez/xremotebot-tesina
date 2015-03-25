@@ -1,20 +1,22 @@
-\chapter{Arquitecturas}
+\chapter{Arquitecturas}\label{ch2}
 
 %El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
 %XRemotebot detallando las mejoras provistas por XRemotebot.
 
-Tanto Remotebot como XRemotebot tiene arquitecturas complejas que
+% FIXME: QUIZAS ESTE CAPITULO PODRÍA IR ANTES DEL ANTERIOR... YA QUE SEGURAMENTE VAS A NOMBRAR Y DESCRIBIR VARIAS COSAS QUE LUEGO NOMBRAS ALLÁ... FIJATE
+
+Tanto Remotebot como XRemotebot tienen arquitecturas complejas que
 dependen de otras librerías y de software instalado en los robots,
 el objetivo de este capítulo es describir la interacción entre los
 distintos dispositivos y aplicaciones utilizadas, demarcando el límite
 entre el desarrollo realizado para esta tesina, XRemotebot, con el software ya
-existente con el que interactua.
+existente con el que interactúa.
 
 \section{Myro}\label{ch2:myro}
 
-Myro es la biblioteca utilizada para controlar a los robots ``Scribbler''
-desde un script Python, esta biblioteca puede interactuar con los robots de 2
-formas diferentes, a través de un cable serial (RS323) o bien usando bluetooth
+Myro [REF] es la biblioteca utilizada para controlar a los robots ``Scribbler''
+desde un script Python. Esta biblioteca puede interactuar con los robots de 2
+formas diferentes: a través de un cable serial (RS323) o bien usando bluetooth
 con RFCOMM. El funcionamiento de Myro requiere que el robot tenga
 cargado un firmware determinado que espera las instrucciones desde el puerto
 serial con el que cuenta el robot (el adaptador bluetooth se conecta en ese
@@ -27,15 +29,19 @@ mismo puerto serial).
     \label{fig:diagrama_myro}
 \end{figure}
 
-\section{Duinobot}\label{ch2:duinobot}
+La figura~\ref{fig:diagrama_myro} muestra la interacción entre los componentes
+más importantes de software y hardware desde el script del usuario hasta el
+robot.
 
-La biblioteca de Python Duinobot desarrollada en conjunto entre un grupo
+\section{DuinoBot}\label{ch2:duinobot}
+
+La biblioteca de Python DuinoBot [REF] desarrollada en conjunto entre un grupo
 de becarios del laboratorio LINTI de esta Facultad y la empresa RobotGroup
-cuenta con un modo de operación similar al de Myro, conectandose con
+cuenta con un modo de operación similar al de Myro, conectándose con
 los robots a través de un dongle XBee (que utiliza el protocolo ZigBee)
 conectado a través de un puerto USB con el dispositivo controlante.
 Para que esta biblioteca pueda controlar a los robots estos últimos
-deberán tener instalado también un firmware especial, en este caso
+deberán tener instalado también un firmware especial: en este caso,
 es un una versión modificada de un firmware que implementa el protocolo
 Firmata de uso amplio para controlar dispositivos Arduino a través de una
 interfaz serial que habitualmente es el puerto USB, pero en este caso
@@ -71,11 +77,16 @@ ilustrado en la figura~\ref{fig:funcionamiento_duinobot_conexion}.
 \section{Remotebot}\label{ch2:remotebot}
 
 La versión original de Remotebot fue presentada como trabajo práctico
-de la materia Laboratorio de Software, este trabajo práctico consistía
-en una implementación en Java de una aplicación para dispositivos Android,
-el producto principal de este trabajo fue el cliente
-Remotebot4Android~\footnote{\url{https://github.com/fernandolopez/remotebot4Android}}
-pero adicionalmente fue necesario especificar un protocolo de comunicaciones
+de la materia Laboratorio de Software
+% FIXME:REF A LA PRESENTACION QUE HICISTE EN LA CLASE.... CREO QUE ESTA EN EL SITIO DE LA MATERIA NO? YO LA TENIA YA QUE LA MOSTRE EN PROYECTO COMO UN EJEMPLO DE USO DE JSON :)], 
+
+este trabajo práctico consistía
+en una implementación en Java de una aplicación para dispositivos Android. 
+
+% FIXME: REDACTAR MEJOR ESTE PARRAFO
+
+El producto principal de este trabajo fue el cliente
+Remotebot4Android~\footnote{\url{https://github.com/fernandolopez/remotebot4Android}}. Además del cliente, se desarrolló un protocolo protocolo de comunicaciones
 y un servidor básico que atienda los requerimientos y se los envíe al
 robot, respondiendo también a peticiones de datos de los sensores del
 robot, ésta fue la primer implementación del servidor
@@ -83,7 +94,7 @@ Remotebot~\footnote{\url{https://github.com/fernandolopez/remotebot}}
 en cuyo concepto está basado XRemotebot.
 
 Remotebot provee una API JSON a través de HTTP que permite controlar a los
-robots de forma local, si bien es posible poner el servicio público
+robots de forma local. Si bien es posible poner el servicio público,
 el mismo no cuenta con autenticación, no soporta bien la concurrencia
 y no provee ningún mecanismo de seguridad. La implementación del servidor
 usa el módulo ``SimpleHTTPServer'' de la biblioteca estándar de Python para
@@ -117,11 +128,11 @@ en esa dirección).
 
 \section{XRemotebot}\label{ch2:xremotebot}
 
-La interacción de XRemotebot a nivel arquitectura es idéntica a la de Remotebot
-con la salvedad que el primero además soporta robots Scribbler y puede ser
-ampliado para interactuar con otros robots, desde el punto de vista del cliente
+La interacción de XRemotebot a nivel arquitectura es muy similar a la provista por Remotebot,
+con la salvedad que el primero, además soporta robots Scribbler y puede ser
+ampliado para interactuar con otros robots. Desde el punto de vista del cliente
 XRemotebot tiene varias diferencias, entre ellas la elección del protocolo,
-usandose Websockets en lugar de peticiones HTTP y la definición del protocolo
+usándose Websockets en lugar de peticiones HTTP y la definición del protocolo
 de capa de aplicación que si bien es similar, ahora cuenta con un saludo y
 un paso de autenticación a través de una ``API key''.
 

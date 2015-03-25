@@ -1,0 +1,33 @@
+% El capítulo 4 describe la implementación de los clientes y el modo de uso
+% de cada uno destacando algunas diferencias y decisiones de diseño en la
+% implementación en Javascript.
+
+\chapter{Implementación de los clientes}\label{ch4}
+
+\section{Cliente Python}\label{ch4:python}
+\section{Cliente Ruby}\label{ch4:ruby}
+\section{Cliente Javascript}\label{ch4:javascript}
+
+Como se mencionó con anterioridad, gran parte de las decisiones de diseño de XRemoteBot
+se hicieron para permitir la implementación de un cliente Javascript, pero dado el hecho
+de que Javascript dentro del entorno de un navegador Web se comporta de forma asincrónica
+no fue posible implementar un cliente Javascript cuyo uso se asemeje al de la biblioteca
+de Python DuinoBot.
+
+Para ilustrar esta problemática se puede tomar en consideración el script de la
+figura~\ref{lst:duinobot_ejemplo}
+típico hecho usando DuinoBot en Python y analizar los inconvenientes para replicar
+algo similar en Javascript.
+
+\begin{figure}
+    \begin{lstlisting}[language=Python,numbers=left]
+from duinobot import *
+b = Board()
+r = Robot(b, 10)
+r.forward(100, 1)
+r.backward(50, 2)
+print(r.getObstacle())
+    \end{lstlisting}
+    \caption{Ejemplo típico usando DuinoBot}
+    \label{lst:duinobot_ejemplo}
+\end{figure}

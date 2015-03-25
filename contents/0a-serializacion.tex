@@ -24,7 +24,7 @@ JSON cuenta con las siguientes características:
 \end{enumerate}
 
 Pero también existen otras alternativas cuyos objetivos son serialización
-y deserialización rápida, y datos serializados más compactos
+y de-serialización rápida, y datos serializados más compactos
 como BSON (Binary JSON) y (CBOR Concise Binary Object Representation).
 
 Algunas características de BSON y CBOR son:
@@ -54,7 +54,7 @@ numérico, 5 strings, 5 objetos (cada uno con una entrada numérica) y 5
 arrays (cada uno con 2 entradas de tipo string).
 
 Estos archivos se cargaron desde scripts similares en Python y Javascript que
-desserializaron y serializaron estos datos repetidas veces calculando el tiempo
+de-serializaron y serializaron estos datos repetidas veces calculando el tiempo
 promedio que llevó hacer cada una de estas acciones para cada formato.
 
 Se eligió hacer las pruebas con Python y Javascript porque el primero es el
