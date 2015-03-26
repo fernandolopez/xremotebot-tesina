@@ -8,3 +8,7 @@
 *.bbl
 *.blg
 *.lof
+*.lol
+*.pdf
+*.bak
+*.eps

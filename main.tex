@@ -64,6 +64,23 @@
 \PrerenderUnicode{ú}
 \PrerenderUnicode{ñ}
 
+%% Los listings precisan parámetros especiales, sino puede fallar la generación del PDF %%
+\lstset{
+    numbers=left,
+    captionpos=b,
+    basicstyle=\ttfamily\footnotesize,
+    extendedchars=true,
+    inputencoding=utf8x,
+    literate={á}{{\'a}}1
+          {é}{{\'e}}1
+          {í}{{\'i}}1
+          {ó}{{\'o}}1
+          {ú}{{\'u}}1
+          {ñ}{{\~n}}1
+}
+\renewcommand{\lstlistingname}{Código}
+\renewcommand\lstlistlistingname{Índice de códigos}
+
 \usepackage{lgrind}
 %% These have been added at the request of the MIT Libraries, because
 %% some PDF conversions mess up the ligatures.  -LB, 1/22/2014
