@@ -1,15 +1,15 @@
 \chapter{Arquitecturas}\label{ch2}
 
 %El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
-%XRemotebot detallando las mejoras provistas por XRemotebot.
+%XRemoteBot detallando las mejoras provistas por XRemoteBot.
 
 % FIXME: QUIZAS ESTE CAPITULO PODRÍA IR ANTES DEL ANTERIOR... YA QUE SEGURAMENTE VAS A NOMBRAR Y DESCRIBIR VARIAS COSAS QUE LUEGO NOMBRAS ALLÁ... FIJATE
 
-Tanto Remotebot como XRemotebot tienen arquitecturas complejas que
+Tanto Remotebot como XRemoteBot tienen arquitecturas complejas que
 dependen de otras librerías y de software instalado en los robots,
 el objetivo de este capítulo es describir la interacción entre los
 distintos dispositivos y aplicaciones utilizadas, demarcando el límite
-entre el desarrollo realizado para esta tesina, XRemotebot, con el software ya
+entre el desarrollo realizado para esta tesina, XRemoteBot, con el software ya
 existente con el que interactúa.
 
 \section{Myro}\label{ch2:myro}
@@ -91,7 +91,7 @@ y un servidor básico que atienda los requerimientos y se los envíe al
 robot, respondiendo también a peticiones de datos de los sensores del
 robot, ésta fue la primer implementación del servidor
 Remotebot~\footnote{\url{https://github.com/fernandolopez/remotebot}}
-en cuyo concepto está basado XRemotebot.
+en cuyo concepto está basado XRemoteBot.
 
 Remotebot provee una API JSON a través de HTTP que permite controlar a los
 robots de forma local. Si bien es posible poner el servicio público,
@@ -126,12 +126,12 @@ además de poder controlar el robot usando los acelerómetros del dispositivo
 (inclinar el dispositivo en una dirección dada hace que el robot se mueva
 en esa dirección).
 
-\section{XRemotebot}\label{ch2:xremotebot}
+\section{XRemoteBot}\label{ch2:xremotebot}
 
-La interacción de XRemotebot a nivel arquitectura es muy similar a la provista por Remotebot,
+La interacción de XRemoteBot a nivel arquitectura es muy similar a la provista por Remotebot,
 con la salvedad que el primero, además soporta robots Scribbler y puede ser
 ampliado para interactuar con otros robots. Desde el punto de vista del cliente
-XRemotebot tiene varias diferencias, entre ellas la elección del protocolo,
+XRemoteBot tiene varias diferencias, entre ellas la elección del protocolo,
 usándose Websockets en lugar de peticiones HTTP y la definición del protocolo
 de capa de aplicación que si bien es similar, ahora cuenta con un saludo y
 un paso de autenticación a través de una ``API key''.

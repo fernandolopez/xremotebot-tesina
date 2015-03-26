@@ -18,14 +18,18 @@ usando la biblioteca DuinoBot y por otro lado provee un alto grado de
 flexibilidad a la hora de agregar nuevos tipos de mensajes a la API sin
 necesidad de reescribir grandes porciones de código.
 
-Con la misma idea de hacer un mapeo directo entre los mensajes de la API
-y la idea de mensaje en el paradigma orientado a objetos, luego de ejecutar
-el método asociado con el mensaje recibido, en los lenguajes orientados a
-objetos más populares un objeto puede retornar un valor de respuesta o fallar
-con una excepción, por esto el servidor cuenta con 2 tipos de respuesta
-``value'' que retorna el valor de respuesta al mensaje recibido y
+En algunos de los lenguajes orientados a objetos más populares como Python
+o Ruby al ejecutar un método pueden ocurrir básicamente dos cosas:
+se puede obtener un valor de resultado o bien un error
+en tiempo de ejecución en la forma de una excepción. Para modelar este
+comportamiento el servidor XRemoteBot cuenta con dos tipos de mensajes
+de respuesta:
+``value'' que retorna el valor resultante de ejecutar el método invocado y
 ``error'' que representa un error que típicamente se representaría como
-una excepción contando con un mensaje de error descriptivo.
+una excepción, los mensajes de error de XRemoteBot tienen como contenido
+un mensaje que describe el error, los clientes pueden tomar este mensaje
+de error y mostrarlos en pantalla o usarlos como descripción de una
+excepción como se hace en el cliente Python por ejemplo.
 
 Tanto para los parámetros, como para los valores de respuesta, los tipos
 de datos representables de forma nativa con JSON resultan suficientes para
@@ -33,10 +37,15 @@ implementar una API similar a la de DuinoBot. Internamente XRemoteBot
 convierte los valores, objetos y arrays de JSON a distintos tipos de
 datos de Python de la forma descripta en la
 tabla~\ref{tbl:rel_json_python}, siguiendo en general las transformaciones
-realizadas por defecto por la libería \texttt{json} de
+realizadas por defecto por las funciones de procesamiento de el módulo
+JSON de la biblioteca estándar d
 Python~\footnote{\url{https://docs.python.org/3/library/json.html}}
 excepto en algunos mensajes donde los valores de
-tipo \texttt{number} de JSON se convierten explícitamente.
+tipo \texttt{number} de JSON se convierten explícitamente (en realidad
+se utilizan funciones provistas por Tornado para hacer la conversión
+de JSON a objetos y de objetos a JSON, pero estas funciones utilizan
+a su vez el módulo JSON de
+Python)~\footnote{\url{http://tornado.readthedocs.org/en/latest/escape.html\#tornado.escape.json_encode}}.
 
 \begin{table}
     \centering
