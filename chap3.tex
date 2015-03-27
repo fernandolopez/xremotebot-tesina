@@ -1,333 +1,158 @@
-%El capítulo 3 describe el protocolo de capa de aplicación diseñado para
-%este servidor y las modalidades de operación del servidor.
-\chapter{Protocolo de capa de aplicación}\label{ch3}
+\chapter{Arquitecturas}\label{cha:arquitectura}
 
-Como se describió anteriormente XRemoteBot utiliza el protocolo WebSocket como
-protocolo de la capa de transporte y mensajes codificados con JSON como
-protocolo de la capa de aplicación, el propósito de este capítulo es describir
-este protocolo de capa de aplicación y detallar los motivos por los cuales
-se modeló el protocolo de esta manera.
+%El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
+%XRemoteBot detallando las mejoras provistas por XRemoteBot.
 
+% FIXME: QUIZAS ESTE CAPITULO PODRÍA IR ANTES DEL ANTERIOR... YA QUE SEGURAMENTE VAS A NOMBRAR Y DESCRIBIR VARIAS COSAS QUE LUEGO NOMBRAS ALLÁ... FIJATE
 
-El protocolo fue diseñado pensando que el mismo debería representar los
-distintos comandos envíados a los robots como si fueran mensajes a objetos
-del paradigma de programación orientado a objetos
-este diseño por un lado mapea de forma muy directa los mensajes de la API
-con los métodos que un programador utilizaría para controlar a los robots
-usando la biblioteca DuinoBot y por otro lado provee un alto grado de
-flexibilidad a la hora de agregar nuevos tipos de mensajes a la API sin
-necesidad de reescribir grandes porciones de código.
+Tanto Remotebot como XRemoteBot tienen arquitecturas complejas que
+dependen de otras librerías y de software instalado en los robots,
+el objetivo de este capítulo es describir la interacción entre los
+distintos dispositivos y aplicaciones utilizadas, demarcando el límite
+entre el desarrollo realizado para esta tesina, XRemoteBot, con el software ya
+existente con el que interactúa.
 
-En algunos de los lenguajes orientados a objetos más populares como Python
-o Ruby al ejecutar un método pueden ocurrir básicamente dos cosas:
-se puede obtener un valor de resultado o bien un error
-en tiempo de ejecución en la forma de una excepción. Para modelar este
-comportamiento el servidor XRemoteBot cuenta con dos tipos de mensajes
-de respuesta:
-``value'' que retorna el valor resultante de ejecutar el método invocado y
-``error'' que representa un error que típicamente se representaría como
-una excepción, los mensajes de error de XRemoteBot tienen como contenido
-un mensaje que describe el error, los clientes pueden tomar este mensaje
-de error y mostrarlos en pantalla o usarlos como descripción de una
-excepción como se hace en el cliente Python por ejemplo.
+\section{Myro}\label{sec:myro}
 
-Tanto para los parámetros, como para los valores de respuesta, los tipos
-de datos representables de forma nativa con JSON resultan suficientes para
-implementar una API similar a la de DuinoBot. Internamente XRemoteBot
-convierte los valores, objetos y arrays de JSON a distintos tipos de
-datos de Python de la forma descripta en la
-tabla~\ref{tbl:rel_json_python}, siguiendo en general las transformaciones
-realizadas por defecto por las funciones de procesamiento de el módulo
-JSON de la biblioteca estándar d
-Python~\footnote{\url{https://docs.python.org/3/library/json.html}}
-excepto en algunos mensajes donde los valores de
-tipo \texttt{number} de JSON se convierten explícitamente (en realidad
-se utilizan funciones provistas por Tornado para hacer la conversión
-de JSON a objetos y de objetos a JSON, pero estas funciones utilizan
-a su vez el módulo JSON de
-Python)~\footnote{\url{http://tornado.readthedocs.org/en/latest/escape.html\#tornado.escape.json_encode}}.
+Myro [REF] es la biblioteca utilizada para controlar a los robots ``Scribbler''
+desde un script Python. Esta biblioteca puede interactuar con los robots de 2
+formas diferentes: a través de un cable serial (RS323) o bien usando bluetooth
+con RFCOMM. El funcionamiento de Myro requiere que el robot tenga
+cargado un firmware determinado que espera las instrucciones desde el puerto
+serial con el que cuenta el robot (el adaptador bluetooth se conecta en ese
+mismo puerto serial).
 
-\begin{table}
+\begin{figure}
     \centering
-    \begin{tabu}{l|l}
-        JSON & Python \\
-        \hline
-        \texttt{string} & \texttt{str} \\
-        \texttt{number} & \texttt{int} o \texttt{float}~\footnote{Dependiendo
-        del mensaje invocado
-        puede ser interpretado como \texttt{int} o \texttt{float}.}\\
-        \texttt{object} & \texttt{dict} \\
-        \texttt{array}  & \texttt{list} \\
-        \texttt{true}/\texttt{false} & \texttt{True}/\texttt{False} (bool) \\
-        \texttt{null} & \texttt{None} \\
-    \end{tabu}
-    \caption{Relación entre los tipos y constantes de JSON y los usados en
-    Python}
-    \label{tbl:rel_json_python}
-\end{table}
+    \includegraphics[width=.7\textwidth]{figures/diagrama_myro}
+    \caption{Diagrama de bloques de Myro}
+    \label{fig:diagrama_myro}
+\end{figure}
 
-\section{Mensajes del cliente al servidor}
+La figura~\ref{fig:diagrama_myro} muestra la interacción entre los componentes
+más importantes de software y hardware desde el script del usuario hasta el
+robot.
 
-Los mensajes al servidor son objetos JSON con dos campos obligatorios y dos
-opcionales, estos campos son:
+\section{DuinoBot}\label{sec:duinobot}
 
-\begin{description}
-    \item[\texttt{entity}] su valor es un string que describe conceptualmente
-        el receptor del mensaje (obligatorio).
-    \item[\texttt{method}] su valor es un string con el nombre del método a
-        invocar (obligatorio).
-    \item[\texttt{args}] su valor es un array posiblemente vacío con los
-        argumentos que deben pasarse al método invocado (opcional).
-    \item[\texttt{msg\_id}] si está presente el servidor incorpora este
-        campo con su valor original en la respuesta, sirve para identificar a
-        qué petición
-        corresponde cada respuesta en implementaciones asincrónicas
-        como la de Javascript.
-\end{description}
+La biblioteca de Python
+DuinoBot~\footnote{\url{https://github.com/Robots-Linti/duinobot}}
+desarrollada en conjunto entre un grupo
+de becarios del laboratorio LINTI de esta Facultad y la empresa RobotGroup
+cuenta con un modo de operación similar al de Myro, conectándose con
+los robots a través de un dongle XBee (que utiliza el protocolo ZigBee)
+conectado a través de un puerto USB con el dispositivo controlante.
+Para que esta biblioteca pueda controlar a los robots estos últimos
+deberán tener instalado también un firmware especial: en este caso,
+es un una versión modificada de un firmware que implementa el protocolo
+Firmata de uso amplio para controlar dispositivos Arduino a través de una
+interfaz serial que habitualmente es el puerto USB, pero en este caso
+la interfaz serial está conectada a un dongle XBee en el robot, la interacción
+entre las distintas capas de software y hardware se ilustra en la
+figura~\ref{fig:funcionamiento_duinobot_diagrama}.
 
-En la actual implementación los valores posibles de \texttt{entity} son
-\texttt{``global''} y \texttt{``robot''}, el primero
-representa acciones globales como el login y el último representa una
-abstracción de los robots soportados por XRemoteBot.
-
-La entidad ``global'' soporta los métodos:
-\begin{description}
-    \item[\texttt{authentication\_required}] no recibe argumentos, retorna
-        \texttt{true} si el servidor está configurado para requerir
-        autenticación y \texttt{false} en caso contrario.
-    \item[\texttt{authenticate}] recibe un string, si el string se corresponde
-        con la \texttt{api\_key} de algún usuario y esa \texttt{api\_key} no
-        ha expirado retorna \texttt{true} y \texttt{false} en caso contrario.
-\end{description}
-
-Entre otros la entidad ``robot'' soporta los métodos:
-\begin{description}
-    \item[\texttt{backward}] recibe un objeto que identifica a un robot
-        específico, una velocidad y un tiempo en segundos,
-        mueve el robot hacia atrás el tiempo indicado y luego contesta
-        al cliente. Si no se envía el parámetro de tiempo el robot se mueve
-        de forma indefinida.
-    \item[\texttt{forward}] ídem moviendo el robot hacia adelante.
-    \item[\texttt{turnLeft}] ídem girando a izquierda.
-    \item[\texttt{turnRight}] ídem girando a derecha.
-    \item[\texttt{getObstacle}] recibe un objeto que identifica a un robot,
-        opcionalmente una distancia y retorna
-        \texttt{true} si hay un obstáculo a una distancia menor o igual a la
-        indicada, si no se envía la distancia se asume un valor por defecto.
-    \item[\texttt{getLine}] recibe un objeto que identifica a un robot y
-        retorna un \texttt{array}
-        con los valores de los sensores de línea del robot.
-\end{description}
-
-Opcionalmente un modelo dado de robot puede soportar otros métodos o retornar
-error en alguno de los métodos anteriores.
-
-La posiblidad que tienen los métodos con tiempo como \texttt{backward} de
-contestar la petición varios segundos después de recibirla sin afectar
-el funcionamiento del servidor ni demorar innesesariamente al resto de los
-clientes está dada por el soporte de asincronismo del framework Tornado.
-
-\section{Mensajes del servidor a los clientes}
-
-El servidor responde a los clientes con mensajes que contienen una
-entrada \texttt{response}, esta entrada identifica el tipo de respuesta
-que puede ser \texttt{value} o \texttt{error}, si el cliente envío un
-campo \texttt{msg\_id} en la petición el servidor incorporará además
-un campo \texttt{msg\_id} idéntico en la respuesta correspondiente
-a esa petición (como se mencionó anteriormente para soportar
-clientes asincrónicos de forma correcta).
-
-Campos de los mensajes \texttt{value}:
-\begin{description}
-    \item[\texttt{response}] el string \texttt{``value''}.
-    \item[\texttt{value}] el valor retornado por el método (puede ser
-        cualquier valor soportado por JSON).
-    \item[\texttt{msg\_id}] si la petición tenía \texttt{msg\_id} se
-        copia el mismo, sino este campo se omite.
-\end{description}
-
-Campos de los mensajes \texttt{error}:
-\begin{description}
-    \item[\texttt{response}] el string \texttt{``error''}.
-    \item[\texttt{message}] un mensaje de error descriptivo.
-    \item[\texttt{msg\_id}] si la petición tenía \texttt{msg\_id} se
-        copia el mismo, sino este campo se omite.
-\end{description}
-
-Los mensajes \texttt{value} representan los valores de respuesta de
-los métodos invocados, para los mensajes que requieren
-un tiempo de demora el servidor contestará con el mensaje \texttt{value}
-una vez transcurrido ese tiempo, para no demorar la atención de peticiones
-de otros clientes el servidor utiliza las funcionalidades provistas por
-Tornado para atender peticiones de forma asíncrona~\citep{dory_2012}. Por
-otro lado los mensajes \texttt{error} representan eventos anómalos que
-generalmente en un sistema no distribuido se modelarían utilizando
-excepciones, por ejemplo errores de codificación, peticiones a recursos
-ocupados, etc...
-
-\section{Ejemplos de interacción entre los clientes y el servidor}
-
-Al comenzar la conexión entre el cliente y el servidor, se intercambian
-los primeros mensajes donde el cliente pregunta al servidor si el
-mismo requiere autenticación y si es así envía la \textit{API key}
-correspondiente. En la tabla~\ref{tbl:ej_autenticacion} se detalla
-el intercambio de mensajes entre un cliente y el servidor en un
-caso de autenticación exitoso con un cliente que envía un \texttt{msg\_id},
-como se puede ver el \texttt{msg\_id}
-no tiene por qué ser consecutivo con el del mensaje anterior, incluso
-puede llegar a ser un string, las únicas restricciones sobre el
-\texttt{msg\_id} son que tiene que ser copiado por el servidor
-en las respuestas y que el valor debe poder ser utilizado como
-identificador de un atributo (usando notación con corchetes) en un
-objeto Javascript, es decir puede ser un número o un string
-arbitrario~\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property\_Accessors}}.
-
-\begin{table}
+\begin{figure}
     \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "global",
-    "method": "authentication_required",
-    "msg_id": 0
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": true,
-    "msg_id": 0
-}
-\end{Verbatim}
-\\
-\hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "global",
-    "method": "authenticate",
-    "args": ["16758efc752c1d97381e6"],
-    "msg_id": 20
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": true,
-    "msg_id": 20
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
-    \caption{Ejemplo de secuencia de autenticación}
-    \label{tbl:ej_autenticacion}
-\end{table}
+    \begin{subfigure}[b]{0.7\textwidth}
+        \includegraphics[width=.95\textwidth]{figures/diagrama_duinobot}
+        \subcaption{Diagrama de bloques de DuinoBot}
+        \label{fig:funcionamiento_duinobot_diagrama}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.29\textwidth}
+        \includegraphics[width=\textwidth]{figures/arquitectura_actual}
+        \subcaption{Esquema de conexión típico}
+        \label{fig:funcionamiento_duinobot_conexion}
+    \end{subfigure}
+    \caption{Funcionamiento de DuinoBot}
+    \label{fig:funcionamiento_duinobot}
+\end{figure}
 
-Otra secuencia de operaciones típica para XRemoteBot es mover un robot
-y luego pedir los valores de alguno de sus sensores, en la
-tabla~\ref{tbl:ej_movimiento_y_sensor} se puede ver un caso donde se
-mueve el robot hacia adelante durante 1 segundo y luego consulta si
-existe algún obstáculo a 10 centímetros o menos del robot, en el primer
-argumento de los mensajes
-envíados a la entidad \textit{robot} se puede ver el objeto que identifica
-al robot específico a utilizar.
+La modalidad de uso esperada con DuinoBot consiste en que cada usuario
+debe contar con una computadora, conectada por USB a un dongle XBee,
+y desde esa computadora puede controlar uno o más robots. Con esa modalidad
+fueron utilizados los robots en los cursos del proyecto
+``Programando con robots y software libre'' y en actividades similares
+planteadas posteriormente, generalmente además cada alumno controla
+un único robot, el esquema de conexión típico en estos cursos se encuentra
+ilustrado en la figura~\ref{fig:funcionamiento_duinobot_conexion}.
 
-\begin{table}
+\section{Remotebot}\label{sec:remotebot}
+
+La versión original de Remotebot fue presentada como trabajo práctico
+de la materia Laboratorio de
+Software~\footnote{\url{http://wiki.labmovil.linti.unlp.edu.ar/index.php?title=RemoteBot:_Android_\%2B_Robots}}
+el objetivo principal del trabajo era desarrollar una aplicación para
+dispositivos Android que accediera a sensores y posiblemente a la red
+wireless usando el lenguaje Java.
+
+% FIXME: REDACTAR MEJOR ESTE PARRAFO
+
+Para este trabajo se implementó
+RemoteBot4Android~\footnote{\url{https://github.com/fernandolopez/remotebot4Android}},
+una aplicación Android
+que permite controlar robots usando los acelerómetros de los dispositivos
+móviles donde se ejecuta, inclinar el dispositivo en
+una dirección provoca que el robot se mueva en esa dirección, además
+esta aplicación cuenta con un indicador que muestra la distancia al obstáculo
+más cercano sensado por el robot y una botonera para controlar al robot
+sin usar los acelerómetros.
+
+El producto principal de este trabajo fue el cliente
+Remotebot4Android pero además del cliente, se desarrolló un 
+protocolo de comunicaciones
+y un servidor básico que atiende los requerimientos y se los envía al
+robot correspondiente, respondiendo también a peticiones de datos de
+los sensores del
+robot, ésta fue la primer implementación del servidor
+Remotebot~\footnote{\url{https://github.com/fernandolopez/remotebot}}
+en cuyo concepto está basado XRemoteBot.
+
+Remotebot provee una API JSON a través de HTTP que permite controlar a los
+robots de forma remota, pero si bien es posible poner el servicio público,
+el mismo no cuenta con autenticación, no soporta bien la concurrencia
+y no provee ningún mecanismo de seguridad por lo que es recomendable solamente
+usarlo dentro de ámbito de una red LAN.
+La implementación del servidor
+usa el módulo ``SimpleHTTPServer'' de la biblioteca estándar de Python para
+proveer el soporte del protocolo HTTP e
+introspección~\footnote{\url{http://www.ibm.com/developerworks/library/l-pyint/}}.
+para convertir los
+mensajes enviados por los clientes en invocaciones a métodos.
+
+\begin{figure}
     \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-    "method": "forward",
-    "args": [50, 1],
-    "msg_id": 40
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": null,
-    "msg_id": 40
-}
-\end{Verbatim}
-\\
-\hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-    "method": "getObstacle",
-    "args": [{model: "n6", id: 4}, 10],
-    "msg_id": 42
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": false,
-    "msg_id": 42
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
-    \caption{Ejemplo de movimiento y acceso a sensores de un robot}
-    \label{tbl:ej_movimiento_y_sensor}
-\end{table}
+    \begin{subfigure}[b]{0.78\textwidth}
+        \includegraphics[width=.95\textwidth]{figures/diagrama_remotebot}
+        \subcaption{Diagrama de bloques de Remotebot}
+        \label{fig:diagrama_remotebot}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/cliente_remotebot}
+        \subcaption{Cliente de Remotebot}
+        \label{fig:cliente_remotebot}
+    \end{subfigure}
+    \caption{Diagrama de bloques e imagen del cliente Remotebot}
+    \label{fig:diagrama_y_cliente_remotebot}
+\end{figure}
 
-Por último en la tabla~\ref{tbl:ej_error} se puede ver un mensaje de error
-típico cuando el cliente envía una petición mal formada donde no existe
-el campo \textit{method} obligatorio, notar que este mensaje a diferencia
-de los anteriores no tiene un campo \textit{msg\_id} pero esto no causaría
-ningún error ya que este campo no es obligatorio, el único error en la
-petición es la ausencia de \textit{method}.
+Como se ve en la figura~\ref{fig:diagrama_remotebot} Remotebot utiliza la
+biblioteca DuinoBot para comunicarse con los robots y el cliente para el cuál
+fue diseñado es una aplicación Android que permite controlar los robots
+y ver los valores del sensor de distancia usando una interfaz con botones,
+además de poder controlar el robot usando los acelerómetros del dispositivo
+(inclinar el dispositivo en una dirección dada hace que el robot se mueva
+en esa dirección).
 
-\begin{table}
-    \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "error",
-    "message": "\"entity\" and \"method\"
-                are mandatory fields"
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
-    \caption{Ejemplo de un mensaje de error ante una petición mal formada}
-    \label{tbl:ej_error}
-\end{table}
+\section{XRemoteBot}\label{sec:xremotebot}
 
-\section{Modalidades del servidor}
+La interacción de XRemoteBot a nivel arquitectura es muy similar a la provista por Remotebot,
+con la salvedad que el primero, además soporta robots Scribbler y puede ser
+ampliado para interactuar con otros robots. Desde el punto de vista del cliente
+XRemoteBot tiene varias diferencias, entre ellas la elección del protocolo,
+usándose Websockets en lugar de peticiones HTTP y la definición del protocolo
+de capa de aplicación que si bien es similar, ahora cuenta con un saludo y
+un paso de autenticación a través de una ``API key''.
 
-A fin de hacer que el servidor pueda exponerse al público se cuenta con
-un sistema con autenticación por \textit{API key}, pero estas claves
-son largas resultando díficil recordarlas y escribirlas sin errores. En
-ámbitos locales como puede ser una red wifi en un aula este mecanismo
-de autenticación puede resultar molesto e innecesario, por lo que el
-servidor es configurable de forma tal que se puede deshabilitar este
-sistema de autenticación. Para que el servidor opere sin requerir
-una \textit{API key} a los clientes basta con configurar la opción
-\texttt{public\_server} en \texttt{False} dentro del archivo
-\textit{configuration.py}.
 
 

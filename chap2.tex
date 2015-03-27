@@ -1,140 +1,114 @@
-\chapter{Arquitecturas}\label{ch2}
+\chapter{Estado del arte}
+Existen diferentes alternativas para controlar robots o microcontroladores
+de forma remota, muchas de estas se agrupan bajo la denominación
+``Internet of Things'', en este capítulo se describirán algunas de las
+más destacadas y las más similares a XRemoteBot.
 
-%El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
-%XRemoteBot detallando las mejoras provistas por XRemoteBot.
+% FIXME: mmmm NO SE SI ESTO DEBERÍA ESTAR EN UN CAPITULO APARTE.....  LO HABLAMOS LUEGO
 
-% FIXME: QUIZAS ESTE CAPITULO PODRÍA IR ANTES DEL ANTERIOR... YA QUE SEGURAMENTE VAS A NOMBRAR Y DESCRIBIR VARIAS COSAS QUE LUEGO NOMBRAS ALLÁ... FIJATE
+\section{Educabot}
+%~\citep{_educabot_2015}[REF]%
+El proyecto Educabot~\footnote{\url{http://www.educabot.org/}} tiene por
+objetivos enseñar tecnología a niños y adultos a través
+del uso, programación y construcción de robots. En el sitio del proyecto
+se ofertan cursos orientados a los distintos niveles.
 
-Tanto Remotebot como XRemoteBot tienen arquitecturas complejas que
-dependen de otras librerías y de software instalado en los robots,
-el objetivo de este capítulo es describir la interacción entre los
-distintos dispositivos y aplicaciones utilizadas, demarcando el límite
-entre el desarrollo realizado para esta tesina, XRemoteBot, con el software ya
-existente con el que interactúa.
+% FIXME: ES ORIGINARIO DE ..... EN ESCUELAS? EN ONGS? DONDE SE LOS USA?
 
-\section{Myro}\label{ch2:myro}
-
-Myro [REF] es la biblioteca utilizada para controlar a los robots ``Scribbler''
-desde un script Python. Esta biblioteca puede interactuar con los robots de 2
-formas diferentes: a través de un cable serial (RS323) o bien usando bluetooth
-con RFCOMM. El funcionamiento de Myro requiere que el robot tenga
-cargado un firmware determinado que espera las instrucciones desde el puerto
-serial con el que cuenta el robot (el adaptador bluetooth se conecta en ese
-mismo puerto serial).
-
-\begin{figure}
-    \centering
-    \includegraphics[width=.7\textwidth]{figures/diagrama_myro}
-    \caption{Diagrama de bloques de Myro}
-    \label{fig:diagrama_myro}
-\end{figure}
-
-La figura~\ref{fig:diagrama_myro} muestra la interacción entre los componentes
-más importantes de software y hardware desde el script del usuario hasta el
-robot.
-
-\section{DuinoBot}\label{ch2:duinobot}
-
-La biblioteca de Python DuinoBot [REF] desarrollada en conjunto entre un grupo
-de becarios del laboratorio LINTI de esta Facultad y la empresa RobotGroup
-cuenta con un modo de operación similar al de Myro, conectándose con
-los robots a través de un dongle XBee (que utiliza el protocolo ZigBee)
-conectado a través de un puerto USB con el dispositivo controlante.
-Para que esta biblioteca pueda controlar a los robots estos últimos
-deberán tener instalado también un firmware especial: en este caso,
-es un una versión modificada de un firmware que implementa el protocolo
-Firmata de uso amplio para controlar dispositivos Arduino a través de una
-interfaz serial que habitualmente es el puerto USB, pero en este caso
-la interfaz serial está conectada a un dongle XBee en el robot, la interacción
-entre las distintas capas de software y hardware se ilustra en la
-figura~\ref{fig:funcionamiento_duinobot_diagrama}.
+En la parte de construcción este proyecto plantea un modelo de robot denominado
+``Rolo'' para los jóvenes de más de 10 años, mientras que para los más chicos
+se plantean actividades con el robot ``elBrian'' que incluyen
+controlarlo a través de una interfaz Web que muestra las imágenes emitidas
+por la cámara incorporada en este robot y además permite controlarlo con
+botones en pantalla que determinan en qué dirección debe moverse el robot
+(figura~\ref{fig:elbrian}).
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{0.7\textwidth}
-        \includegraphics[width=.95\textwidth]{figures/diagrama_duinobot}
-        \subcaption{Diagrama de bloques de DuinoBot}
-        \label{fig:funcionamiento_duinobot_diagrama}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.29\textwidth}
-        \includegraphics[width=\textwidth]{figures/arquitectura_actual}
-        \subcaption{Esquema de conexión típico}
-        \label{fig:funcionamiento_duinobot_conexion}
-    \end{subfigure}
-    \caption{Funcionamiento de DuinoBot}
-    \label{fig:funcionamiento_duinobot}
+    \includegraphics[width=0.5\textwidth]{figures/elbrian-1}
+    \caption{Pantalla principal de elBrian (en el recuadro rojo normalmente
+        se muestra la cámara de el robot)}
+    \label{fig:elbrian}
 \end{figure}
 
-La modalidad de uso esperada con DuinoBot consiste en que cada usuario
-debe contar con una computadora, conectada por USB a un dongle XBee,
-y desde esa computadora puede controlar uno o más robots. Con esa modalidad
-fueron utilizados los robots en los cursos del proyecto
-``Programando con robots y software libre'' y en actividades similares
-planteadas posteriormente, generalmente además cada alumno controla
-un único robot, el esquema de conexión típico en estos cursos se encuentra
-ilustrado en la figura~\ref{fig:funcionamiento_duinobot_conexion}.
-
-\section{Remotebot}\label{ch2:remotebot}
-
-La versión original de Remotebot fue presentada como trabajo práctico
-de la materia Laboratorio de Software
-% FIXME:REF A LA PRESENTACION QUE HICISTE EN LA CLASE.... CREO QUE ESTA EN EL SITIO DE LA MATERIA NO? YO LA TENIA YA QUE LA MOSTRE EN PROYECTO COMO UN EJEMPLO DE USO DE JSON :)], 
-
-este trabajo práctico consistía
-en una implementación en Java de una aplicación para dispositivos Android. 
-
-% FIXME: REDACTAR MEJOR ESTE PARRAFO
-
-El producto principal de este trabajo fue el cliente
-Remotebot4Android~\footnote{\url{https://github.com/fernandolopez/remotebot4Android}}. Además del cliente, se desarrolló un protocolo protocolo de comunicaciones
-y un servidor básico que atienda los requerimientos y se los envíe al
-robot, respondiendo también a peticiones de datos de los sensores del
-robot, ésta fue la primer implementación del servidor
-Remotebot~\footnote{\url{https://github.com/fernandolopez/remotebot}}
-en cuyo concepto está basado XRemoteBot.
-
-Remotebot provee una API JSON a través de HTTP que permite controlar a los
-robots de forma local. Si bien es posible poner el servicio público,
-el mismo no cuenta con autenticación, no soporta bien la concurrencia
-y no provee ningún mecanismo de seguridad. La implementación del servidor
-usa el módulo ``SimpleHTTPServer'' de la biblioteca estándar de Python para
-proveer el soporte del protocolo HTTP e introspection para convertir los
-mensajes enviados por los clientes en invocaciones a métodos.
-
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.78\textwidth}
-        \includegraphics[width=.95\textwidth]{figures/diagrama_remotebot}
-        \subcaption{Diagrama de bloques de Remotebot}
-        \label{fig:diagrama_remotebot}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.2\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/cliente_remotebot}
-        \subcaption{Cliente de Remotebot}
-        \label{fig:cliente_remotebot}
-    \end{subfigure}
-    \caption{Diagrama de bloques e imagen del cliente Remotebot}
-    \label{fig:diagrama_y_cliente_remotebot}
-\end{figure}
-
-Como se ve en la figura~\ref{fig:diagrama_remotebot} Remotebot utiliza la
-biblioteca DuinoBot para comunicarse con los robots y el cliente para el cuál
-fue diseñado es una aplicación Android que permite controlar los robots
-y ver los valores del sensor de distancia usando una interfaz con botones,
-además de poder controlar el robot usando los acelerómetros del dispositivo
-(inclinar el dispositivo en una dirección dada hace que el robot se mueva
-en esa dirección).
-
-\section{XRemoteBot}\label{ch2:xremotebot}
-
-La interacción de XRemoteBot a nivel arquitectura es muy similar a la provista por Remotebot,
-con la salvedad que el primero, además soporta robots Scribbler y puede ser
-ampliado para interactuar con otros robots. Desde el punto de vista del cliente
-XRemoteBot tiene varias diferencias, entre ellas la elección del protocolo,
-usándose Websockets en lugar de peticiones HTTP y la definición del protocolo
-de capa de aplicación que si bien es similar, ahora cuenta con un saludo y
-un paso de autenticación a través de una ``API key''.
+Las tecnologías utilizadas en la interfaz web de ``elBrian'' coinciden en gran
+parte con las utilizadas en el desarrollo de XRemoteBot, pero el objetivo del
+servidor CUAL???? es controlar un único robot en un ambiente local y además este servidor
+se instala en el robot cuestión que sería imposible en los robots basados en
+microcontroladores AVR y Parallax (ojo!!!!  ESTO NOMBRALO ANTES PLEASE!!! ) a los que XRemoteBot se encuentra dirigido.
 
 
+El servidor web de ``elBrian'' está implementado usando el framework Tornado,
+WebSockets, mjpg-streamer, opencv y JSON. El mismo está diseñado para ejecutarse
+en el robot ya que el mismo está basado en una placa RaspberryPi, la cuál
+cuenta con un procesador ARM perfectamente capaz de ejecutar un sistema
+operativo completo como GNU/Linux y de soportar el intérprete oficial de Python.
+
+Mientras que este servidor coincide en gran medida en la elección de lenguaje
+y bibliotecas utilizadas su implementación es específica para el robot ``elBrian''
+y no podría ser portada para robots con menores capacidades de procesamiento
+sin una reescritura significativa. Además el protocolo utilizado no contempla
+el acceso a valores de sensores, los únicos mensajes que permite enviar
+al robot son movimientos.
+
+\begin{itemize}
+    \item Educabot \url{http://www.educabot.org/}
+    \item Código fuente de ``elBrian'' \url{https://github.com/educabot/elBraian}
+\end{itemize}
+
+\section{Gobot con cppp-io}
+
+Gobot {REF} es una biblioteca que permite controlar robots programando en el lenguaje
+Go[REF], esta biblioteca soporta el protocolo Firmata (IDEM CON ESTAS COSAS.... ACLARA, PONE REFERENCIAS O NOMBRLAS ANETES) para controlar robots
+conectados directamente a través de una interfaz serial, como es el caso
+de los robots Multiplo N6, y soporta la API cppp-io{REF] que define una API JSON
+que permite el acceso a la información y control de robots a través de la Web.
+
+Gobot además tiene compatibilidad con distintos sensores y robots, además de
+placas utilizadas normalmente en la construcción de robots como Arduino,
+Raspberry Pi, Intel Edison y Beaglebone Black.
+
+Este proyecto es interesante como base para desarrollar algún proyecto
+similar a XRemoteBot en Go, pero requeriría además la reimplementación
+del módulo de Python DuinoBot que controla, a través de una versión
+modificada del protocolo Firmata, a los robots Multiplo N6 y por otro
+lado los robots Scribbler tampoco aparecen en la lista de robots soportados.
+
+\begin{itemize}
+    \item Gobot \url{http://gobot.io}
+    \item Especificación de cppp-io \url{https://github.com/hybridgroup/cppp-io/}
+\end{itemize}
+
+\section{Tele Toyland}
+
+Este sitio provee acceso a varios dispositivos a través de una interfaz web,
+por ejemplo es posible controlar un cabezal con una punta que dibuja sobre
+una caja de arena, basta con hacer clic sobre las posiciones sobre las cuales
+se quiere que pase la punta y presionar el botón ``go'' para que el cabezal
+empiece a moverse dibujando lo pedido, en este y el resto de los experimentos
+disponibles en el sitio los resultados se pueden ver a través de un streaming
+de video.
+
+El sitio no provee detalles del software, ni el protocolo utilizado.
+
+\begin{itemize}
+    \item \url{http://www.teletoyland.com}
+\end{itemize}
+
+% FIXME
+%\section{}
+%http://www3.uji.es/~pnebot/Files/Articuls/RemoteProgramming.pdf
+%Otro
+%http://telerobot.mech.uwa.edu.au/Telerobot/instructions.html
+\section{DIY}
+% www.linuxuser.co.uk/tutorials/control-your-raspberry-pi-robot-from-a-web-connected-device
+Finalmente en la consigna de ``do it yourself'' existen diversas guías para
+programar servidores que permitan controlar robots o microcontroladores
+en general, se puede encontrar un caso muy bien explicado en el sitio
+de Adafruit~\url{https://learn.adafruit.com/wifi-controlled-mobile-robot/building-the-web-interface},
+este es un buen ejercicio de programación, sobre todo para aprender a
+programar servidores que provean una API web y clientes que la consuman. Sin
+embargo estas guías son introductorias y el objetivo es crear un servidor
+muy simple, similar a lo que fue el servidor Remotebot, pensados para ser
+usados en un ambiente local ya que no proveen autenticación en general.
 

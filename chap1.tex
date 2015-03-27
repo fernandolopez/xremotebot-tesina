@@ -164,7 +164,7 @@ natural pensar en la posibilidad de manejar distintos tipos de robots
 que tengan algunas características mínimas en común con los robots ya
 descriptos.
 
-El servidor Remotebot original (figura~\ref{fig:arquitectura_remotebot})
+El servidor RemoteBot original (figura~\ref{fig:arquitectura_remotebot})
 tenía algunas de estas características, pero
 estaba pobremente implementado ya que no era más que una herramienta auxiliar
 para un cliente muy específico y era meramente un intermediario entre el
@@ -185,123 +185,8 @@ terminase.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figures/arquitectura_remotebot}
-    \caption{Esquema de conexión de Remotebot}
+    \caption{Esquema de conexión de RemoteBot}
     \label{fig:arquitectura_remotebot}
 \end{figure}
 
-
-\section{Alternativas similares a XRemoteBot}
-
-Existen diferentes alternativas para controlar robots o microcontroladores
-de forma remota, muchas de estas se agrupan bajo la denominación
-``Internet of Things'', en este capítulo se describirán algunas de las
-más destacadas y las más similares a XRemoteBot.
-
-% FIXME: mmmm NO SE SI ESTO DEBERÍA ESTAR EN UN CAPITULO APARTE.....  LO HABLAMOS LUEGO
-
-\subsection{Educabot}
-%~\citep{_educabot_2015}[REF]%
-El proyecto Educabot~\footnote{\url{http://www.educabot.org/}} tiene por
-objetivos enseñar tecnología a niños y adultos a través
-del uso, programación y construcción de robots. En el sitio del proyecto
-se ofertan cursos orientados a los distintos niveles.
-
-% FIXME: ES ORIGINARIO DE ..... EN ESCUELAS? EN ONGS? DONDE SE LOS USA?
-
-En la parte de construcción este proyecto plantea un modelo de robot denominado
-``Rolo'' para los jóvenes de más de 10 años, mientras que para los más chicos
-se plantean actividades con el robot ``elBrian'' que incluyen
-controlarlo a través de una interfaz Web que muestra las imágenes emitidas
-por la cámara incorporada en este robot y además permite controlarlo con
-botones en pantalla que determinan en qué dirección debe moverse el robot
-(figura~\ref{fig:elbrian}).
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\textwidth]{figures/elbrian-1}
-    \caption{Pantalla principal de elBrian (en el recuadro rojo normalmente
-        se muestra la cámara de el robot)}
-    \label{fig:elbrian}
-\end{figure}
-
-Las tecnologías utilizadas en la interfaz web de ``elBrian'' coinciden en gran
-parte con las utilizadas en el desarrollo de XRemoteBot, pero el objetivo del
-servidor CUAL???? es controlar un único robot en un ambiente local y además este servidor
-se instala en el robot cuestión que sería imposible en los robots basados en
-microcontroladores AVR y Parallax (ojo!!!!  ESTO NOMBRALO ANTES PLEASE!!! ) a los que XRemoteBot se encuentra dirigido.
-
-
-El servidor web de ``elBrian'' está implementado usando el framework Tornado,
-Websockets, mjpg-streamer, opencv y JSON. El mismo está diseñado para ejecutarse
-en el robot ya que el mismo está basado en una placa RaspberryPi, la cuál
-cuenta con un procesador ARM perfectamente capaz de ejecutar un sistema
-operativo completo como GNU/Linux y de soportar el intérprete oficial de Python.
-
-Mientras que este servidor coincide en gran medida en la elección de lenguaje
-y bibliotecas utilizadas su implementación es específica para el robot ``elBrian''
-y no podría ser portada para robots con menores capacidades de procesamiento
-sin una reescritura significativa. Además el protocolo utilizado no contempla
-el acceso a valores de sensores, los únicos mensajes que permite enviar
-al robot son movimientos.
-
-\begin{itemize}
-    \item Educabot \url{http://www.educabot.org/}
-    \item Código fuente de ``elBrian'' \url{https://github.com/educabot/elBraian}
-\end{itemize}
-
-\subsection{Gobot con cppp-io}
-
-Gobot {REF} es una biblioteca que permite controlar robots programando en el lenguaje
-Go[REF], esta biblioteca soporta el protocolo Firmata (IDEM CON ESTAS COSAS.... ACLARA, PONE REFERENCIAS O NOMBRLAS ANETES) para controlar robots
-conectados directamente a través de una interfaz serial, como es el caso
-de los robots Multiplo N6, y soporta la API cppp-io{REF] que define una API JSON
-que permite el acceso a la información y control de robots a través de la Web.
-
-Gobot además tiene compatibilidad con distintos sensores y robots, además de
-placas utilizadas normalmente en la construcción de robots como Arduino,
-Raspberry Pi, Intel Edison y Beaglebone Black.
-
-Este proyecto es interesante como base para desarrollar algún proyecto
-similar a XRemoteBot en Go, pero requeriría además la reimplementación
-del módulo de Python DuinoBot que controla, a través de una versión
-modificada del protocolo Firmata, a los robots Multiplo N6 y por otro
-lado los robots Scribbler tampoco aparecen en la lista de robots soportados.
-
-\begin{itemize}
-    \item Gobot \url{http://gobot.io}
-    \item Especificación de cppp-io \url{https://github.com/hybridgroup/cppp-io/}
-\end{itemize}
-
-\subsection{Tele Toyland}
-
-Este sitio provee acceso a varios dispositivos a través de una interfaz web,
-por ejemplo es posible controlar un cabezal con una punta que dibuja sobre
-una caja de arena, basta con hacer clic sobre las posiciones sobre las cuales
-se quiere que pase la punta y presionar el botón ``go'' para que el cabezal
-empiece a moverse dibujando lo pedido, en este y el resto de los experimentos
-disponibles en el sitio los resultados se pueden ver a través de un streaming
-de video.
-
-El sitio no provee detalles del software, ni el protocolo utilizado.
-
-\begin{itemize}
-    \item \url{http://www.teletoyland.com}
-\end{itemize}
-
-% FIXME
-%\subsection{}
-%http://www3.uji.es/~pnebot/Files/Articuls/RemoteProgramming.pdf
-%Otro
-%http://telerobot.mech.uwa.edu.au/Telerobot/instructions.html
-\subsection{DIY}
-% www.linuxuser.co.uk/tutorials/control-your-raspberry-pi-robot-from-a-web-connected-device
-Finalmente en la consigna de ``do it yourself'' existen diversas guías para
-programar servidores que permitan controlar robots o microcontroladores
-en general, se puede encontrar un caso muy bien explicado en el sitio
-de Adafruit~\url{https://learn.adafruit.com/wifi-controlled-mobile-robot/building-the-web-interface},
-este es un buen ejercicio de programación, sobre todo para aprender a
-programar servidores que provean una API web y clientes que la consuman. Sin
-embargo estas guías son introductorias y el objetivo es crear un servidor
-muy simple, similar a lo que fue el servidor Remotebot, pensados para ser
-usados en un ambiente local ya que no proveen autenticación en general.
 
