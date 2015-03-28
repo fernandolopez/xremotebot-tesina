@@ -64,6 +64,23 @@
 \PrerenderUnicode{ú}
 \PrerenderUnicode{ñ}
 
+%% Los listings precisan parámetros especiales, sino puede fallar la generación del PDF %%
+\lstset{
+    numbers=left,
+    captionpos=b,
+    basicstyle=\ttfamily\footnotesize,
+    extendedchars=true,
+    inputencoding=utf8x,
+    literate={á}{{\'a}}1
+          {é}{{\'e}}1
+          {í}{{\'i}}1
+          {ó}{{\'o}}1
+          {ú}{{\'u}}1
+          {ñ}{{\~n}}1
+}
+\renewcommand{\lstlistingname}{Código}
+\renewcommand\lstlistlistingname{Índice de códigos}
+
 \usepackage{lgrind}
 %% These have been added at the request of the MIT Libraries, because
 %% some PDF conversions mess up the ligatures.  -LB, 1/22/2014
@@ -83,15 +100,16 @@
 % applicable.
 % \include{signature}
 \pagestyle{plain}
-%\include{contents}
-%\include{prologue}
-%\include{chap1}
-%\include{chap2}
-%\include{chap3}
+\include{contents}
+\include{prologue}
+\include{chap1}
+\include{chap2}
+\include{chap3}
 \include{chap4}
+\include{chap5}
 \appendix
-%\include{contents/0a-serializacion}
-%\include{contents/0b-protocolo}
-%\include{biblio}
+\include{contents/0a-serializacion}
+\include{contents/0b-websockets-y-promises}
+\include{biblio}
 \end{document}
 

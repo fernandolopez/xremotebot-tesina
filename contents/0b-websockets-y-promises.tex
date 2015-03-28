@@ -1,0 +1,107 @@
+\chapter{WebSockets y Promises}\label{ch:websockets_y_promises}
+
+\section{WebSockets}
+
+Para permitir el uso remoto de los robots a través de Internet sin necesidad
+de requerir configuraciones ni puertos especiales se eligió implementar el
+sistema como una
+aplicación web. Sin embargo, como se menciona en el
+capítulo~\ref{ch:serializacion} no se utiliza HTTP para el intercambio de
+mensajes y valores de retorno entre los clientes y el servidor sino el
+protocolo WebSocket.
+
+El protocolo WebSocket permite mantener conexiones persistentes y no envía
+encabezados HTTP en cada mensaje, reduciendo así el overhead en los mensajes
+intercambiados que supondría el uso de HTTP~\citep{wang_2013}, aprovechando al
+mismo tiempo los puertos TCP que abre el servidor Web.
+
+La elección de este protocolo trae como desventaja frente al uso de HTTP la
+necesidad de tener consideraciones de seguridad especiales, para la parte
+Web del sistema se utiliza autenticación con cookies pero no resulta seguro
+utilizar el mismo mecanismo para la sesión con WebSockets ya que el sistema
+quedaría vulnerable a ataques de tipo CSRF (Cross-Site Request
+Forgery)~\citep{owasp_2014}~\footnote{
+\url{https://www.owasp.org/images/5/52/OWASP_Testing_Guide_v4.pdf}}.
+
+Una de las estrategias recomendadas es verificar el encabezado \texttt{Origin}
+desde el servidor, pero esta técnica no es suficiente ya que los
+clientes pueden falsear este campo y solamente si el cliente es un navegador
+envía este encabezado.
+Otra estrategia es tener un mecanismo de autenticación
+separado para la comunicación~\footnote{\url{https://www.christian-schneider.net/CrossSiteWebSocketHijacking.html}},
+esta fue la estrategia elegida para XRemoteBot usando una \textit{API key}
+para identificar a los usuarios al inicio de la comunicación.
+
+\section{Promises}
+
+La API de WebSockets disponible en los navegadores Web requieren
+redefinir una serie de funciones de la instancia del WebSocket
+para recibir y enviar mensajes~\citep{websocket_2014}, a saber:
+\begin{description}
+    \item[\texttt{WebSocket\#onopen()}] se ejecutará cuando
+    la conexión esté establecida.
+    \item[\texttt{WebSocket\#onerror()}] se ejecutará ante un error en
+    la conexión.
+    \item[\texttt{WebSocket\#onclose()}] se ejecutará si la conexión
+    se cierra.
+    \item[\texttt{WebSocket\#onmessage()}] se ejecutará al recibir un
+    mensaje desde el servidor, recibe como argumento el mensaje
+    enviado por el servidor.
+\end{description}
+
+La intención del autor es ocultar estos detalles de implementación de
+los usuarios que quieran controlar los robots usando la API Javascript,
+para esto es posible utilizar el objeto \textit{Promise} que se encuentra
+en proceso de estandarización para ECMAScript 6, pero ya se puede
+usar en los navegadores más populares.
+
+Los objetos \textit{Promise} se utilizan para obtener valores resultantes
+de cómputos asincrónicos, como es el caso de la respuesta a una petición
+hecha con WebSockets, la interfaz de \textit{Promise} no permite programar
+los robots en Javascript con una interfaz idéntica a la usada al programar
+los robots con la biblioteca DuinoBot, pero es relativamente fácil de
+utilizar y ante la imposibilidad de demorar la ejecución del código
+Javascript sin crear funciones adicionales provee una alternativa
+relativamente simple en comparación con el uso directo de la interfaz
+de los objetos \texttt{WebSocket}.
+
+Los objetos \textit{Promise} se instancian pasándoles como argumento una
+función que a su vez recibe 2 argumentos, \texttt{resolve} y \texttt{reject}.
+El primer argumento ``cumple'' o ``resuelve'' la promesa y el segundo la
+``rechaza''.
+Las ``promesas'' tienen dos métodos: \texttt{then} y \texttt{catch} que se
+ejecutan cuando la promesa se ``cumple'' o se ``rechaza'' respectivamente.
+
+XRemoteBot para Javascript al crear cada mensaje le asigna un \texttt{msg\_id},
+crea una \texttt{Promise} y guarda en un \texttt{object} de mensajes
+pendientes un objeto que contiene las funciones \texttt{resolve} y
+\texttt{reject} asociados con esa \texttt{Promise}
+usando como clave el \texttt{msg\_id}. Al recibir una respuesta
+desde el servidor, el cuerpo de \texttt{WebSocket\#onmessage()} toma el
+\texttt{msg\_id} de la respuesta, lo utiliza para recuperar las funciones
+asociadas con la \texttt{Promise} de este mensaje y ejecuta el
+\texttt{resolve} pasándole como argumento la respuesta del servidor.
+De esta manera las ``promesas'' asociadas con cada
+mensaje se ``cumplen'' al obtener la respuesta correspondiente del servidor.
+
+Cada método de XRemoteBot para Javascript que involucre enviar un mensaje
+retornará una ``promesa'' que se cumplirá cuando el servidor responda
+el mensaje.
+
+Esto permite, por ejemplo, obtener el valor del sensor de distancia de un 
+robot de forma simple como se ve en el código~\ref{lst:promises_get_obstacle}.
+Si bien esta interfaz no es idéntica a la de DuinoBot, es lo más parecido
+que se pudo lograr.
+
+\begin{lstlisting}[language=C,
+caption={Implementación de \texttt{getObstacle()} con ``promesas''},
+label=lst:promises_get_obstacle]
+robot.getObstacle().then(function(hay_obstaculo){
+    if (hay_obstaculo.value){
+        console.log("Hay un obstáculo al frente");
+    }
+    else {
+        console.log("No hay obstáculos");
+    }
+});
+\end{lstlisting}
