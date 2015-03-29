@@ -7,13 +7,16 @@ más destacadas y las más similares a XRemoteBot.
 % FIXME: mmmm NO SE SI ESTO DEBERÍA ESTAR EN UN CAPITULO APARTE.....  LO HABLAMOS LUEGO
 
 \section{Educabot}
-%~\citep{_educabot_2015}[REF]%
 El proyecto Educabot~\footnote{\url{http://www.educabot.org/}} tiene por
 objetivos enseñar tecnología a niños y adultos a través
 del uso, programación y construcción de robots. En el sitio del proyecto
-se ofertan cursos orientados a los distintos niveles.
+se ofertan cursos orientados a los distintos niveles, estos robots se
+usaron en actividades en distintas escuelas de la Ciudad Autónoma de Buenos
+Aires~\footnote{\url{https://youtu.be/1oCOAtX9OS4}}.
 
 % FIXME: ES ORIGINARIO DE ..... EN ESCUELAS? EN ONGS? DONDE SE LOS USA?
+% Son cursos privados según dijo el tipo, pero no tengo de donde citar
+% eso no dice nada el sitio.
 
 En la parte de construcción este proyecto plantea un modelo de robot denominado
 ``Rolo'' para los jóvenes de más de 10 años, mientras que para los más chicos
@@ -33,9 +36,11 @@ botones en pantalla que determinan en qué dirección debe moverse el robot
 
 Las tecnologías utilizadas en la interfaz web de ``elBrian'' coinciden en gran
 parte con las utilizadas en el desarrollo de XRemoteBot, pero el objetivo del
-servidor CUAL???? es controlar un único robot en un ambiente local y además este servidor
+servidor de ``elBrian'' es controlar un único robot en un ambiente local,
+además este servidor
 se instala en el robot cuestión que sería imposible en los robots basados en
-microcontroladores AVR y Parallax (ojo!!!!  ESTO NOMBRALO ANTES PLEASE!!! ) a los que XRemoteBot se encuentra dirigido.
+microcontroladores AVR y PIC (``Basic Stamp 2`` de Parallax)
+a los que XRemoteBot se encuentra dirigido.
 
 
 El servidor web de ``elBrian'' está implementado usando el framework Tornado,
@@ -58,13 +63,19 @@ al robot son movimientos.
 
 \section{Gobot con cppp-io}
 
-Gobot {REF} es una biblioteca que permite controlar robots programando en el lenguaje
-Go[REF], esta biblioteca soporta el protocolo Firmata (IDEM CON ESTAS COSAS.... ACLARA, PONE REFERENCIAS O NOMBRLAS ANETES) para controlar robots
+Gobot~\footnote{\url{http://gobot.io}}
+es una biblioteca que permite controlar robots programando en el lenguaje
+Go~\footnote{\url{https://golang.org/}}, esta biblioteca soporta el
+protocolo Firmata~\footnote{\url{https://github.com/firmata/protocol}}
+para controlar robots
 conectados directamente a través de una interfaz serial, como es el caso
-de los robots Multiplo N6, y soporta la API cppp-io{REF] que define una API JSON
+de los robots Multiplo N6, y soporta la API
+cppp-io~\footnote{\url{https://github.com/hybridgroup/cppp-io/}}
+que define una API JSON
 que permite el acceso a la información y control de robots a través de la Web.
 
 Gobot además tiene compatibilidad con distintos sensores y robots, además de
+ser compatible con
 placas utilizadas normalmente en la construcción de robots como Arduino,
 Raspberry Pi, Intel Edison y Beaglebone Black.
 
@@ -74,14 +85,10 @@ del módulo de Python DuinoBot que controla, a través de una versión
 modificada del protocolo Firmata, a los robots Multiplo N6 y por otro
 lado los robots Scribbler tampoco aparecen en la lista de robots soportados.
 
-\begin{itemize}
-    \item Gobot \url{http://gobot.io}
-    \item Especificación de cppp-io \url{https://github.com/hybridgroup/cppp-io/}
-\end{itemize}
-
 \section{Tele Toyland}
 
-Este sitio provee acceso a varios dispositivos a través de una interfaz web,
+Este sitio provee acceso a varios dispositivos a través de una interfaz
+Web~\footnote{\url{http://www.teletoyland.com}}
 por ejemplo es posible controlar un cabezal con una punta que dibuja sobre
 una caja de arena, basta con hacer clic sobre las posiciones sobre las cuales
 se quiere que pase la punta y presionar el botón ``go'' para que el cabezal
@@ -89,11 +96,18 @@ empiece a moverse dibujando lo pedido, en este y el resto de los experimentos
 disponibles en el sitio los resultados se pueden ver a través de un streaming
 de video.
 
-El sitio no provee detalles del software, ni el protocolo utilizado.
+Entre los proyectos con los que permite interactuar Tele Toyland
+hay 2 areneros como el descripto
+anteriormente, una torre de leds, una marioneta y laberintos.
 
-\begin{itemize}
-    \item \url{http://www.teletoyland.com}
-\end{itemize}
+El sitio no provee detalles del software, ni el protocolo utilizado. Desde
+lo funcional
+provee una especie de control remoto para los distintos dispositivos a los
+que permite
+manipular, se puede incluso configurar una serie de instrucciones a ejecutar
+en secuencia. Sin embargo no provee una biblioteca que permita controlar
+los dispositivos desde un lenguaje de programación.
+
 
 % FIXME
 %\section{}
@@ -109,6 +123,6 @@ de Adafruit~\url{https://learn.adafruit.com/wifi-controlled-mobile-robot/buildin
 este es un buen ejercicio de programación, sobre todo para aprender a
 programar servidores que provean una API web y clientes que la consuman. Sin
 embargo estas guías son introductorias y el objetivo es crear un servidor
-muy simple, similar a lo que fue el servidor Remotebot, pensados para ser
+muy simple, similar a lo que fue el servidor RemoteBot, pensados para ser
 usados en un ambiente local ya que no proveen autenticación en general.
 

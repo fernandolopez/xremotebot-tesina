@@ -7,6 +7,7 @@
 \chapter{Motivación del diseño y desarrollo de XRemoteBot}\label{ch1}
 % FIXME \section{Motivación del diseño y desarrollo de XRemoteBot}\label{ch1:motivacion}
 
+\section{Motivación}\label{sec:motivacion}
 Desde el año 2009, en el marco del proyecto ``Programando con robots y
 software libre'' de la Facultad de Informática,
 se brindan cursos de programación en Python para alumnos de escuelas
@@ -61,18 +62,119 @@ ya mencionados.
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{figures/scribbler}
-        \subcaption{Robot Scribbler de Parallax}
-        \label{fig:robots_usados_scribbler}
+        \subcaption{Robot Scribbler de Parallax}\label{fig:robots_usados_scribbler}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{figures/n6}
-        \subcaption{Robot Multiplo N6 de RobotGroup}
-        \label{fig:robots_usados_n6}
+        \subcaption{Robot Multiplo N6 de RobotGroup}\label{fig:robots_usados_n6}
     \end{subfigure}
-    \caption{Robots usados en el proyecto}
-    \label{fig:robots_usados}
+    \caption{Robots usados en el proyecto}\label{fig:robots_usados}
 \end{figure}
 
+\section{Los robots}
+Como se mencionó anteriormente se utilizaron a lo largo del proyecto dos
+modelos de robots distintos, los Scribbler y los N6. Esta sección tiene una
+breve reseña de sus características técnicas.
+
+\subsection{Scribbler de Parallax}
+Los robots Scribbler (versión 1) cuentan con un microcontrolador
+\textit{PIC16F57} que viene programado con un intérprete de Basic, el producto
+completo es denominado por Parallax ``Basic Stamp 2''.
+Para su locomoción este robot cuenta con dos ruedas conectadas a través de
+cajas
+reductoras~\footnote{\url{http://es.wikipedia.org/wiki/Reductores_de_velocidad}}
+a sus respectivos motores de DC y una tercer rueda no conectada a ningún
+motor que sirve como tercer punto de apoyo para el cuerpo del robot.
+La alimentación eléctrica del robot es provista por 6 pilas AA.
+
+En cuanto a los sensores, el robot está equipado con:
+\begin{itemize}
+    \item Dos emisores infrarrojos a los lados de su parte frontal y un
+        sensor infrarrojo entre ellos que permite sensar (de acuerdo a si se
+        refleja el haz de luz infrarroja de alguno de los laterales) si
+        hay algún obstáculo a la derecha o a la izquierda del robot.
+    \item Tres fotorresistores ubicados dentro de 3 cavidades al frente del
+        robot que permiten sensar la presencia de fuentes de luz e
+        identificar (si la luz no es muy difusa) si las mismas se encuentran
+        directamente enfrente, a la izquierda o a la derecha del robot.
+    \item Dos sensores de línea que consisten cada uno de un emisor
+        y un sensor infrarrojo, los mismos detectan cambios de contraste
+        en el piso de acuerdo a la cantidad de luz IR reflejada y generalmente
+        se utilizan para que el robot siga un camino demarcado por una línea
+        de un color sobre una superficie de un color contrastante.
+\end{itemize}
+
+Si bien las anteriores son las características generales del robot, usándolo
+de esta manera hay que programarlo a través de un cable serial usando el
+lenguaje PBASIC basado en BASIC, para nuestro proyecto utilizamos una versión
+que agrega un dispositivo extra, el FLUKE-6, que se conecta al puerto
+serial del robot y provee la capacidad de comandarlo de forma inalámbrica
+usando Bluetooth, además de agregar otra serie de sensores. Conectar el
+FLUKE-6 invierte el sentido de giro de las ruedas, por lo que el frente
+del robot pasa a ser el lugar donde se conecta el FLUKE-6. De aquí
+en adelante cuando se mencione la parte delantera del Scribbler, será la
+parte donde se encuentra conectado el FLUKE-6 y la parte trasera será la
+opuesta.
+
+El FLUKE-6 es comandado por con un microcontrolador \textit{LPC2106F} basado
+en la arquitectura
+\textit{ARM7}~\footnote{\url{http://pdf1.alldatasheet.com/datasheet-pdf/view/83950/PHILIPS/LPC2106FHN48.html}}
+, posee un módulo de comunicaciones
+Bluetooth que utiliza como medio de comunicación con la computadora
+controlante
+provee una camara de baja resolución con la que se pueden tomar fotografías
+que luego serán transmitidas por bluetooth y además agrega
+un sensor infrarrojo que permite detectar la presencia de obstáculos
+a la izquierda, al centro o a la derecha (está compuesto de 3 emisores
+y un receptor). Con esta adición el robot queda equipado ahora con sensores
+en la parte frontal y en la parte trasera, pero más importante aún
+el módulo Bluetooth permite controlarlo de forma inalámbrica siempre
+que se grabe un firmware especial en la placa FLUKE-6, esto es lo que permite
+que estos robots puedan ser programados con Python unsando la biblioteca
+\textit{Myro}.
+
+\subsection{Multiplo N6}
+El robot Multiplo N6 fabricado por la empresa RobotGroup cuenta con un
+microcontrolador Atmel \textit{AVR ATMega32U4} con el bootloader de Arduino
+precargado, para su locomoción cuenta con dos ruedas conectadas a través
+de reductores de velocidad a sus correspondientes motores DC y una tercer
+rueda no conectada a ningún motor que sirve como tercer punto de apoyo,
+la alimentación eléctrica de estos robots está dada por tres pilas AA
+en serie (o bien dos packs de tres pilas cada uno en paralelo).
+
+En cuanto a los sensores el N6 está equipado con:
+\begin{itemize}
+    \item Un sensor ultrasónico para detectar obstáculos al frente del
+        robot.
+    \item Un sensor infrarrojo que puede ser utilizado en conjunto con
+        un control remoto universal para enviar comandos al robot
+        (siempre que se programe este comportamiento previamente).
+    \item Dos sensores detectores de línea, compuestos de un emisor y
+        un receptor infrarrojo cada uno.
+    \item Opcionalmente estos sensores pueden desatornillarse y ensamblarse
+        para funcionar como encoders de las ruedas, de esta manera pudiendo
+        calcular la velocidad de giro de las ruedas (pero este uso
+        no es recomendable si se controla el robot de forma remota
+        ya que la latencia de las comunicaciones puede hacer que se pierdan
+        datos haciendo que el cálculo de la velocidad se impreciso).
+\end{itemize}
+
+En esta configuración estos robots son programables usando el entorno de
+Arduino, pero dado que el proyecto tenía por objetivo la enseñanza de 
+programación en el lenguaje Python se encargó al fabricante una modificación
+para hacer que el robot se pudiera controlar de forma inalámbrica, esta
+modificación consistió en la adición de un módulo de comunicación inalámbrica
+XBee que permite enviar y recibir datos del robot a traves del protocolo
+ZigBee. Adicionalmente los fabricantes proveyeron a los integrantes del
+proyecto \proyecto{} de una implementación
+inicial de un firmware basado en la implementación para Arduino del protocolo
+de control \texttt{Firmata} y
+de un módulo Python para controlar a los robots usando este protocolo, el
+cuál fue adaptado por los miembros del proyecto \proyecto{}
+para soportar nuevas funcionalidades y proveer una
+API similar a la de la biblioteca \texttt{Myro}. Además para interactuar
+
+\section{Características comunes}
 Aunque se han utilizado a la fecha estos dos modelos distintos de robots,
 en esencia, las características principales de ambos modelos son las mismas
 y coinciden con las de otros robots usados en la Argentina para enseñar a
@@ -185,8 +287,7 @@ terminase.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figures/arquitectura_remotebot}
-    \caption{Esquema de conexión de RemoteBot}
-    \label{fig:arquitectura_remotebot}
+    \caption{Esquema de conexión de RemoteBot}\label{fig:arquitectura_remotebot}
 \end{figure}
 
 
