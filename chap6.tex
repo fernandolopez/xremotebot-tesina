@@ -1,0 +1,314 @@
+% El capítulo 4 describe la implementación de los clientes y el modo de uso
+% de cada uno destacando algunas diferencias y decisiones de diseño en la
+% implementación en Javascript.
+
+\chapter{Implementación de los clientes}\label{cha:clientes}
+
+La implementación de XRemoteBot para esta tesina incluye tres clientes en distintos
+lenguajes de programación: Python, Ruby y Javascript. Este último para ejecutarse
+en el entorno de un navegador Web.
+
+Estos clientes tienen distintas características y principalmente el que más difiere
+de los otros es el cliente Javascript ya que es una implementación a ser ejecutada
+en el navegador con las restricciones que esto trae, pero con la ventaja de que
+se encuentra integrado con la vista Web de XRemoteBot por lo que cuenta con una
+vista de la cámara al lado del campo de texto donde el usuario puede codificar.
+
+En general se intentó copiar el estilo de programación del módulo DuinoBot original
+de la forma más fiel posible, en el caso de Javascript por limitaciones del entorno
+no se logró imitar este estilo tan fielmente como en los otros clientes.
+
+\section{Cliente Python}\label{sec:python}
+El uso del cliente Python es muy similar al uso directo de los robots con la
+biblioteca DuinoBot aunque la implementación es bastante diferente por el protocolo
+subyacente.
+
+El cliente Python utiliza un solo módulo que no pertenece a la biblioteca estándar
+de Python, el módulo para acceso a WebSockets
+\textit{websocket-client}\footnote{\url{https://pypi.python.org/pypi/websocket-client}}
+que cuenta, además de con una interfaz asincrónica, con una interfaz de ``bajo nivel''
+sincrónica similar a la interfaz tradicional de Sockets.
+
+\begin{lstlisting}[language=Python,
+caption={Ejemplo con XRemoteBot para Python},label=lst:ejemplo_xremotebot_python]
+from xremotebot import *
+server = Server('ws://xremotebot.example:8000/api', 'api_key')
+robot = Robot(server, server.fetch_robot())
+robot.forward(100, 1)
+robot.backward(50, 2)
+print(robot.getObstacle())
+\end{lstlisting}
+
+
+Las operaciones con demoras, como los movimientos se implementan localmente
+utilizando 2 mensajes y la función \texttt{time.wait()} de Python. De esta
+forma
+invocar al método \texttt{robot.forward(100, 1)} se traduce en los mensajes
+de
+la figura~\ref{fig:ejemplo_xremotebot_python_json}. Como todos los métodos
+de movimiento
+proveen esta funcionalidad de demora, la misma implementada en el
+\textit{decorator}\footnote{Esto es un decorator de Python, no confundir
+con el patrón de diseño. \url{https://www.python.org/dev/peps/pep-0318/}}
+\texttt{xremotebot.timed} a fin de evitar repetición de código.
+
+\begin{lstlisting}[language=Python,
+caption={Mensajes generados al invocar \texttt{robot.forward(100, 1)} en
+XRemoteBot para Python}, label=lst:ejemplo_xremotebot_python_json]
+{
+    "entity": "robot",
+    "method": "forward",
+    "args": [100]
+}
+# Después de 1 segundo...
+{
+    "entity": "robot",
+    "method": "stop",
+    "args": []
+}
+\end{lstlisting}
+
+
+\section{Cliente Ruby}\label{ch4:ruby}
+
+Las gemas que proveen soporte para WebSockets en Ruby proveen una API
+asincrónica que no es deseable para este proyecto por lo que me incliné
+por incorporar el código del
+proyecto\footnote{\url{https://github.com/gimite/web-socket-ruby}}
+al cliente Ruby de XRemoteBot, este proyecto no se encuentra empaquetado
+en forma de gema pero provee una API sincrónica que permite implementar
+el cliente Ruby de XRemoteBot para que se comporte de una forma muy similar
+a la biblioteca DuinoBot original.
+
+\begin{lstlisting}[language=Ruby,
+caption={Ejemplo usando XRemoteBot para Ruby},
+label=lst:ejemplo_xremotebot_ruby]
+require 'xremotebot'
+server = XRemoteBot::Server.new('xremotebot.example',
+                                8000,
+                                'api',
+                                'api_key')
+
+print "Robots #{server.get_robots}\n"
+                                                                                                                    robot = Robot.new server, server.fetch_robot
+robot.forward 100, 1
+robot.backward 50, 2
+print robot.getObstacle
+\end{lstlisting}
+
+
+
+\section{Cliente Javascript}\label{ch4:javascript}
+
+\subsection{API Javascript y asincronismo}
+Como se mencionó con anterioridad, gran parte de las decisiones de diseño de XRemoteBot
+se hicieron para permitir la implementación de un cliente Javascript, pero dado el hecho
+de que Javascript dentro del entorno de un navegador Web se comporta de forma asincrónica
+no fue posible implementar un cliente Javascript cuyo uso se asemeje al de la biblioteca
+de Python DuinoBot.
+
+Para ilustrar esta problemática se puede tomar en consideración el 
+código~\ref{lst:ejemplo_duinobot}
+típico hecho usando DuinoBot en Python y analizar los inconvenientes para replicar
+algo similar en Javascript.
+
+\begin{lstlisting}[language=Python,
+caption={Ejemplo típico usando DuinoBot},label=lst:ejemplo_duinobot]
+from duinobot import *
+board = Board()
+robot = Robot(board, 10)
+robot.forward(100, 1)
+robot.backward(50, 2)
+print(robot.getObstacle())
+\end{lstlisting}
+
+
+Las líneas 2 y 3 del ejemplo de la código~\ref{lst:ejemplo_duinobot} son
+operaciones que retornan objetos, en XRemoteBot la línea 2 no tiene sentido
+ya que la placa a la que está conectado el robot está predefinida en el
+servidor, pero la línea 3 sí es necesaria para obtener una instancia de un
+robot no reservado, estas operaciones que retornan un valor el XRemoteBot
+se dividen en un mensaje de petición y uno de respuesta, el problema
+es que por el asincronismo de Javascript y de la API de WebSockets no
+es posible determinar en que momento llegará la respuesta con el valor
+retornado y la única forma de bloquear la ejecución del script hasta que
+llegue la respuesta sería hacer ``busy waiting'', lo cuál puede llegar a
+bloquear la pestaña del navegador ya que los navegadores típicamente usan
+un solo thread compartido entre el renderizado de la página, manejo de
+eventos y ejecución del código Javascript asociado a la página.
+
+En tanto las líneas 4 y 5 si bien no retornan un valor deben ejecutarse
+en orden, y la línea 5 en este caso debe ejecutarse precisamente 1 segundo
+después de la ejecución de la línea 4, también la línea 6 deberá ejecutarse
+2 segundos después de la línea 5 ya que no es lo mismo preguntar si hay
+un obstáculo cuando el robot aún no retrocedió, esto que parece muy obvio
+y natural en la mayoría de los lenguajes de programación no es posible
+en Javascript (dentro del navegador, con intérpretes como NodeJS sí es
+posible) y el orden de ejecución y demora no se puede lograr simplemente
+poniendo una instrucción debajo de otra.\footnote{FIXME}
+
+
+La solución encontrada a este problema fue el uso de
+\textit{Promises}~\citep{ECMA-262},
+las \textit{Promises} proveen un mecanismo para ejecutar instrucciones,
+que dependen de los resultados o de la terminación de eventos asincrónicos,
+las \textit{Promises} permiten tener secuencia e interdependencia entre los
+mensajes enviados a los
+robots.
+Si bien el objeto \textit{Promise} está en proceso de estandarización,
+los navegadores Google Chrome, Firefox, Internet Explorer, Opera y Safari las
+soportan\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise}}.
+El problema de esta solución es que la sintaxis de un script XRemoteBot en
+Javascript usando \textit{Promises}
+resulta bastante distinta de la sintaxis de un script DuinoBot como resulta
+evidente
+en el código~\ref{lst:ejemplo_xremotebot_javascript} donde se muestra un
+script equivalente
+al del código~\ref{lst:ejemplo_duinobot} escrito en Javascript.
+
+\begin{lstlisting}[language=C,
+caption={Ejemplo de XRemoteBot en Javascript},
+label=lst:ejemplo_xremotebot_javascript]
+var server = new Server('xremotebot.example:8000', 'api-key');
+server.onConnect(function(){
+    server.fetch_robot().then(function(robot){
+        robot.forward(100, 1).then(function(){
+            robot.backward(50, 2).then(function(){
+                robot.getObstacle().then(function(obstacle){
+                    println(obstacle);
+                })
+            })
+        })
+    });
+});
+\end{lstlisting}
+
+Como se puede ver después de cada acción bloqueante, es decir cada método que
+provoque una demora, y de cada método que retorne un valor útil, como
+\texttt{Robot\#getObstacle()}, se invoca el método \texttt{Promise\#then()} con
+una función anónima como argumento. Esta función que se pasa por argumento al
+then se ejecutará si la \textit{Promise} se ``resuelve'', en el caso de
+XRemoteBot la \textit{Promise} se ``resuelve'' cuando el servidor
+responde al mensaje que generó la \textit{Promise}.
+Este mecanismo se logró identificando cada mensaje con un \texttt{msg\_id},
+manteniendo un objeto Javascript (usado como si fuera un \texttt{dict}
+o \texttt{HashMap}) con el identificador como clave y la promesa
+correspondiente a cada uno los mensajes cuyas respuestas están pendientes
+como valor. Dentro del callback \texttt{onmessage} del WebSocket utilizado
+al recibir una respuesta se busca el \texttt{msg\_id} en el objeto de
+mensajes con respuesta pendiente y se ``resuelve'' la promesa correspondiente
+a este mensaje. De esta manera se ejecuta la siguiente función (pasada como
+argumento a \texttt{Promise\#then}) siguiendo con el flujo del programa
+en orden y con la demora necesaria. En el
+código~\ref{lst:ejemplo_xremotebot_javascript_promises} se muestra esta primer
+implementación.
+
+
+\begin{lstlisting}[language=C,
+caption={Ejemplo simplificado de la implementación de XRemoteBot con
+Promises dentro del constructor Server en remotebot.js},
+label=lst:ejemplo_xremotebot_javascript_promises]
+this.send_ws_msg = function(msg){
+    var promise;
+    promise = new Promise(function(resolve, reject){
+        that.pending_msgs[msg_id] = {resolve: resolve, reject: reject};
+    });
+    msg['msg_id'] = msg_id;
+    that.ws.send(JSON.stringify(msg));
+    return promise;
+}
+// ...
+this.ws.onmessage = function(msg){
+    msg = JSON.parse(msg.data);
+    if (msg['msg_id'] !== undefined){
+        var executor = that.pending_msgs[msg['msg_id']];
+        delete that.pending_msgs[msg['msg_id']];
+        executor.resolve(msg);
+    }
+};
+\end{lstlisting}
+
+
+Evidentemente esta forma de programar resulta engorrosa y poco práctica,
+por lo que se añadieron
+lógica y estructuras de datos extra que serializan en envío de mensajes al
+servidor, enviando de a un mensaje por vez (el objeto Javascript con
+mensajes con respuesta pendiente tendrá a lo sumo una entrada)
+y encolando los mensajes sobrantes
+en una cola de mensajes demorados (\texttt{Server\#delayed}), cuando
+el servidor contesta el mensaje enviado anteriormente se toma un mensaje
+de la cola si lo hubiere y se lo envía al servidor. De esta manera
+se garantiza la demora necesaria entre la ejecución de cada método
+del robot, sin embargo para obtener los valores de retorno de los métodos,
+como en el caso de los métodos de acceso a los sensores, sigue siendo
+necesario el uso del método \texttt{Promise\#then}. A pesar de esto último
+como se puede ver en el código~\ref{lst:ejemplo_xremotebot_javascript_cola}
+con estas modificaciones es posible hacer que el cliente Javascript
+tenga una API más limpia y usable, esta última versión es la definitiva
+para este trabajo.
+
+\begin{lstlisting}[language=C,
+caption={Ejemplo de XRemoteBot en Javascript con empleo de una cola para
+serializar mensajes},
+label=lst:ejemplo_xremotebot_javascript_cola]
+var server = new Server('xremotebot.example:8000', 'api-key');
+server.fetch_robot().then(function(robot){
+    robot.forward(100, 1);
+    robot.backward(50, 2);
+    robot.getObstacle().then(function(obstacle){
+        println(obstacle);
+    });
+});
+\end{lstlisting}
+
+
+Una solución alternativa para lograr imitar tanto como sea posible la
+API de DuinoBot puede ser utilizar un intérprete Javascript implementado en
+Javascript como
+JS-Interpreter\footnote{\url{https://github.com/NeilFraser/JS-Interpreter}},
+pero requeriría modificar el intérprete para lograr una ejecución paso a paso
+controlada por el flujo de mensajes a través de la conexión con WebSockets,
+además de agregar complejidad, este tipo de intérpretes no accede a un entorno
+compreto como lo hace el intérprete incorporado en los navegadores y puede
+tener incompatibilidades o funcionalidades no implementadas, en este caso
+por ejemplo JS-Interpreter no soporta interrupciones y no puede interactuar
+directamente con DOM, otra opción es
+Hypnotic\footnote{\url{http://coolwanglu.github.io/hypnotic/web/demo.html}}
+que utiliza el intérprete Narcissus y provee una función \texttt{sleep()} que
+demora la ejecución del código como se desea para este proyecto, pero el
+invoveniente de Hypnotic es que por el momento solamente funciona en el
+navegador
+Firefox\footnote{\url{https://github.com/coolwanglu/hypnotic/wiki\#limitations}}.
+
+
+\subsection{Interacción con DOM y JQuery}
+
+\subsection{Interfaz Web y streaming de video}
+
+La interfaz Web de XRemoteBot, que está pensada principalmente para los casos
+de uso donde los clientes están en una ubicación geografica distinta a la de
+los robots provee login, acceso a la visualización y renovación de una
+clave alfanumérica única por cada usuario denominada \textit{API key} que
+permite reservar y controlar los robots sin la necesidad de exponer el nombre
+de usuario y contraseña, y una página que permite ver los robots en vivo por
+video opcionalmente controlandolos con un script Javascript.
+
+Login y renovación de API, doc
+
+La interfaz web pensada para ser utilizada en conjunto con el cliente
+Javascript (aunque puede ser accedida sin problemas aún si se usa
+otro de los clientes) provee un area de texto para escribir el script
+a ejecutar % FIXME
+para la misma se utilizó CodeMirror ...
+
+Un area de texto que simula la salida de una terminal, en la misma
+se pueden ver mensajes de log generados con la función
+\texttt{rblog} que pueden ser habilitados o deshabilitados desde un
+checkbox y mensajes impresos con la función \texttt{rbprintln}.
+
+Un area de video destinada a emisiones en vivo que muestren la posición
+del robot, el mismo no requiere ningún plugin ya que se utilizó
+\texttt{jsmpeg}\footnote{\url{https://github.com/phoboslab/jsmpeg}}
+que permite emitir video en vivo usando WebSockets y renderizarlo
+en el navegador en un elemento Canvas, de esta manera se logró tener
+video en vivo utilizando características estándar de HTML5.

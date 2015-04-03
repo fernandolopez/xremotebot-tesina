@@ -1,39 +1,3 @@
-\chapter{Pruebas}\label{cha:pruebas}
-
-El servidor se probó con Python 2.7 (portarlo a Python 3 involucraría
-portar DuinoBot, Myro y otros módulos asociados) en entornos creados
-con virtualenv\footnote{FIXME REF} y con una base de datos
-Sqlite\footnote{FIXME REF}
-sobre
-sistemas Lihuen 5 y 6 beta (basados en Debian Wheezy y Jessie respectivamente).
-Las dependencias se instalaron declarandolas en \texttt{setup.py} e instalandolas
-con pip, a excepción de los módulos DuinoBot y Myro que fueron instalados
-desde repositorios Git usando también pip, pero indicando la URL manualmente
-ya que no fué posible declararlos de esta manera en \texttt{setup.py}.
-
-\begin{lstlisting}[language=bash,caption={Instalación de XRemoteBot},label=]
-git clone https://github.com/fernandolopez/xremotebot.git
-cd xremotebot
-virtualenv .
-. bin/activate
-pip install -r requirements.txt
-pip install 'git+https://github.com/Robots-Linti/duinobot.git@pygame_opcional'
-pip install 'git+https://github.com/fernandolopez/Myro.git'
-\end{lstlisting}
-
-Para soportar el streaming de video además es necesario 
-
-
-
-\begin{lstlisting}[language=bash,caption={Instalación de XRemoteBot},label=]
-./run.sh
-\end{lstlisting}
-
-usando los archivos requirementes.txt
-y requirements-dev.txt, a excepción de los módulos DuinoBot y Myro que se
-instalaron con pip desde Git por lo que no fue posible usar los archivos
-
-
 
 \chapter{Conclusiones}\label{cha:conclusiones}
 
