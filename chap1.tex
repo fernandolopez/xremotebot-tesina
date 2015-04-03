@@ -4,59 +4,19 @@
 %% You can process specific files by typing their names in at the 
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
-\chapter{Motivación del diseño y desarrollo de XRemoteBot}\label{ch1}
-% FIXME \section{Motivación del diseño y desarrollo de XRemoteBot}\label{ch1:motivacion}
+\chapter{Motivación del diseño y desarrollo de XRemoteBot}\label{cha:motivacion}
+
+% FIXME ¿una intro al cap?
 
 \section{Motivación}\label{sec:motivacion}
 Desde el año 2009, en el marco del proyecto ``Programando con robots y
 software libre'' de la Facultad de Informática,
-se brindan cursos de programación en Python para alumnos de escuelas
-secundarias utilizando robots didácticos.
+se utilizan robots para brindar cursos básicos de programación en Python a alumnos de escuelas
+secundarias. Estos robots son simplemente una herramienta didáctica, dado que el foco principal es la enseñanza de las estructuras básicas de Python y no la electrónica relacionada a los mismos.
 
-En un comienzo se utilizaron los robots Scribbler de Parallax
-(figura~\ref{fig:robots_usados_scribbler}), los mismos se
-pueden programar directamente a través de un cable en el lenguaje
-PBASIC y funcionar de forma autónoma o pueden ser controlados de forma
-inalámbrica con Bluetooth, durante las actividades se utilizó de la última
-forma que permite controlarlo usando el lenguaje Python cuyo intérprete no
-es posible ejecutar directamente sobre el microcontrolador del robot.
+%FIXME aca no se si no pondría un párrafo de por qué python... fijate en el libro de robots qué pusimos...
 
-Estos robots se importaban desde Estados Unidos en volúmenes bajos lo que
-dificultaba su adquisición y dejaba al equipo sin ninguna garantía ante
-averías, por estos motivos se buscaron alternativas de fabricación nacional,
-que pudieran utilizarse desde Python y tuvieran especificaciones abiertas.
-De esta manera en el año 2011 se adquirieron para pruebas robots Multiplo N6
-de la empresa RobotGroup (figura~\ref{fig:robots_usados_n6})
-cuyas especificaciones se distribuyen bajo una licencia libre y
-la empresa se comprometió a la creación de una biblioteca Python que permitiera
-su programación en ese lenguaje, esa biblioteca se desarrolló en conjunto
-con miembros del laboratorio LINTI y miembros de la empresa RobotGroup siendo
-mantenida en la actualidad por los primeros. Los robots Multiplo N6 son
-controlados por una placa basada en Arduino, la misma se puede programar
-a través de un cable en el lenguaje C++ de manera que el robot luego funcione
-de manera autónoma y también pueden ser controlados de forma inalámbrica
-a través del protocolo ZigBee~\citep{diaz_aprendiendo_2012}. La placa
-controladora del N6 se denomina DuinoBot y no debe confundirse con la biblioteca
-Python del mismo nombre que se desarrolló en conjunto con la empresa RobotGroup
-para controlar estos robots. De aquí en adelante se denominará DuinoBot a la
-biblioteca y placa controladora al componente de hardware que contiene el
-microcontrolador a menos que se especifique lo contrario.
-
-
-
-En el año 2012, a través de una cooperación con la Fundación YPF que brindó
-un subsidio y bajo el auspicio de la Dirección de Escuelas Técnicas de la
-Provincia de Buenos Aires se dictaron cursos en 10 escuelas técnicas de la
-provincia. La fundación YPF brindó a cada una de estas escuelas, entre otras
-cosas, 20 robots Multiplo N6 que quedarían en cada escuela, en estos cursos
-se capacitó a 140 docentes y 40 alumnos avanzados en programación en Python
-a través del uso de estos dispositivos~\citep{diaz_aprendiendo_2012}.
-Esta experiencia consolidó el uso de
-los robots N6 para los cursos dictados en el marco del proyecto
-``Programando con robots y software libre'' donde estos robots desplazaron
-a los Scribblers por su confiabilidad y stock, dadas las dificultades de
-reponer los Scribblers a medida que se averiaban por los motivos
-ya mencionados.
+%FIXME FIJATE SI PODES HACER QUE LAS FIGURAS SE MUESTREN MAS CERCA DE DONDE LAS MENCIONAS
 
 \begin{figure}
     \centering
@@ -71,23 +31,74 @@ ya mencionados.
     \caption{Robots usados en el proyecto}\label{fig:robots_usados}
 \end{figure}
 
+En un comienzo se utilizaron los robots Scribbler de Parallax, mostrados en la figura~\ref{fig:robots_usados_scribbler}. Estos robots pueden programarse directamente a través de un cable utilizando  el lenguaje
+PBASIC, y funcionar de forma autónoma o pueden ser controlados de forma
+inalámbrica con Bluetooth. En las experiencias realizadas se los utilizó de la última
+forma, dado  que permite controlar el robot usando el lenguaje Python, cuyo intérprete no
+es posible ejecutar directamente sobre el microcontrolador del mismo.
+
+Estos robots se importaban desde Estados Unidos en volúmenes bajos, lo que
+dificultaba su adquisición tanto por el equipo del proyecto como de posibles escuelas que quieran comprarlos, dejando, además al equipo sin ninguna garantía ante posibles 
+averías. Por estos motivos se buscaron alternativas de fabricación nacional,
+que pudieran ser programados en lenguaje Python y tuvieran especificaciones abiertas.
+De esta manera, a fines del año 2011, se adquirieron dos robots Multiplo N6
+de la empresa RobotGroup, mostrados en la figura~\ref{fig:robots_usados_n6},
+cuyas especificaciones se distribuyen bajo una licencia libre. Desde la empresa se 
+ofrece una API para la programación de estos robots basada en las librerías de Arduino,
+la cual no se adecuaba a las propuestas del proyecto. Por este motivo, se desarrolló
+una biblioteca Python que permite la programación en dicho lenguaje. Este
+desarrollo fue realizado por un equipo de trabajo integrado por miembros del
+laboratorio LINTI y miembros de la empresa RobotGroup, y actualmente está
+siendo mantenido por el LINTI[REF AL PAPER DE JAIIO ]. 
+
+Los robots Multiplo N6 son
+controlados por una placa basada en Arduino. La misma se puede programar
+a través de un cable, utilizando el lenguaje de programación C++, de manera que el robot luego funcione
+de manera autónoma,  y también pueden ser controlados de forma inalámbrica
+a través del protocolo ZigBee~\citep{diaz_aprendiendo_2012}. 
+
+La placa
+controladora del Multiplo N6 se denomina DuinoBot y no debe confundirse con la biblioteca
+Python del mismo nombre que se desarrolló en conjunto con la empresa RobotGroup
+para controlar estos robots. De aquí en adelante se denominará DuinoBot a la
+biblioteca y placa controladora al componente de hardware que contiene el
+microcontrolador a menos que se especifique lo contrario.
+
+
+
+En el año 2012, a través de una cooperación con la Fundación YPF que brindó
+un subsidio y bajo el auspicio de la Dirección de Escuelas Técnicas de la
+Provincia de Buenos Aires se dictaron cursos en 10 escuelas técnicas de la
+provincia. La fundación YPF brindó a cada una de estas escuelas, entre otras
+cosas, 20 robots Multiplo N6 que quedaron en cada escuela. En estos cursos
+se capacitaron más de 140 docentes y 40 alumnos avanzados, en programación en el lenguaje Python utilizando 
+estos dispositivos~\citep{diaz_aprendiendo_2012} como herramienta didáctica.
+
+Esta experiencia consolidó el uso de
+los robots Multiplo N6 para los cursos dictados en el marco del proyecto
+``Programando con robots y software libre'',  donde este nuevo modelo de  robot desplazó
+a los Scribblers, tanto por su confiabilidad y la facilidad de adquisición de los mismos.
+
+
+
 \section{Los robots}
 Como se mencionó anteriormente se utilizaron a lo largo del proyecto dos
-modelos de robots distintos, los Scribbler y los N6. Esta sección tiene una
+modelos de robots distintos: el  Scribbler y el Multiplo N6. Esta sección provee una
 breve reseña de sus características técnicas.
 
-\subsection{Scribbler de Parallax}
+\subsection{Robot Scribbler de Parallax}
 Los robots Scribbler (versión 1) cuentan con un microcontrolador
-\textit{PIC16F57} que viene programado con un intérprete de Basic, el producto
+\textit{PIC16F57} que viene programado con un intérprete de Basic. El producto
 completo es denominado por Parallax ``Basic Stamp 2''.
 Para su locomoción este robot cuenta con dos ruedas conectadas a través de
 cajas
-reductoras~\footnote{\url{http://es.wikipedia.org/wiki/Reductores_de_velocidad}}
-a sus respectivos motores de DC y una tercer rueda no conectada a ningún
+reductoras\footnote{\url{http://es.wikipedia.org/wiki/Reductores_de_velocidad}}
+a sus respectivos motores de DC (corriente continua)  y una tercer rueda no conectada a ningún
 motor que sirve como tercer punto de apoyo para el cuerpo del robot.
+
 La alimentación eléctrica del robot es provista por 6 pilas AA.
 
-En cuanto a los sensores, el robot está equipado con:
+En cuanto a los sensores, este robot está equipado con:
 \begin{itemize}
     \item Dos emisores infrarrojos a los lados de su parte frontal y un
         sensor infrarrojo entre ellos que permite sensar (de acuerdo a si se
@@ -98,18 +109,19 @@ En cuanto a los sensores, el robot está equipado con:
         identificar (si la luz no es muy difusa) si las mismas se encuentran
         directamente enfrente, a la izquierda o a la derecha del robot.
     \item Dos sensores de línea que consisten cada uno de un emisor
-        y un sensor infrarrojo, los mismos detectan cambios de contraste
+        y un sensor infrarrojo (IR). Los mismos detectan cambios de contraste
         en el piso de acuerdo a la cantidad de luz IR reflejada y generalmente
         se utilizan para que el robot siga un camino demarcado por una línea
         de un color sobre una superficie de un color contrastante.
 \end{itemize}
 
-Si bien las anteriores son las características generales del robot, usándolo
+Si bien las anteriores son las características generales de estos robots, usándolo
 de esta manera hay que programarlo a través de un cable serial usando el
-lenguaje PBASIC basado en BASIC, para nuestro proyecto utilizamos una versión
-que agrega un dispositivo extra, el FLUKE-6, que se conecta al puerto
+lenguaje PBASIC basado en BASIC. Para las actividades planteadas en el marco del
+proyecto \proyecto{}, se utilizó  una versión
+que agrega un dispositivo extra: el FLUKE-6. Este dispositivo se conecta al puerto
 serial del robot y provee la capacidad de comandarlo de forma inalámbrica
-usando Bluetooth, además de agregar otra serie de sensores. Conectar el
+usando Bluetooth.  Conectar el
 FLUKE-6 invierte el sentido de giro de las ruedas, por lo que el frente
 del robot pasa a ser el lugar donde se conecta el FLUKE-6. De aquí
 en adelante cuando se mencione la parte delantera del Scribbler, será la
@@ -118,31 +130,31 @@ opuesta.
 
 El FLUKE-6 es comandado por con un microcontrolador \textit{LPC2106F} basado
 en la arquitectura
-\textit{ARM7}~\footnote{\url{http://pdf1.alldatasheet.com/datasheet-pdf/view/83950/PHILIPS/LPC2106FHN48.html}}
-, posee un módulo de comunicaciones
+\textit{ARM7}\footnote{\url{http://pdf1.alldatasheet.com/datasheet-pdf/view/83950/PHILIPS/LPC2106FHN48.html}}
+. Posee un módulo de comunicaciones
 Bluetooth que utiliza como medio de comunicación con la computadora
-controlante
-provee una camara de baja resolución con la que se pueden tomar fotografías
-que luego serán transmitidas por bluetooth y además agrega
+controlante y
+provee una cámara de baja resolución con la que se pueden tomar fotografías
+que luego serán transmitidas por bluetooth. Además agrega
 un sensor infrarrojo que permite detectar la presencia de obstáculos
 a la izquierda, al centro o a la derecha (está compuesto de 3 emisores
 y un receptor). Con esta adición el robot queda equipado ahora con sensores
 en la parte frontal y en la parte trasera, pero más importante aún
 el módulo Bluetooth permite controlarlo de forma inalámbrica siempre
-que se grabe un firmware especial en la placa FLUKE-6, esto es lo que permite
-que estos robots puedan ser programados con Python unsando la biblioteca
-\textit{Myro}.
+que se grabe un firmware especial en la placa FLUKE-6. Esto es lo que permite
+que estos robots puedan ser programados con Python unsando una  biblioteca denominada
+\textit{Myro}, que será descripta más adelante en este informe.
 
 \subsection{Multiplo N6}
-El robot Multiplo N6 fabricado por la empresa RobotGroup cuenta con un
+El robot Multiplo N6, fabricado por la empresa RobotGroup, cuenta con un
 microcontrolador Atmel \textit{AVR ATMega32U4} con el bootloader de Arduino
-precargado, para su locomoción cuenta con dos ruedas conectadas a través
+precargado. Para su locomoción cuenta con dos ruedas conectadas a través
 de reductores de velocidad a sus correspondientes motores DC y una tercer
-rueda no conectada a ningún motor que sirve como tercer punto de apoyo,
-la alimentación eléctrica de estos robots está dada por tres pilas AA
+rueda no conectada a ningún motor que sirve como tercer punto de apoyo.
+La alimentación eléctrica de estos robots está dada por tres pilas AA
 en serie (o bien dos packs de tres pilas cada uno en paralelo).
 
-En cuanto a los sensores el N6 está equipado con:
+En cuanto a los sensores el Multiplo N6 está equipado con:
 \begin{itemize}
     \item Un sensor ultrasónico para detectar obstáculos al frente del
         robot.
@@ -160,49 +172,51 @@ En cuanto a los sensores el N6 está equipado con:
 \end{itemize}
 
 En esta configuración estos robots son programables usando el entorno de
-Arduino, pero dado que el proyecto tenía por objetivo la enseñanza de 
-programación en el lenguaje Python se encargó al fabricante una modificación
-para hacer que el robot se pudiera controlar de forma inalámbrica, esta
+Arduino, pero dado que el objetivo del proyecto es la enseñanza de 
+programación en el lenguaje Python,  se planteó una modificación
+para hacer que el robot se pudiera controlar de forma inalámbrica. Esta
 modificación consistió en la adición de un módulo de comunicación inalámbrica
-XBee que permite enviar y recibir datos del robot a traves del protocolo
-ZigBee. Adicionalmente los fabricantes proveyeron a los integrantes del
+XBee que permite enviar y recibir datos del robot a través del protocolo
+ZigBee. Los fabricantes proveyeron a los integrantes del
 proyecto \proyecto{} de una implementación
 inicial de un firmware basado en la implementación para Arduino del protocolo
 de control \texttt{Firmata} y
 de un módulo Python para controlar a los robots usando este protocolo, el
 cuál fue adaptado por los miembros del proyecto \proyecto{}
 para soportar nuevas funcionalidades y proveer una
-API similar a la de la biblioteca \texttt{Myro}. Además para interactuar
+API compatible con la de la biblioteca \texttt{Myro}.
 
 \section{Características comunes}
 Aunque se han utilizado a la fecha estos dos modelos distintos de robots,
 en esencia, las características principales de ambos modelos son las mismas
 y coinciden con las de otros robots usados en la Argentina para enseñar a
-programar, a saber:
+programar. En general, todos ellos incluyen:
 \begin{itemize}
-    \item El medio de locomoción es con 2 motores continuos que mueven cada
+    \item Un medio de locomoción  con 2 motores continuos que mueven cada
         uno una de las ruedas laterales.
-    \item Cuentan con algún sensor o sensores que permiten detectar obstáculos.
-    \item Cuentan con algún sensor o sensores que permiten detectar líneas.
-    \item Operan sin el uso de cables
+    \item Sensores que permiten detectar obstáculos.
+    \item Sensores que permiten detectar líneas.
+    \item Operación inalámbrica.
 \end{itemize}
 
 Cabe destacar sobre este último ítem que algunos de los robots no requieren
 cables para operar ya que son programados con anterioridad a través de un
 cable (usualmente USB o Serial) normalmente en algún lenguaje como C, Assembler
-o Basic. Pero los robots usados en el proyecto antes mencionado no requieren cables ya que son controlados a través de señales
+o Basic. Pero los robots usados en el proyecto antes mencionado no requieren
+cables ya que son controlados a través de señales
 inalámbricas lo que permite controlarlos en tiempo real y utilizando
 un intérprete Python estándar (cPython) instalado en el dispositivo
 controlante.
 
 Dado el costo y fragilidad de los robots habitualmente los alumnos interactúan
-con los mismos solamente en el aula, ya sea en su escuela si la misma pudo adquirir los mismos o en las instalaciones de la  Facultad de Informática si el alumno
+con los mismos solamente en el aula, ya sea en su escuela si la misma pudo
+adquirir los robots, o en las instalaciones de la  Facultad de Informática si el alumno
 realiza alguna pasantía o práctica en la misma. Esto tiene varias connotaciones:
 \begin{itemize}
-    \item El alumno al estar en una situación formal en la escuela
-        compartiendo el recurso limitado que es el robot con otros
-        alumnos posiblemente no tenga el tiempo o el ambiente más apropiado
-        para experimentar de forma lúdica con el robot.
+    \item El alumno, al estar en una situación formal en la escuela
+        compartiendo el robot (recurso limitado) con otros
+        alumnos, posiblemente no tenga el tiempo o el ambiente más apropiado
+        para experimentar de forma lúdica con el mismo.
     \item La tarea para casa solamente es realizable a través de un simulador
         que puede ser lo suficientemente completo y fiel como para aprender
         a programar, pero resulta menos estimulante y realista que manipular
@@ -214,7 +228,7 @@ realiza alguna pasantía o práctica en la misma. Esto tiene varias connotacione
         (a lo sumo podrán usar un simulador).
 \end{itemize}
 
-Por otro lado los dongles XBee que permiten conectarse con los robots
+Por otro lado los dongles XBee (CREO QUE ES LA PRIMERA VEZ QUE MENCIONAS DONGLES!!!! FIJATE Y ACLARA ANTES)que permiten conectarse con los robots
 Multiplo N6
 son relativamente costosos, el esquema normal de conexionado entre dispositivos
 controladores y robots descripto en el capítulo~\ref{cha:arquitectura} requiere
@@ -256,19 +270,19 @@ implementar otros clientes que permitieran usar los robots en cursos
 de programación de distintos lenguajes sin reimplementar el protocolo
 de bajo nivel lo que hace en opinión del autor más sencilla la creación
 de nuevos clientes en distintos lenguajes.
-En especial la elección de protocolos y tecnologías usadas
-y la falta de necesidad de acceder directamente al hardware a través de USB
+En especia,l la elección de protocolos y tecnologías usadas
+y la falta de necesidad de acceder directamente al hardware a través de USB,
 habilita la implementación de un cliente Javascript que se ejecute en el
-navegador Web de los usuarios.
+navegador Web de los usuarios. Esta implementación, junto con las desarrolladas en Ruby y Python, se describen en el cap XXXXXX.
 
 El nivel de abstracción que puede proveer esta API hace que también sea
 natural pensar en la posibilidad de manejar distintos tipos de robots
 que tengan algunas características mínimas en común con los robots ya
 descriptos.
 
-El servidor RemoteBot original (figura~\ref{fig:arquitectura_remotebot})
+Originalmente se desarrolló un servidor básicp denominado RemoteBot [REF AL PAPER DE WICC]. RemoteBot, cuya arquitectura planteada se muestra en la figura~\ref{fig:arquitectura_remotebot}), 
 tenía algunas de estas características, pero
-estaba pobremente implementado ya que no era más que una herramienta auxiliar
+estaba pobremente implementado, ya que no era más que una herramienta auxiliar
 para un cliente muy específico y era meramente un intermediario entre el
 cliente original implementado en Java y el módulo DuinoBot. Este servidor
 estaba severamente limitado
@@ -278,6 +292,11 @@ de reserva de robots por lo que un cliente podía interferir en la operación
 de un robot de otro cliente y las operaciones bloqueantes de un cliente
 impedían el uso de los robots al resto de los clientes hasta que esa operación
 terminase.
+
+% FIXME: AGREGA ALGUN PARRAFO TIPO:
+
+RemoteBot fue desarrollado como un trabajo de la cátedra Laboratorio.... y el objetivo fue probar la interacción con los robots desde una aplicación movil.
+
 
 % FIXME: CREO QUE ESTARÍA BUENO QUE ACA PONGAS UNA FIGURA CON LA ARQUITETURA DE REMOTEBOOT
 % Lo puse en otra sección donde se habla más en detalle. Fernando. Armé otra

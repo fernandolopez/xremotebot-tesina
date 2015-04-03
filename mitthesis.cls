@@ -450,7 +450,7 @@ reserved.\par\permission}}
 \def\maketitle{\begin{titlepage}
 \large
 {\def\baselinestretch{1.2}\Large\bf \choosecase{\@title} \par}
-{\large Tesis de grado de la Licenciatura en Inform\'atica}
+{\large Tesina de grado de la Licenciatura en Inform\'atica}
 por\par
 {\Large  \choosecase{\@author}}
 \par

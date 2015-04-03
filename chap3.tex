@@ -1,4 +1,7 @@
-\chapter{Arquitecturas}\label{cha:arquitectura}
+%\chapter{Arquitecturas}\label{cha:arquitectura}
+\chapter{Myro y Duinobot: Las bases de la propuesta}\label{cha:arquitectura}
+
+%FIX ME: yo pondría como titulo: Myro y DuinoBot: LAS BASES DE LA PROPUESTAS
 
 %El capítulo 2 describe la arquitectura de DuinoBot, Myro, Remotebot y
 %XRemoteBot detallando las mejoras provistas por XRemoteBot.
@@ -6,21 +9,36 @@
 % FIXME: QUIZAS ESTE CAPITULO PODRÍA IR ANTES DEL ANTERIOR... YA QUE SEGURAMENTE VAS A NOMBRAR Y DESCRIBIR VARIAS COSAS QUE LUEGO NOMBRAS ALLÁ... FIJATE
 
 Tanto Remotebot como XRemoteBot tienen arquitecturas complejas que
-dependen de otras librerías y de software instalado en los robots,
-el objetivo de este capítulo es describir la interacción entre los
+dependen de otras librerías y de software instalado en los robots.
+El objetivo de este capítulo es describir la interacción entre los
 distintos dispositivos y aplicaciones utilizadas, demarcando el límite
 entre el desarrollo realizado para esta tesina, XRemoteBot, con el software ya
 existente con el que interactúa.
 
 \section{Myro}\label{sec:myro}
 
-Myro [REF] es la biblioteca utilizada para controlar a los robots ``Scribbler''
-desde un script Python. Esta biblioteca puede interactuar con los robots de 2
+Como se mencionó al comienzo de este informe,
+Myro\footnote{\url{http://myro.roboteducation.org/}}
+es la biblioteca utilizada para controlar a los robots
+``Scribbler''\footnote{\url{http://wiki.roboteducation.org/Myro_Hardware}}
+desde un script Python. Esta biblioteca fue desarrollada por
+Institute for Personal Robots in Education (IPRE) y
+y utilizado en el proyecto Robot en la enseñanza de ciencias
+de la computación\footnote{\url{http://www.roboteducation.org}}
+en distintos niveles
+educativos\footnote{\url{http://www.roboteducation.org/schools.html}}.
+Si bien el proyecto original fue desarrollado por Microsoft Research,
+el software generado es software libre y portable tanto en sistemas Windows
+como GNU/Linux.
+
+
+Myro puede interactuar con los robots de dos
 formas diferentes: a través de un cable serial (RS323) o bien usando bluetooth
 con RFCOMM. El funcionamiento de Myro requiere que el robot tenga
 cargado un firmware determinado que espera las instrucciones desde el puerto
-serial con el que cuenta el robot (el adaptador bluetooth se conecta en ese
-mismo puerto serial).
+serial con el que cuenta el robot y una placa llamada FLUKE-6 que se conecta
+al puerto serial del robot y cuenta con un adaptador bluetooth que permite
+enviarle comandos de forma inalámbrica a través de este protocolo.
 
 \begin{figure}
     \centering
@@ -33,10 +51,39 @@ La figura~\ref{fig:diagrama_myro} muestra la interacción entre los componentes
 más importantes de software y hardware desde el script del usuario hasta el
 robot.
 
+Cabe destacar que el código de Myro funciona con Python 2.7 pero no con
+Python 3, posiblemente esto se relacione con la desición del \ipre{}
+de desarrollar una nueva biblioteca para controlar a los robots que funcione
+en distintos lenguajes de
+programación\footnote{\url{http://calicoproject.org/}}. De todas formas se
+decidió seguir con Myro por la experiencia del autor de esta tesina
+con esta librería.
+
+% FIXME Maybe más adelante
+Lamentablemente el servidor SVN oficial donde se publicaban las
+actualizaciones de Myro a la fecha de escribir este documento
+no se encuentra en funcionamiento, por lo que debí recurrir a una
+copia de este repositorio en
+GitHub\footnote{\url{https://github.com/yingted/Myro}} de la cuál
+cree un fork y la reorganicé de forma tal que fuera posible instalar
+esta librería desde un entorno Python con un solo comando y hice
+una pequeña corrección para que el uso de la biblioteca IDLE sea
+opcional ya esa biblioteca sirve para crear interfaces gráficas
+y eso no es necesario para este proyecto.
+
+Esta librería (técnicamente un paquete Python) consta de múltiples
+módulos y requiere de otros para contar con funcionalidades opcionales
+como el soporte de Joysticks, una interfaz gráfica para mostrar
+los valores de los sensores en un diálogo y soporte para manipulación
+de imágenes para poder sacar fotos con el robot y manipularlas. Sin
+embargo para el alcance de este trabajo con el acceso a las funcionalidades
+básicas del robot como moverlo y acceder a sus sensores es suficiente.
+
+
 \section{DuinoBot}\label{sec:duinobot}
 
 La biblioteca de Python
-DuinoBot~\footnote{\url{https://github.com/Robots-Linti/duinobot}}
+DuinoBot\footnote{\url{https://github.com/Robots-Linti/duinobot}}
 desarrollada en conjunto entre un grupo
 de becarios del laboratorio LINTI de esta Facultad y la empresa RobotGroup
 cuenta con un modo de operación similar al de Myro, conectándose con
@@ -75,84 +122,4 @@ fueron utilizados los robots en los cursos del proyecto
 planteadas posteriormente, generalmente además cada alumno controla
 un único robot, el esquema de conexión típico en estos cursos se encuentra
 ilustrado en la figura~\ref{fig:funcionamiento_duinobot_conexion}.
-
-\section{Remotebot}\label{sec:remotebot}
-
-La versión original de Remotebot fue presentada como trabajo práctico
-de la materia Laboratorio de
-Software~\footnote{\url{http://wiki.labmovil.linti.unlp.edu.ar/index.php?title=RemoteBot:_Android_\%2B_Robots}}
-el objetivo principal del trabajo era desarrollar una aplicación para
-dispositivos Android que accediera a sensores y posiblemente a la red
-wireless usando el lenguaje Java.
-
-% FIXME: REDACTAR MEJOR ESTE PARRAFO
-
-Para este trabajo se implementó
-RemoteBot4Android~\footnote{\url{https://github.com/fernandolopez/remotebot4Android}},
-una aplicación Android
-que permite controlar robots usando los acelerómetros de los dispositivos
-móviles donde se ejecuta, inclinar el dispositivo en
-una dirección provoca que el robot se mueva en esa dirección, además
-esta aplicación cuenta con un indicador que muestra la distancia al obstáculo
-más cercano sensado por el robot y una botonera para controlar al robot
-sin usar los acelerómetros.
-
-El producto principal de este trabajo fue el cliente
-Remotebot4Android pero además del cliente, se desarrolló un 
-protocolo de comunicaciones
-y un servidor básico que atiende los requerimientos y se los envía al
-robot correspondiente, respondiendo también a peticiones de datos de
-los sensores del
-robot, ésta fue la primer implementación del servidor
-Remotebot~\footnote{\url{https://github.com/fernandolopez/remotebot}}
-en cuyo concepto está basado XRemoteBot.
-
-Remotebot provee una API JSON a través de HTTP que permite controlar a los
-robots de forma remota, pero si bien es posible poner el servicio público,
-el mismo no cuenta con autenticación, no soporta bien la concurrencia
-y no provee ningún mecanismo de seguridad por lo que es recomendable solamente
-usarlo dentro de ámbito de una red LAN.
-La implementación del servidor
-usa el módulo ``SimpleHTTPServer'' de la biblioteca estándar de Python para
-proveer el soporte del protocolo HTTP e
-introspección~\footnote{\url{http://www.ibm.com/developerworks/library/l-pyint/}}.
-para convertir los
-mensajes enviados por los clientes en invocaciones a métodos.
-
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.78\textwidth}
-        \includegraphics[width=.95\textwidth]{figures/diagrama_remotebot}
-        \subcaption{Diagrama de bloques de Remotebot}
-        \label{fig:diagrama_remotebot}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.2\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/cliente_remotebot}
-        \subcaption{Cliente de Remotebot}
-        \label{fig:cliente_remotebot}
-    \end{subfigure}
-    \caption{Diagrama de bloques e imagen del cliente Remotebot}
-    \label{fig:diagrama_y_cliente_remotebot}
-\end{figure}
-
-Como se ve en la figura~\ref{fig:diagrama_remotebot} Remotebot utiliza la
-biblioteca DuinoBot para comunicarse con los robots y el cliente para el cuál
-fue diseñado es una aplicación Android que permite controlar los robots
-y ver los valores del sensor de distancia usando una interfaz con botones,
-además de poder controlar el robot usando los acelerómetros del dispositivo
-(inclinar el dispositivo en una dirección dada hace que el robot se mueva
-en esa dirección).
-
-\section{XRemoteBot}\label{sec:xremotebot}
-
-La interacción de XRemoteBot a nivel arquitectura es muy similar a la provista por Remotebot,
-con la salvedad que el primero, además soporta robots Scribbler y puede ser
-ampliado para interactuar con otros robots. Desde el punto de vista del cliente
-XRemoteBot tiene varias diferencias, entre ellas la elección del protocolo,
-usándose Websockets en lugar de peticiones HTTP y la definición del protocolo
-de capa de aplicación que si bien es similar, ahora cuenta con un saludo y
-un paso de autenticación a través de una ``API key''.
-
-
 

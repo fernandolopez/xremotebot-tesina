@@ -1,27 +1,32 @@
-\chapter{Estado del arte}
+\chapter{Controlando dispositivos de forma remota}\label{cha:arte}
+
 Existen diferentes alternativas para controlar robots o microcontroladores
 de forma remota, muchas de estas se agrupan bajo la denominación
-``Internet of Things'', en este capítulo se describirán algunas de las
-más destacadas y las más similares a XRemoteBot.
+``Internet of Things''\footnote{\url{https://www.iotwf.com/resources/1}}.
+En este capítulo se describirán algunas de las
+más destacadas y las más similares a los requerimientos planteados en esta
+propuesta.
+
 
 % FIXME: mmmm NO SE SI ESTO DEBERÍA ESTAR EN UN CAPITULO APARTE.....  LO HABLAMOS LUEGO
 
 \section{Educabot}
-El proyecto Educabot~\footnote{\url{http://www.educabot.org/}} tiene por
-objetivos enseñar tecnología a niños y adultos a través
-del uso, programación y construcción de robots. En el sitio del proyecto
-se ofertan cursos orientados a los distintos niveles, estos robots se
-usaron en actividades en distintas escuelas de la Ciudad Autónoma de Buenos
-Aires~\footnote{\url{https://youtu.be/1oCOAtX9OS4}}.
+El proyecto Educabot\footnote{\url{http://www.educabot.org/}} tiene por
+objetivo enseñar tecnología a niños y adultos a través
+del uso, programación y construcción de robots. En el sitio del proyecto se ofertan cursos orientados a los distintos niveles y se mencionan actividades realizadas en distintas escuelas de la Ciudad Autónoma de Buenos
+Aires\footnote{\url{https://youtu.be/1oCOAtX9OS4}}.
 
 % FIXME: ES ORIGINARIO DE ..... EN ESCUELAS? EN ONGS? DONDE SE LOS USA?
 % Son cursos privados según dijo el tipo, pero no tengo de donde citar
 % eso no dice nada el sitio.
+% FIXME: En el sitio no mencionan nada de los cursos en escuelas lo único
+% que encontré es lo de youtube que es una charla en la Pycon del fundador
 
-En la parte de construcción este proyecto plantea un modelo de robot denominado
+En la parte de construcción, este proyecto plantea un modelo de robot
+denominado
 ``Rolo'' para los jóvenes de más de 10 años, mientras que para los más chicos
 se plantean actividades con el robot ``elBrian'' que incluyen
-controlarlo a través de una interfaz Web que muestra las imágenes emitidas
+controlarlo a través de una interfaz web que muestra las imágenes emitidas
 por la cámara incorporada en este robot y además permite controlarlo con
 botones en pantalla que determinan en qué dirección debe moverse el robot
 (figura~\ref{fig:elbrian}).
@@ -36,12 +41,14 @@ botones en pantalla que determinan en qué dirección debe moverse el robot
 
 Las tecnologías utilizadas en la interfaz web de ``elBrian'' coinciden en gran
 parte con las utilizadas en el desarrollo de XRemoteBot, pero el objetivo del
-servidor de ``elBrian'' es controlar un único robot en un ambiente local,
-además este servidor
-se instala en el robot cuestión que sería imposible en los robots basados en
+servidor de ``elBrian'' es controlar un único robot en un ambiente local.
+Además este servidor
+se instala en el robot utilizado,  cuestión que sería imposible en los
+robots basados en
 microcontroladores AVR y PIC (``Basic Stamp 2`` de Parallax)
 a los que XRemoteBot se encuentra dirigido.
 
+%FIXME: fijate de poner aunque sea notas al pie con las referencias de los paquetes o protocolos que nmbras... el que no sabe.. se muere...
 
 El servidor web de ``elBrian'' está implementado usando el framework Tornado,
 WebSockets, mjpg-streamer, opencv y JSON. El mismo está diseñado para ejecutarse
@@ -50,11 +57,11 @@ cuenta con un procesador ARM perfectamente capaz de ejecutar un sistema
 operativo completo como GNU/Linux y de soportar el intérprete oficial de Python.
 
 Mientras que este servidor coincide en gran medida en la elección de lenguaje
-y bibliotecas utilizadas su implementación es específica para el robot ``elBrian''
-y no podría ser portada para robots con menores capacidades de procesamiento
+y bibliotecas utilizadas, su implementación es específica para el robot ``elBrian''
+y no puede ser portada a robots con menores capacidades de procesamiento
 sin una reescritura significativa. Además el protocolo utilizado no contempla
 el acceso a valores de sensores, los únicos mensajes que permite enviar
-al robot son movimientos.
+al robot son comandos de movimientos.
 
 \begin{itemize}
     \item Educabot \url{http://www.educabot.org/}
@@ -63,14 +70,14 @@ al robot son movimientos.
 
 \section{Gobot con cppp-io}
 
-Gobot~\footnote{\url{http://gobot.io}}
+Gobot\footnote{\url{http://gobot.io}}
 es una biblioteca que permite controlar robots programando en el lenguaje
-Go~\footnote{\url{https://golang.org/}}, esta biblioteca soporta el
-protocolo Firmata~\footnote{\url{https://github.com/firmata/protocol}}
+Go\footnote{\url{https://golang.org/}}. Esta biblioteca soporta el
+protocolo Firmata\footnote{\url{https://github.com/firmata/protocol}}
 para controlar robots
 conectados directamente a través de una interfaz serial, como es el caso
 de los robots Multiplo N6, y soporta la API
-cppp-io~\footnote{\url{https://github.com/hybridgroup/cppp-io/}}
+cppp-io\footnote{\url{https://github.com/hybridgroup/cppp-io/}}
 que define una API JSON
 que permite el acceso a la información y control de robots a través de la Web.
 
@@ -80,31 +87,30 @@ placas utilizadas normalmente en la construcción de robots como Arduino,
 Raspberry Pi, Intel Edison y Beaglebone Black.
 
 Este proyecto es interesante como base para desarrollar algún proyecto
-similar a XRemoteBot en Go, pero requeriría además la reimplementación
+similar a XRemoteBot en Go, pero requiere además la reimplementación
 del módulo de Python DuinoBot que controla, a través de una versión
-modificada del protocolo Firmata, a los robots Multiplo N6 y por otro
-lado los robots Scribbler tampoco aparecen en la lista de robots soportados.
+modificada del protocolo Firmata, a los robots Multiplo N6. Por otro
+lado, los robots Scribbler tampoco aparecen en la lista de robots soportados.
 
 \section{Tele Toyland}
 
-Este sitio provee acceso a varios dispositivos a través de una interfaz
-Web~\footnote{\url{http://www.teletoyland.com}}
-por ejemplo es posible controlar un cabezal con una punta que dibuja sobre
-una caja de arena, basta con hacer clic sobre las posiciones sobre las cuales
+Tele Toyland\footnote{\url{http://www.teletoyland.com}} es un sitio que provee acceso a varios dispositivos a través de una interfaz
+web. Por ejemplo, es posible controlar un cabezal con una punta que dibuja sobre
+una caja de arena. Basta con hacer clic sobre las posiciones sobre las cuales
 se quiere que pase la punta y presionar el botón ``go'' para que el cabezal
-empiece a moverse dibujando lo pedido, en este y el resto de los experimentos
-disponibles en el sitio los resultados se pueden ver a través de un streaming
+empiece a moverse dibujando lo pedido. En éste y el resto de los experimentos
+disponibles en el sitio, los resultados se pueden ver a través de un streaming
 de video.
 
 Entre los proyectos con los que permite interactuar Tele Toyland
-hay 2 areneros como el descripto
+se encuentran  2 areneros como el descripto
 anteriormente, una torre de leds, una marioneta y laberintos.
 
 El sitio no provee detalles del software, ni el protocolo utilizado. Desde
 lo funcional
 provee una especie de control remoto para los distintos dispositivos a los
 que permite
-manipular, se puede incluso configurar una serie de instrucciones a ejecutar
+manipular, en donde se puede, incluso, configurar una serie de instrucciones a ejecutar
 en secuencia. Sin embargo no provee una biblioteca que permita controlar
 los dispositivos desde un lenguaje de programación.
 
@@ -116,6 +122,12 @@ los dispositivos desde un lenguaje de programación.
 %http://telerobot.mech.uwa.edu.au/Telerobot/instructions.html
 \section{DIY}
 % www.linuxuser.co.uk/tutorials/control-your-raspberry-pi-robot-from-a-web-connected-device
+
+
+
+%FIX ME ESTO QUEDA MUY DESCOLGADO..... yo pondŕia algo como 
+%Bajo la consigna DIY, o ``do it yourself'' y acá poner un par de ref!!!, existen diversas.....y seguir...., 
+
 Finalmente en la consigna de ``do it yourself'' existen diversas guías para
 programar servidores que permitan controlar robots o microcontroladores
 en general, se puede encontrar un caso muy bien explicado en el sitio

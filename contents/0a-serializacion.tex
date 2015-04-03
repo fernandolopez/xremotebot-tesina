@@ -1,7 +1,4 @@
-% Apéndice A Serialización
-
-\chapter{Serialización}
-\label{ch:serializacion}
+\chapter{Serialización}\label{cha:serializacion}
 
 Siendo una aplicación cliente-servidor XRemoteBot requiere algún método de
 serialización para intercambiar datos entre los clientes y el servidor,
@@ -20,7 +17,7 @@ JSON cuenta con las siguientes características:
     \item Al ser un formato de texto es simple analizar el tráfico entre los
         clientes y el servidor para detectar posibles errores.
     \item Está soportado de forma nativa por los navegadores más
-        utilizados%~\footnote{\url{http://caniuse.com/#search=json}}.
+        utilizados.%~\footnote{\url{http://caniuse.com/#search=json}}.
 \end{enumerate}
 
 Pero también existen otras alternativas cuyos objetivos son serialización
@@ -192,12 +189,12 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
 De la figura~\ref{fig:ser-size} se desprende que los distintos métodos de
 serialización no ofrecen diferencias significativas en el tamaño de los
 strings generados para los volumenes de datos probados. Por otro lado
-se puede observar en la figura~\ref{fig-ser-time-py} que al menos en
+se puede observar en la figura~\ref{fig:ser-time-py} que al menos en
 Python y con la librería usada CBOR tiene los mejores tiempos, sin
 embargo en las pruebas con Javascript en la figura~\ref{fig:ser-time-js}
 se puede observar que los mejores tiempos son para el formato JSON,
 esto es entendible ya que este es el único formato procesado de forma
-nativa~\footnote{Si bien es posible encontrar parsers nativos para los
+nativa\footnote{Si bien es posible encontrar parsers nativos para los
 otros formatos y usarlos desde NodeJS no se utilizó esta modalidad porque
 no sería una prueba realista dado que los motores Javascript de los
 navegadores no permiten esto.}.
@@ -208,4 +205,4 @@ en Python son, en comparación con la versión en Javascript, marginales
 entradas entre el mejor y peor tiempo de deserialización) y las diferencias
 en cuanto a tamaño del string generado al
 serializar también son pequeñas (aproximadamente 2MiB de diferencia para
-$2^{14}$ entradas entre el mejor y el peor método
+$2^{14}$ entradas entre el mejor y el peor método).

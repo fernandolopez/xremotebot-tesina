@@ -1,5 +1,5 @@
 all: clean figures
-	latexmk -pdf main.tex
+	latexmk  -jobname="main-moficando" -pdf main.tex
 
 clean:
 	rm -f *.aux *.bbl *.out *.toc *.blg  *.lof *.lot *.fdb_latexmk

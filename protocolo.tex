@@ -1,0 +1,579 @@
+
+\chapter{Protocolo de capa de aplicación de XRemoteBot}\label{cha:protocolo}
+
+
+\section{Serialización}
+Siendo una aplicación cliente-servidor XRemoteBot requiere algún método de
+serialización para intercambiar datos entre los clientes y el servidor,
+considerando que el servidor no es más que un servidor web que usa websockets
+como protocolo, el método de serialización más adecuado parece ser JSON
+(Javascript Serialization Object Notation).
+
+JSON cuenta con las siguientes características:
+
+\begin{enumerate}
+    \item Es un formato estandarizado por ECMA~\citep{ecma-404}
+        y está especificado por la rfc-7159~\citep{rfc-7159}.
+    \item Soporta los tipos de datos necesarios para intercambiar mensajes con
+        los datos necesarios para controlar los robots usando un nivel de
+        abstracción adecuado.
+    \item Al ser un formato de texto es simple analizar el tráfico entre los
+        clientes y el servidor para detectar posibles errores.
+    \item Está soportado de forma nativa por los navegadores más
+        utilizados.%~\footnote{\url{http://caniuse.com/#search=json}}.
+\end{enumerate}
+
+Pero también existen otras alternativas cuyos objetivos son serialización
+y de-serialización rápida, y datos serializados más compactos
+como BSON (Binary JSON) y (CBOR Concise Binary Object Representation).
+
+Algunas características de BSON y CBOR son:
+
+\begin{enumerate}
+    \item Codifican la información en formato binario.
+    \item Son tan fáciles de usar como JSON.
+    \item Ambos formatos proveen un superset de los tipos de datos provistos
+        por JSON.
+    \item CBOR está especificado por la rfc-7049~\citep{rfc-7049}.
+    \item BSON tiene una especificación informal pero cuenta una
+        implementación bien conocida siendo la representación de datos primaria en
+        MongoDB~\footnote{\url{http://bsonspec.org/}}.
+    \item Por estar en formato binario decodificar una captura de tráfico
+        para depurar un programa es más laborioso.
+    \item En algunos casos estos formatos binarios generarán mensajes más
+        chicos que JSON, pero no siempre.
+    \item Requieren usar librerías Javascript en los clientes web ya que los
+        navegadores no lo implementan de forma nativa.
+\end{enumerate}
+
+Para tomar un decisión respecto al formato a utilizar se decidió generar
+16 archivos \texttt{JSON} con datos aleatorios, estos archivos se cargaron
+con una cantidad de entradas múltiplo de 1024 desde 1024 hasta 16384, donde
+cada una de estas entradas es un objeto \texttt{JSON} con 5 entradas de tipo
+numérico, 5 strings, 5 objetos (cada uno con una entrada numérica) y 5
+arrays (cada uno con 2 entradas de tipo string).
+
+Estos archivos se cargaron desde scripts similares en Python y Javascript que
+de-serializaron y serializaron estos datos repetidas veces calculando el tiempo
+promedio que llevó hacer cada una de estas acciones para cada formato.
+
+Se eligió hacer las pruebas con Python y Javascript porque el primero es el
+lenguaje de implementación del servidor y del cliente que probablemente tenga
+más uso en un futuro, mientras que Javascript es el lenguaje de implementación
+del cliente que se ejecutará en los navegadores web y que puede servir como
+base para implementaciones con Brython, Skulp, Opal, etc...
+
+Para hacer el experimento repetible la implementación en
+Javascript se ejecutó con el intérprete \textbf{nodejs} basado en
+el motor \textbf{v8} usado por \textbf{Chrome} y además se crearon
+scripts de apoyo para generar los datos de prueba, ejecutar los scripts
+con los distintos formatos de forma automatizada y formatear los datos
+resultantes en archivos csv.
+
+Todas las pruebas se realizaron sobre Lihuen 6 beta (basado en Debian Jessie)
+en una notebook con procesador ``Intel(R) Core(TM) i3 CPU M 370 @ 2.40GHz''
+y 4GB de RAM % NOTA: son 4GB no 4GiB
+usando Python 3.4.2 y NodeJS 0.10.35~\footnote{Se usó NodeJS 0.10.35 ya que
+la versión 0.10.29 distribuida al momento con Debian Jessie tenía un bug que
+generaba un error de memoria al
+deserializar strings largos con \texttt{JSON.load} (CVE-2014-5256)}
+
+De estas pruebas se desprenden las mediciones de las
+figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
+
+\begin{figure}
+    \centering
+    \begin{framed}
+        \begin{tikzpicture}[trim axis left, trim axis right]
+            \begin{axis}[
+                    height=10cm,
+                    width=10cm,
+                    scaled x ticks = false, % No usar notación exponencial
+                    xlabel=Cantidad de entradas,
+                    ylabel=Segundos,
+                    x tick label style={/pgf/number format/fixed, rotate=45, anchor=north east}, % Las etiquetas son números y rotar 45°
+                    xtick=data, % Generar una etiqueta por punto en los datos
+                    ylabel near ticks, % Poner las etiquetas más o menos cerca de algunos datos
+                    ymin=0, % No hay tiempos negativos
+                    xmin=1024, % La escala empieza en 1024
+                    legend style={legend pos=north west}, % Cuadro de leyendas a la derecha arriba
+                    every axis x label/.style={
+                        at={(axis description cs:0.5,-0.15)}, % Desplazar la descripción del eje x
+                        anchor=north, % El desplazamiento relativo a la parte superior del texto
+                    },
+                    legend cell align=left, % Alineación del texto en la caja de leyendas
+                ]
+                \foreach \s in {json, bson, cbor} {
+                    \addlegendentryexpanded{\s\ dump}
+                    \addplot table [x=entries, y=dump_time, col sep=comma] {data/py-\s.csv};
+
+                    \addlegendentryexpanded{\s\ load}
+                    \addplot table [x=entries, y=load_time, col sep=comma] {data/py-\s.csv};
+                }
+            \end{axis}
+        \end{tikzpicture}
+    \end{framed}
+
+    \caption{Cantidad de entradas versus tiempo de serialización y deserialización en Python}
+    \label{fig:ser-time-py}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{framed}
+        \begin{tikzpicture}[trim axis left, trim axis right]
+            \begin{axis}[
+                    height=10cm,
+                    width=10cm,
+                    scaled x ticks = false, % No usar notación exponencial
+                    xlabel=Cantidad de entradas,
+                    ylabel=Segundos,
+                    x tick label style={/pgf/number format/fixed, rotate=45, anchor=north east}, % Las etiquetas son números y rotar 45°
+                    xtick=data, % Generar una etiqueta por punto en los datos
+                    ylabel near ticks, % Poner las etiquetas más o menos cerca de algunos datos
+                    ymin=0, % No hay tiempos negativos
+                    xmin=1024, % La escala empieza en 1024
+                    legend style={legend pos=north west}, % Cuadro de leyendas a la derecha arriba
+                    every axis x label/.style={
+                        at={(axis description cs:0.5,-0.15)}, % Desplazar la descripción del eje x
+                        anchor=north, % El desplazamiento relativo a la parte superior del texto
+                    },
+                    legend cell align=left, % Alineación del texto en la caja de leyendas
+                ]
+                \foreach \s in {json, bson, cbor} {
+                    \addlegendentryexpanded{\s\ dump}
+                    \addplot table [x=entries, y=dump_time, col sep=comma] {data/js-\s.csv};
+
+                    \addlegendentryexpanded{\s\ load}
+                    \addplot table [x=entries, y=load_time, col sep=comma] {data/js-\s.csv};
+                }
+            \end{axis}
+        \end{tikzpicture}
+    \end{framed}
+    \caption{Cantidad de entradas versus tiempo de serialización y deserialización en Javascript (nodejs)}
+    \label{fig:ser-time-js}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \begin{framed}
+        \begin{tikzpicture}[trim axis left, trim axis right]
+            \begin{axis}[
+                    height=10cm,
+                    width=10cm,
+                    scaled x ticks = false,
+                    xlabel=Cantidad de entradas,
+                    ylabel=Tamaño en MiB,
+                    x tick label style={/pgf/number format/fixed, rotate=45, anchor=north east},
+                    xtick=data,
+                    ylabel near ticks,
+                    ymin=0,
+                    xmin=1024,
+                    legend style={legend pos=north west},
+                    every axis x label/.style={
+                        at={(axis description cs:0.5,-0.15)},
+                        anchor=north,
+                    },
+                    legend cell align=left
+                ]
+                \foreach \s in {json, bson, cbor} {
+                    \addlegendentryexpanded{\s}
+                    \addplot table [x=entries, y=serialized_size, col sep=comma] {data/js-\s.csv};
+
+                }
+            \end{axis}
+        \end{tikzpicture}
+    \end{framed}
+    \caption{Cantidad de entradas versus tamaño del archivo serializado}
+    \label{fig:ser-size}
+\end{figure}
+
+De la figura~\ref{fig:ser-size} se desprende que los distintos métodos de
+serialización no ofrecen diferencias significativas en el tamaño de los
+strings generados para los volumenes de datos probados. Por otro lado
+se puede observar en la figura~\ref{fig:ser-time-py} que al menos en
+Python y con la librería usada CBOR tiene los mejores tiempos, sin
+embargo en las pruebas con Javascript en la figura~\ref{fig:ser-time-js}
+se puede observar que los mejores tiempos son para el formato JSON,
+esto es entendible ya que este es el único formato procesado de forma
+nativa\footnote{Si bien es posible encontrar parsers nativos para los
+otros formatos y usarlos desde NodeJS no se utilizó esta modalidad porque
+no sería una prueba realista dado que los motores Javascript de los
+navegadores no permiten esto.}.
+
+Teniendo en cuenta que las diferencias de tiempo al procesar los datos
+en Python son, en comparación con la versión en Javascript, marginales
+(apenas alrededor de $0.25$ segundos para $2^{14}$
+entradas entre el mejor y peor tiempo de deserialización) y las diferencias
+en cuanto a tamaño del string generado al
+serializar también son pequeñas (aproximadamente 2MiB de diferencia para
+$2^{14}$ entradas entre el mejor y el peor método).
+
+
+\section{Protocolo diseñado para XRemoteBot}
+
+Como se describió anteriormente XRemoteBot utiliza el protocolo WebSocket como
+protocolo de la capa de transporte y mensajes codificados con JSON como
+protocolo de la capa de aplicación. El propósito de este capítulo es describir
+este protocolo de capa de aplicación y detallar los motivos por los cuales
+se modeló el protocolo de esta manera.
+
+% FIXME agregue
+\subsection{Consideraciones generales}
+
+
+El protocolo fue diseñado pensando que el mismo debería representar los
+distintos comandos enviados a los robots como si fueran mensajes a objetos
+del paradigma de programación orientado a objetos. Este diseño por un lado
+mapea de forma muy directa los mensajes de la API
+con los métodos que un programador utilizaría para controlar a los robots
+usando la biblioteca DuinoBot,  y por otro lado, provee un alto grado de
+flexibilidad a la hora de agregar nuevos tipos de mensajes a la API sin
+necesidad de reescribir grandes porciones de código.
+
+En algunos de los lenguajes orientados a objetos más populares como Python
+o Ruby, al ejecutar un método pueden ocurrir básicamente dos cosas:
+se puede obtener un valor de resultado o bien un error
+en tiempo de ejecución en la forma de una excepción. Para modelar este
+comportamiento el servidor XRemoteBot cuenta con dos tipos de mensajes
+de respuesta:
+
+\begin{itemize}
+    \item El mensaje tipo ``value'' que retorna el valor resultante de
+        ejecutar el método invocado.
+    \item El mensaje tipo ``error'' que representa el error en tiempo
+        de ejecución que típicamente se representa con excepciones.
+\end{itemize}
+
+Los mensajes de error de XRemoteBot tienen como contenido
+un mensaje de texto que describe el error producido. Los clientes
+pueden tomar este mensaje
+de error y mostrarlos en pantalla o usarlos como descripción de una
+excepción como se hace en el cliente Python por ejemplo.
+
+%FIX ME agregue
+\subsection{Alternativas analizadas}
+%ACA PONE ALGO DE SE PODRÍA HABER USADO YML, XML O ALGO DEFINIDO POR VOS.. O LO QUE QUIEAS...
+%
+
+%FIX ME agregue
+\subsection{El protocolo basado en JSON}
+
+Como se mencionó anteriormente, tanto para los parámetros, como para los valores de respuesta, los tipos
+de datos representables de forma nativa con JSON resultan suficientes para
+implementar una API similar a la de DuinoBot.
+
+Internamente XRemoteBot
+convierte los valores, objetos y arrays de JSON a distintos tipos de
+datos de Python de la forma descripta en la
+tabla~\ref{tbl:rel_json_python}, siguiendo, en general las transformaciones
+realizadas por defecto por las funciones de procesamiento de el módulo
+JSON de la biblioteca estándar de
+Python\footnote{\url{https://docs.python.org/3/library/json.html}}.
+
+% FIXME: LO SIUIENTE LO SACARIA... CONFUNDE
+% ------------
+% excepto en algunos mensajes donde los valores de
+% tipo \texttt{number} de JSON se convierten explícitamente (en realidad
+% se utilizan funciones provistas por Tornado para hacer la conversión
+% de JSON a objetos y de objetos a JSON, pero estas funciones utilizan
+% a su vez el módulo JSON de
+% Python)\footnote{\url{http://tornado.readthedocs.org/en/latest/escape.html\#tornado.escape.json_encode}}.
+% --------------
+\begin{table}
+    \centering
+    \begin{tabu}{l|l}
+        JSON & Python \\
+        \hline
+        \texttt{string} & \texttt{str} \\
+        \texttt{number} & \texttt{int} o \texttt{float}\footnote{Dependiendo
+        del mensaje invocado
+        puede ser interpretado como \texttt{int} o \texttt{float}.}\\
+        \texttt{object} & \texttt{dict} \\
+        \texttt{array}  & \texttt{list} \\
+        \texttt{true}/\texttt{false} & \texttt{True}/\texttt{False} (bool) \\
+        \texttt{null} & \texttt{None} \\
+    \end{tabu}
+    \caption{Relación entre los tipos y valores de JSON y los usados en
+    Python}
+    \label{tbl:rel_json_python}
+\end{table}
+
+\subsection{Mensajes del cliente al servidor}
+
+Los mensajes al servidor son objetos JSON con dos campos obligatorios y dos
+opcionales. Los campos que componen a estos objetos  son:
+
+\begin{description}
+    \item[\texttt{entity}] cuyo valor es un string que describe conceptualmente
+        el receptor del mensaje (obligatorio).
+    \item[\texttt{method}] cuyo valor es un string con el nombre del método a
+        invocar (obligatorio).
+    \item[\texttt{args}] cuyo valor es un array posiblemente vacío con los
+        argumentos que deben pasarse al método invocado (opcional).
+    \item[\texttt{msg\_id}] si está presente el servidor incorpora este
+        campo con su valor original en la respuesta. Sirve para identificar a
+        qué petición
+        corresponde cada respuesta en implementaciones asincrónicas
+        como la de Javascript.
+\end{description}
+
+En la actual implementación los valores posibles del campo \texttt{entity} son
+\texttt{``global''} y \texttt{``robot''}. El primero
+representa acciones globales como el login y el último representa una
+abstracción de los robots soportados por XRemoteBot.
+
+La entidad ``global'' soporta los métodos:
+\begin{description}
+    \item[\texttt{authentication\_required}] No recibe argumentos. Retorna el valor 
+        \texttt{true} si el servidor está configurado para requerir
+        autenticación y \texttt{false} en caso contrario.
+    \item[\texttt{authenticate}] Recibe un string como argumento. Si el string se corresponde
+        con la \texttt{api\_key} de algún usuario  ACA DEBERIAS DECIR QUE ES ESTO!!!! y esa \texttt{api\_key}  no
+        ha expirado retorna el valor \texttt{true} y \texttt{false} en caso contrario.
+\end{description}
+
+Entre otros la entidad ``robot'' soporta los métodos:
+\begin{description}
+    \item[\texttt{backward}] Recibe un objeto que identifica a un robot
+        específico, una velocidad y un tiempo en segundos. Mueve el robot hacia atrás el tiempo indicado y luego contesta al cliente QUE COSA CONSTESTA???. Si no se envía el parámetro de tiempo el robot se mueve
+        de forma indefinida.
+    \item[\texttt{forward}] Idem moviendo el robot hacia adelante. ESCRIBILOS TODOS!! NO PONGAS IDEM!! JAJAAJ
+    \item[\texttt{turnLeft}] ídem girando a izquierda. ESCRIBILOS TODOS!! NO PONGAS IDEM!! JAJAAJ
+    \item[\texttt{turnRight}] ídem girando a derecha. ESCRIBILOS TODOS!! NO PONGAS IDEM!! JAJAAJ
+    \item[\texttt{getObstacle}] Recibe un objeto que identifica a un robot y,
+        opcionalmente una distancia. Retorna el valor 
+        \texttt{true} si hay un obstáculo a una distancia menor o igual a la
+        indicada. Si no se envía la distancia se asume un valor por defecto. CUAL??????
+    \item[\texttt{getLine}] Recibe un objeto que identifica a un robot y
+        retorna un \texttt{array}
+        con los valores de los sensores de línea del robot.
+\end{description}
+
+
+Opcionalmente un modelo dado de robot puede soportar otros métodos o retornar
+error en alguno de los métodos anteriores. EN ESTE CASO, EL PROTOCOLO PLANTEADO ES FACILMETE EXTENSIBLE... O ALGO ASI
+
+
+%fix me: redacta mejor... 
+La posibilidad que tienen los métodos con tiempo como \texttt{backward} de
+contestar la petición varios segundos después de recibirla sin afectar
+el funcionamiento del servidor ni demorar innesesariamente al resto de los
+clientes está dada por el soporte de asincronismo del framework Tornado.
+
+\section{Mensajes del servidor a los clientes}
+
+El servidor responde a los clientes con mensajes que contienen una única
+entrada \texttt{response}. Esta entrada identifica el tipo de respuesta
+que puede ser \texttt{value} o \texttt{error}. Si el cliente envía un
+campo \texttt{msg\_id} en la petición, el servidor incorporará además
+un campo \texttt{msg\_id} idéntico en la respuesta correspondiente
+a esa petición (como se mencionó anteriormente para soportar
+clientes asincrónicos de forma correcta).
+
+\subsection{Mensajes tipo value}
+
+Los mensajes \texttt{value} representan los valores de respuesta de
+los métodos invocados.
+
+Los campos de los mensajes tipo \texttt{value} son:
+
+\begin{description}
+    \item[\texttt{response}] identifica el tipo de mensaje, en este caso
+        es un string con el valor \texttt{``value''}.
+    \item[\texttt{value}] el valor retornado por el método (puede ser
+        cualquier valor soportado por JSON).
+    \item[\texttt{msg\_id}] si la petición contiene el campo \texttt{msg\_id} se
+        copia el mismo campo, sino este campo se omite.
+\end{description}
+
+Para los mensajes que requieren
+un tiempo de demora el servidor contestará con el mensaje \texttt{value}
+una vez transcurrido ese tiempo. Para no demorar la atención de peticiones
+de otros clientes el servidor utiliza las funcionalidades provistas por
+Tornado para atender peticiones de forma asíncrona~\citep{dory_2012}.
+
+\subsection{Mensajes tipo error}
+
+Los mensajes \texttt{error} representan eventos anómalos que
+generalmente en un sistema no distribuido se modelarían utilizando
+excepciones, por ejemplo errores de codificación, peticiones a recursos
+ocupados, etc...
+
+Campos de los mensajes \texttt{error}:
+\begin{description}
+    \item[\texttt{response}] identifica el tipo de mensaje, en este caso
+        es un string con el valor \texttt{``error''}.
+    \item[\texttt{message}] un mensaje de error descriptivo.
+    \item[\texttt{msg\_id}] si la petición tenía \texttt{msg\_id} se
+        copia el mismo, sino este campo se omite.
+\end{description}
+
+
+\section{Ejemplos de interacción entre los clientes y el servidor}
+
+Al comenzar la conexión entre el cliente y el servidor, se intercambian
+los primeros mensajes donde el cliente pregunta al servidor si el
+mismo requiere autenticación y si es así envía la \textit{API key}
+correspondiente. En la tabla~\ref{tbl:ej_autenticacion} se detalla
+el intercambio de mensajes entre un cliente y el servidor en un
+caso de autenticación exitoso con un cliente que envía un \texttt{msg\_id},
+como se puede ver el \texttt{msg\_id}
+no tiene por qué ser consecutivo con el del mensaje anterior, incluso
+puede llegar a ser un string, las únicas restricciones sobre el
+\texttt{msg\_id} son que tiene que ser copiado por el servidor
+en las respuestas y que el valor debe poder ser utilizado como
+identificador de un atributo (usando notación con corchetes) en un
+objeto Javascript, es decir puede ser un número o un string
+arbitrario\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property\_Accessors}}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
+        \hline
+        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
+        \hline
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "entity": "global",
+    "method": "authentication_required",
+    "msg_id": 0
+}
+\end{Verbatim}
+&
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "response": "value",
+    "value": true,
+    "msg_id": 0
+}
+\end{Verbatim}
+\\
+\hline
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "entity": "global",
+    "method": "authenticate",
+    "args": ["16758efc752c1d97381e6"],
+    "msg_id": 20
+}
+\end{Verbatim}
+&
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "response": "value",
+    "value": true,
+    "msg_id": 20
+}
+\end{Verbatim}
+\\
+\hline
+    \end{tabular}
+    \caption{Ejemplo de secuencia de autenticación}
+    \label{tbl:ej_autenticacion}
+\end{table}
+
+Otra secuencia de operaciones típica para XRemoteBot es mover un robot
+y luego pedir los valores de alguno de sus sensores, en la
+tabla~\ref{tbl:ej_movimiento_y_sensor} se puede ver un caso donde se
+mueve el robot hacia adelante durante 1 segundo y luego consulta si
+existe algún obstáculo a 10 centímetros o menos del robot, en el primer
+argumento de los mensajes
+envíados a la entidad \textit{robot} se puede ver el objeto que identifica
+al robot específico a utilizar.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
+        \hline
+        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
+        \hline
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "entity": "robot",
+    "method": "forward",
+    "args": [50, 1],
+    "msg_id": 40
+}
+\end{Verbatim}
+&
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "response": "value",
+    "value": null,
+    "msg_id": 40
+}
+\end{Verbatim}
+\\
+\hline
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "entity": "robot",
+    "method": "getObstacle",
+    "args": [{model: "n6", id: 4}, 10],
+    "msg_id": 42
+}
+\end{Verbatim}
+&
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "response": "value",
+    "value": false,
+    "msg_id": 42
+}
+\end{Verbatim}
+\\
+\hline
+    \end{tabular}
+    \caption{Ejemplo de movimiento y acceso a sensores de un robot}
+    \label{tbl:ej_movimiento_y_sensor}
+\end{table}
+
+Por último en la tabla~\ref{tbl:ej_error} se puede ver un mensaje de error
+típico cuando el cliente envía una petición mal formada donde no existe
+el campo \textit{method} obligatorio, notar que este mensaje a diferencia
+de los anteriores no tiene un campo \textit{msg\_id} pero esto no causaría
+ningún error ya que este campo no es obligatorio, el único error en la
+petición es la ausencia de \textit{method}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
+        \hline
+        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
+        \hline
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "entity": "robot",
+}
+\end{Verbatim}
+&
+\begin{Verbatim}[fontsize=\footnotesize]
+{
+    "response": "error",
+    "message": "\"entity\" and \"method\"
+                are mandatory fields"
+}
+\end{Verbatim}
+\\
+\hline
+    \end{tabular}
+    \caption{Ejemplo de un mensaje de error ante una petición mal formada}
+    \label{tbl:ej_error}
+\end{table}
+
+\section{Modalidades del servidor}
+
+A fin de hacer que el servidor pueda exponerse al público se cuenta con
+un sistema con autenticación por \textit{API key}, pero estas claves
+son largas resultando díficil recordarlas y escribirlas sin errores. En
+ámbitos locales como puede ser una red wifi en un aula este mecanismo
+de autenticación puede resultar molesto e innecesario, por lo que el
+servidor es configurable de forma tal que se puede deshabilitar este
+sistema de autenticación. Para que el servidor opere sin requerir
+una \textit{API key} a los clientes basta con configurar la opción
+\texttt{public\_server} en \texttt{False} dentro del archivo
+\textit{configuration.py}.
+
+% FIXME: Ampliar

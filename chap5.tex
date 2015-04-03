@@ -2,22 +2,30 @@
 % de cada uno destacando algunas diferencias y decisiones de diseño en la
 % implementación en Javascript.
 
-\chapter{Implementación de los clientes}\label{ch4}
-Los clientes hosted no tienen video % FIXME
-Cuestiones de estilo casing copiando duinobot
+\chapter{Implementación de los clientes}\label{cha:clientes}
 
-Se implementaron 3 clientes para permitir el uso de XRemoteBot desde 3
-lenguajes de programación distintos: Python, Ruby y Javascript. Este último
-en el navegador.
+La implementación de XRemoteBot para esta tesina incluye tres clientes en distintos
+lenguajes de programación: Python, Ruby y Javascript. Este último para ejecutarse
+en el entorno de un navegador Web.
 
-\section{Cliente Python}\label{ch4:python}
+Estos clientes tienen distintas características y principalmente el que más difiere
+de los otros es el cliente Javascript ya que es una implementación a ser ejecutada
+en el navegador con las restricciones que esto trae, pero con la ventaja de que
+se encuentra integrado con la vista Web de XRemoteBot por lo que cuenta con una
+vista de la cámara al lado del campo de texto donde el usuario puede codificar.
+
+En general se intentó copiar el estilo de programación del módulo DuinoBot original
+de la forma más fiel posible, en el caso de Javascript por limitaciones del entorno
+no se logró imitar este estilo tan fielmente como en los otros clientes.
+
+\section{Cliente Python}\label{sec:python}
 El uso del cliente Python es muy similar al uso directo de los robots con la
 biblioteca DuinoBot aunque la implementación es bastante diferente por el protocolo
 subyacente.
 
 El cliente Python utiliza un solo módulo que no pertenece a la biblioteca estándar
 de Python, el módulo para acceso a WebSockets
-\textit{websocket-client}~\footnote{\url{https://pypi.python.org/pypi/websocket-client}}
+\textit{websocket-client}\footnote{\url{https://pypi.python.org/pypi/websocket-client}}
 que cuenta, además de con una interfaz asincrónica, con una interfaz de ``bajo nivel''
 sincrónica similar a la interfaz tradicional de Sockets.
 
@@ -25,7 +33,7 @@ sincrónica similar a la interfaz tradicional de Sockets.
 caption={Ejemplo con XRemoteBot para Python},label=lst:ejemplo_xremotebot_python]
 from xremotebot import *
 server = Server('ws://xremotebot.example:8000/api', 'api_key')
-robot = server.fetch_robot()
+robot = Robot(server, server.fetch_robot())
 robot.forward(100, 1)
 robot.backward(50, 2)
 print(robot.getObstacle())
@@ -37,10 +45,10 @@ utilizando 2 mensajes y la función \texttt{time.wait()} de Python. De esta
 forma
 invocar al método \texttt{robot.forward(100, 1)} se traduce en los mensajes
 de
-la figura~\ref{fig:mensajes_xremotebot_python_json}. Como todos los métodos
+la figura~\ref{fig:ejemplo_xremotebot_python_json}. Como todos los métodos
 de movimiento
 proveen esta funcionalidad de demora, la misma implementada en el
-\textit{decorator}~\footnote{Esto es un decorator de Python, no confundir
+\textit{decorator}\footnote{Esto es un decorator de Python, no confundir
 con el patrón de diseño. \url{https://www.python.org/dev/peps/pep-0318/}}
 \texttt{xremotebot.timed} a fin de evitar repetición de código.
 
@@ -66,7 +74,7 @@ XRemoteBot para Python}, label=lst:ejemplo_xremotebot_python_json]
 Las gemas que proveen soporte para WebSockets en Ruby proveen una API
 asincrónica que no es deseable para este proyecto por lo que me incliné
 por incorporar el código del
-proyecto~\footnote{\url{https://github.com/gimite/web-socket-ruby}}
+proyecto\footnote{\url{https://github.com/gimite/web-socket-ruby}}
 al cliente Ruby de XRemoteBot, este proyecto no se encuentra empaquetado
 en forma de gema pero provee una API sincrónica que permite implementar
 el cliente Ruby de XRemoteBot para que se comporte de una forma muy similar
@@ -76,9 +84,13 @@ a la biblioteca DuinoBot original.
 caption={Ejemplo usando XRemoteBot para Ruby},
 label=lst:ejemplo_xremotebot_ruby]
 require 'xremotebot'
-server = XRemoteBot::Server.new('ws://xremotebot.example:8000/api',
+server = XRemoteBot::Server.new('xremotebot.example',
+                                8000,
+                                'api',
                                 'api_key')
-robot = server.fetch_robot
+
+print "Robots #{server.get_robots}\n"
+                                                                                                                    robot = Robot.new server, server.fetch_robot
 robot.forward 100, 1
 robot.backward 50, 2
 print robot.getObstacle
@@ -145,7 +157,7 @@ mensajes enviados a los
 robots.
 Si bien el objeto \textit{Promise} está en proceso de estandarización,
 los navegadores Google Chrome, Firefox, Internet Explorer, Opera y Safari las
-soportan~\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise}}.
+soportan\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise}}.
 El problema de esta solución es que la sintaxis de un script XRemoteBot en
 Javascript usando \textit{Promises}
 resulta bastante distinta de la sintaxis de un script DuinoBot como resulta
@@ -253,7 +265,7 @@ server.fetch_robot().then(function(robot){
 Una solución alternativa para lograr imitar tanto como sea posible la
 API de DuinoBot puede ser utilizar un intérprete Javascript implementado en
 Javascript como
-JS-Interpreter~\footnote{\url{https://github.com/NeilFraser/JS-Interpreter}},
+JS-Interpreter\footnote{\url{https://github.com/NeilFraser/JS-Interpreter}},
 pero requeriría modificar el intérprete para lograr una ejecución paso a paso
 controlada por el flujo de mensajes a través de la conexión con WebSockets,
 además de agregar complejidad, este tipo de intérpretes no accede a un entorno
@@ -261,12 +273,12 @@ compreto como lo hace el intérprete incorporado en los navegadores y puede
 tener incompatibilidades o funcionalidades no implementadas, en este caso
 por ejemplo JS-Interpreter no soporta interrupciones y no puede interactuar
 directamente con DOM, otra opción es
-Hypnotic~\footnote{\url{http://coolwanglu.github.io/hypnotic/web/demo.html}}
+Hypnotic\footnote{\url{http://coolwanglu.github.io/hypnotic/web/demo.html}}
 que utiliza el intérprete Narcissus y provee una función \texttt{sleep()} que
 demora la ejecución del código como se desea para este proyecto, pero el
 invoveniente de Hypnotic es que por el momento solamente funciona en el
 navegador
-Firefox~\footnote{\url{https://github.com/coolwanglu/hypnotic/wiki\#limitations}}.
+Firefox\footnote{\url{https://github.com/coolwanglu/hypnotic/wiki\#limitations}}.
 
 
 \subsection{Interacción con DOM y JQuery}
@@ -296,7 +308,7 @@ checkbox y mensajes impresos con la función \texttt{rbprintln}.
 
 Un area de video destinada a emisiones en vivo que muestren la posición
 del robot, el mismo no requiere ningún plugin ya que se utilizó
-\texttt{jsmpeg}~\footnote{\url{https://github.com/phoboslab/jsmpeg}}
+\texttt{jsmpeg}\footnote{\url{https://github.com/phoboslab/jsmpeg}}
 que permite emitir video en vivo usando WebSockets y renderizarlo
 en el navegador en un elemento Canvas, de esta manera se logró tener
 video en vivo utilizando características estándar de HTML5.
