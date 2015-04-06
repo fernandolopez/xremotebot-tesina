@@ -44,8 +44,9 @@ por los navegadores más usados en la actualidad.
 De forma similar la comparación entre frameworks Web se realizó rápidamente
 dado que el primer framework probado (Tornado) tenía soporte para todas
 las funcionalidades requeridas o deseables para este trabajo (principalmente
-soporte de WebSockets, asincronismo, renderizado de templates) sin imponer
-una modalidad de trabajo como puede hacer un framework más orientado al
+soporte de WebSockets, asincronismo, renderizado de templates).
+A la vez Tornado no impone
+una modalidad de trabajo, como puede hacer un framework más orientado al
 desarrollo de aplicaciones Web utilizando patrón Model View Controler
 como por ejemplo Django que puede llegar a ser más adecuado para el desarrollo
 de aplicaciones que dependan más del acceso a una base de datos que el
@@ -67,8 +68,34 @@ por XRemoteBot.
 
 La API generada fue probada con 3 clientes distintos incorporados en este
 trabajo, de los cuales el cliente Javascript se puede ejecutar desde el
-navegador (inclusive desde dispositivos móviles y los clientes Python y
+navegador (inclusive desde dispositivos móviles) y los clientes Python y
 Ruby se pueden usar en cualquier computadora
 donde se puedan instalar sus intérpretes (abarcando computadoras con
 los sistemas operativos GNU/Linux, *BSD, Windows y Mac).
 
+Los clientes Ruby y Python son los más simples y pueden requerir algo
+más de desarrollo para pulir detalles. En ambos casos los errores
+retornados por el servidor se convierten en excepciones de la clase
+\texttt{Exception}, incluyendo en el protocolo un código de error
+se podría implementar un control de errores más específico en
+los clientes lanzando distintas excepciones para distintos tipos
+de errores. En el caso del cliente Javascript esto se resolvió
+naturalmente usando \textit{Promises} en lugar de excepciones.
+
+El sistema resultante es fácilmente extensible en tres aspectos:
+\begin{itemize}
+    \item Dada su sencilles protocolo es fácilmente extensible.
+    \item Definiendo un script en ``remotebot/robots/<nombre>.py''
+en el servidor y agregand ``<nombre>'' en la opción ``robots''
+de la configuración es suficiente para agregar soporte
+para un nuevo robot.
+    \item Si se requiere controlar un dispositivo tan distinto de los
+        robots que requeriría métodos muy distintos se pueden definir
+        nuevas entidades, una entidad simplemente es una clase que
+        hereda de ``remotebot.models.entity.Entity'' y que se
+        registra al final del archivo ``remotebot/handlers/ws\_handler.py''
+        con el método \texttt{WSHandler.register\_api\_handler()}.
+        En el método anterior recibe como primer argumento el
+        nombre de la entidad y como segundo argumento una instancia
+        de una clase que herede de ``remotebot.models.entity.Entity''.
+\end{itemize}

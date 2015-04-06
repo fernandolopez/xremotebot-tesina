@@ -1,8 +1,4 @@
-
 \chapter{Protocolo de capa de aplicación de XRemoteBot}\label{cha:protocolo}
-
-
-\section{Serialización}
 Siendo una aplicación cliente-servidor XRemoteBot requiere algún método de
 serialización para intercambiar datos entre los clientes y el servidor,
 considerando que el servidor no es más que un servidor web que usa websockets
@@ -255,7 +251,34 @@ excepción como se hace en el cliente Python por ejemplo.
 %FIX ME agregue
 \subsection{Alternativas analizadas}
 %ACA PONE ALGO DE SE PODRÍA HABER USADO YML, XML O ALGO DEFINIDO POR VOS.. O LO QUE QUIEAS...
-%
+En definitiva cualquier forma de serialización de datos hubiera
+sido suficiente para este protocolo, se eligió evaluar protocolos
+similares a JSON dada su facilidad de uso, facilidad de lectura
+y la disponibilidad
+de funciones para manipularlo en las bibliotecas estándar
+de los tres lenguajes elegidos. Esto es importante porque es
+la intención del autor que cualquiera con conocimientos básicos
+de programación pueda desarrollar clientes en otros lenguajes.
+
+Estas características no se dan en formatos como YAML que
+son más complejos y no es soportado de forma nativa en
+la mayoría de los lenguajes. Tampoco cumple con las características
+requeridas XML que si bien es posible
+procesarlo en cualquiera de estos lenguajes sin agregar bibliotecas
+externas un posible desarrollador de un cliente tendría más
+problemas para implementar el cliente ya que las API para
+manipular XML suelen
+ser más complejas dada la estructura de estos archivos y además
+la información codificada en XML es más díficil de leer por
+ejemplo en una captura de red.
+
+También se descartó crear un mecanismo de serialización específico
+para este trabajo, ya que de hacerlo debería haber implementado
+todo el protocolo en tres lenguajes distintos y además cualquiera
+que quisiera crear un cliente para XRemoteBot debería también
+implementar el protocolo en el lenguaje deseado, con toda
+la complejidad que tiene validar y extraer información con
+distintos típos de datos de forma correcta y segura.
 
 %FIX ME agregue
 \subsection{El protocolo basado en JSON}
@@ -272,15 +295,6 @@ realizadas por defecto por las funciones de procesamiento de el módulo
 JSON de la biblioteca estándar de
 Python\footnote{\url{https://docs.python.org/3/library/json.html}}.
 
-% FIXME: LO SIUIENTE LO SACARIA... CONFUNDE
-% ------------
-% excepto en algunos mensajes donde los valores de
-% tipo \texttt{number} de JSON se convierten explícitamente (en realidad
-% se utilizan funciones provistas por Tornado para hacer la conversión
-% de JSON a objetos y de objetos a JSON, pero estas funciones utilizan
-% a su vez el módulo JSON de
-% Python)\footnote{\url{http://tornado.readthedocs.org/en/latest/escape.html\#tornado.escape.json_encode}}.
-% --------------
 \begin{table}
     \centering
     \begin{tabu}{l|l}
@@ -330,22 +344,40 @@ La entidad ``global'' soporta los métodos:
         \texttt{true} si el servidor está configurado para requerir
         autenticación y \texttt{false} en caso contrario.
     \item[\texttt{authenticate}] Recibe un string como argumento. Si el string se corresponde
-        con la \texttt{api\_key} de algún usuario  ACA DEBERIAS DECIR QUE ES ESTO!!!! y esa \texttt{api\_key}  no
+        con la \texttt{api\_key} (una clave generada de forma aleatoria que identifica
+        a un usuario específico) de algún usuario
+        y esa \texttt{api\_key}  no
         ha expirado retorna el valor \texttt{true} y \texttt{false} en caso contrario.
 \end{description}
 
 Entre otros la entidad ``robot'' soporta los métodos:
 \begin{description}
     \item[\texttt{backward}] Recibe un objeto que identifica a un robot
-        específico, una velocidad y un tiempo en segundos. Mueve el robot hacia atrás el tiempo indicado y luego contesta al cliente QUE COSA CONSTESTA???. Si no se envía el parámetro de tiempo el robot se mueve
+        específico, una velocidad y un tiempo en segundos. Mueve el robot hacia
+        atrás el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
+        Si no se envía el parámetro de tiempo el robot se mueve
         de forma indefinida.
-    \item[\texttt{forward}] Idem moviendo el robot hacia adelante. ESCRIBILOS TODOS!! NO PONGAS IDEM!! JAJAAJ
-    \item[\texttt{turnLeft}] ídem girando a izquierda. ESCRIBILOS TODOS!! NO PONGAS IDEM!! JAJAAJ
-    \item[\texttt{turnRight}] ídem girando a derecha. ESCRIBILOS TODOS!! NO PONGAS IDEM!! JAJAAJ
+    \item[\texttt{forward}] Recibe un objeto que identifica a un robot
+        específico, una velocidad y un tiempo en segundos. Mueve el robot hacia
+        adelante el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
+        Si no se envía el parámetro de tiempo el robot se mueve
+        de forma indefinida.
+    \item[\texttt{turnLeft}] Recibe un objeto que identifica a un robot
+        específico, una velocidad y un tiempo en segundos. Gira hacia
+        la izquierda el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
+        Si no se envía el parámetro de tiempo el robot se mueve
+        de forma indefinida.
+    \item[\texttt{turnRight}] Recibe un objeto que identifica a un robot
+        específico, una velocidad y un tiempo en segundos. Gira hacia
+        la derecha el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
+        Si no se envía el parámetro de tiempo el robot se mueve
+        de forma indefinida.
     \item[\texttt{getObstacle}] Recibe un objeto que identifica a un robot y,
         opcionalmente una distancia. Retorna el valor 
         \texttt{true} si hay un obstáculo a una distancia menor o igual a la
-        indicada. Si no se envía la distancia se asume un valor por defecto. CUAL??????
+        indicada. Si no se envía la distancia se asume un valor por defecto,
+        este valor por defecto depende del modelo de robot usado ya que los
+        sensores tienen rangos diferentes.
     \item[\texttt{getLine}] Recibe un objeto que identifica a un robot y
         retorna un \texttt{array}
         con los valores de los sensores de línea del robot.
@@ -353,14 +385,62 @@ Entre otros la entidad ``robot'' soporta los métodos:
 
 
 Opcionalmente un modelo dado de robot puede soportar otros métodos o retornar
-error en alguno de los métodos anteriores. EN ESTE CASO, EL PROTOCOLO PLANTEADO ES FACILMETE EXTENSIBLE... O ALGO ASI
+error en alguno de los métodos anteriores. El protocolo es fácilmente
+extensible ya que simplemente modela un pasaje de mensajes con argumentos,
+para agregar nuevos mensajes basta con enviar distintos strings en el
+campo ``method'' y para soportar nuevos tipos de entidades simplemente
+se puede enviar un string diferente en ``entity''.
+
+Por ejemplo potencialmente
+se podría controlar un sistema que controle la iluminación de un casa,
+supongamos entonces que los métodos serán ``main\_bedroom'', ``children\_bedroom'',
+``kitchen'', ``living'' y ``garage''. Supongamos que cada uno de estos
+controla la luz de la habitación descripta por su nombre, reciben como
+argumento la intensidad de luz como un número de 0 a 255. Finalmente
+podemos llamar a la ``entity'' ``houselight''.
+
+Podríamos controlar las luces con una secuencia de mensajes como
+los mostrados en el código~\ref{lst:houselight}. Por supuesto luego
+habría que agregar soporte para estas funcionalidades en el servidor
+y los clientes pero como veremos más adelante esto tampoco es
+un problema.
+
+\begin{lstlisting}[language=python,
+caption={Ejemplo de una posible extensión al protocolo para controlar
+las luces de una casa},
+label=lst:houselight]
+{
+    "entity": "houselight",
+    "method": "main_bedroom",
+    "args": [60],
+}
+{
+    "entity": "houselight",
+    "method": "garage",
+    "args": [0],
+}
+{
+    "entity": "houselight",
+    "method": "living",
+    "args": [255],
+}
+\end{lstlisting}
 
 
-%fix me: redacta mejor... 
-La posibilidad que tienen los métodos con tiempo como \texttt{backward} de
-contestar la petición varios segundos después de recibirla sin afectar
-el funcionamiento del servidor ni demorar innesesariamente al resto de los
-clientes está dada por el soporte de asincronismo del framework Tornado.
+Los métodos bloqueantes como \texttt{backward} (que con DuinoBot demoran
+la ejecución del proceso hasta que transcurra el tiempo indicado como
+parámetro) son modelados desde el servidor demorando la respuesta al método
+gracias a que el framework Tornado funciona con un ``bucle principal''
+(``main loop'') donde se pueden encolar trabajos para que se ejecuten
+en el futuro.
+Esta funcionalidad no es necesaria para la mayoría de los clientes que
+pueden implementar las demoras de forma local usando la función
+\texttt{sleep()}\footnote{tanto en Ruby como en Python se llama igual.},
+pero es necesario para la implementación en Javascript donde no es posible
+demorar la ejecución del script sin impactar de forma negativa la performance
+del navegador (al menos en la pestaña actual).
+
+
 
 \section{Mensajes del servidor a los clientes}
 
@@ -576,4 +656,8 @@ una \textit{API key} a los clientes basta con configurar la opción
 \texttt{public\_server} en \texttt{False} dentro del archivo
 \textit{configuration.py}.
 
-% FIXME: Ampliar
+Dado que existe esta modalidad el protocolo cuenta con un mensaje
+para preguntar si es necesario proseguir con la authenticación
+(\texttt{authentication\_required}), con lo cuál se pueden crear
+scritps que se adapten a ambos escenarios.
+

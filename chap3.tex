@@ -12,7 +12,7 @@ Tanto Remotebot como XRemoteBot tienen arquitecturas complejas que
 dependen de otras librerías y de software instalado en los robots.
 El objetivo de este capítulo es describir la interacción entre los
 distintos dispositivos y aplicaciones utilizadas, demarcando el límite
-entre el desarrollo realizado para esta tesina, XRemoteBot, con el software ya
+entre el desarrollo realizado para esta tesina (XRemoteBot) con el software ya
 existente con el que interactúa.
 
 \section{Myro}\label{sec:myro}
@@ -31,12 +31,11 @@ Si bien el proyecto original fue desarrollado por Microsoft Research,
 el software generado es software libre y portable tanto en sistemas Windows
 como GNU/Linux.
 
-
 Myro puede interactuar con los robots de dos
 formas diferentes: a través de un cable serial (RS323) o bien usando bluetooth
 con RFCOMM. El funcionamiento de Myro requiere que el robot tenga
 cargado un firmware determinado que espera las instrucciones desde el puerto
-serial con el que cuenta el robot y una placa llamada FLUKE-6 que se conecta
+serial con el que cuenta el robot y una placa llamada IPRE Fluke que se conecta
 al puerto serial del robot y cuenta con un adaptador bluetooth que permite
 enviarle comandos de forma inalámbrica a través de este protocolo.
 

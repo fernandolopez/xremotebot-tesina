@@ -1,17 +1,21 @@
 \chapter{Pruebas}\label{cha:pruebas}
 
 El servidor se probó con Python 2.7 (portarlo a Python 3 involucraría
-portar DuinoBot, Myro y otros módulos asociados) en entornos creados
+portar DuinoBot, Myro y otros módulos asociados), en entornos creados
 con virtualenv\footnote{FIXME REF} y con una base de datos
 Sqlite\footnote{FIXME REF}
 sobre
 sistemas Lihuen 5 y 6 beta (basados en Debian Wheezy y Jessie respectivamente).
-Las dependencias se instalaron declarandolas en \texttt{setup.py} e instalandolas
+Las dependencias se instalaron declarándolas en \texttt{setup.py} e instalandolas
 con pip, a excepción de los módulos DuinoBot y Myro que fueron instalados
 desde repositorios Git usando también pip, pero indicando la URL manualmente
-ya que no fué posible declararlos de esta manera en \texttt{setup.py}.
+ya que no fué posible declararlos de esta manera en \texttt{setup.py}, el
+código~\ref{lst:instalar_xremotebot} muestra como instalar el servidor
+y los paquetes necesarios para soportar robots Multiplo N6 y Scribbler.
 
-\begin{lstlisting}[language=bash,caption={Instalación de XRemoteBot},label=]
+\begin{lstlisting}[language=bash,
+caption={Instalación de XRemoteBot},
+label=lst:instalar_xremotebot]
 git clone https://github.com/fernandolopez/xremotebot.git
 cd xremotebot
 virtualenv .
@@ -21,17 +25,218 @@ pip install 'git+https://github.com/Robots-Linti/duinobot.git@pygame_opcional'
 pip install 'git+https://github.com/fernandolopez/Myro.git'
 \end{lstlisting}
 
-Para soportar el streaming de video además es necesario 
+\begin{lstlisting}[language=bash,
+caption={Instalación del soporte de video para XRemoteBot},
+label=lst:instalar_video]
+apt-get install libav-tools nodejs
+npm install -g ws
+\end{lstlisting}
 
+Para soportar el streaming de video además es necesario instalar
+\texttt{avconv}, \texttt{NodeJS} y el paquete \texttt{ws} para NodeJS,
+se pueden instalarde distintas formas dependiendo del sistema operativo
+utilizado, en código~\ref{lst:instalar_video} muestra como instalarlo
+en un sistema basado en Debian GNU/Linux.
 
+Finalmente para ejecutar todo es conveniente utilizar el script
+\texttt{run} provisto con el servidor que se encarga de ejecutar
+avconv, el servidor de jsmpeg y de asociar las MACs de los
+robots Scribbler que hubiera configurados con dispositivos
+\texttt{rfcomm} de manera que queden utilizables para \texttt{Myro}.
+Luego de ejecutar esas tareas el script \texttt{run} ejecuta
+el servidor XRemoteBot.
 
-\begin{lstlisting}[language=bash,caption={Instalación de XRemoteBot},label=]
+\begin{lstlisting}[language=bash,
+caption={Ejecutar el servidor y procesos asociados},
+label=lst:ejecutar_xremotebot]
 ./run.sh
 \end{lstlisting}
+
+Si hubiese algún robot Scribbler en la configuración el script
+\texttt{run} pedirá la contraseña de administrador para asociar
+su MAC con un dispositivo \texttt{rfcomm}.
+
 
 usando los archivos requirementes.txt
 y requirements-dev.txt, a excepción de los módulos DuinoBot y Myro que se
 instalaron con pip desde Git por lo que no fue posible usar los archivos
 
+\section{Pruebas de uso de recursos}
+Se dejó el servidor ejecutándose durante aproximadamente 24hs en
+un equipo con un procesador
+``AMD Athlon(tm) 64 X2 Dual Core Processor 4600+'' y 2GB de memoria
+RAM. Durante ese tiempo hubo un cliente conectado controlando
+un robot (que recibió energía de una fuente ATX para evitar problemas
+con las pilas) realizando movimientos cada determinada cantidad de
+segundos. Esporádicamente se verificó con la herramienta
+\texttt{htop} el uso de recursos general de XRemoteBot y herramientas
+asociadas. En estas pruebas ni XRemoteBot ni el servidor de jsmpeg
+mostraron valores significativos en el uso de CPU y memoria en
+el sistema, en cambio la herramienta \texttt{avconv} consumió
+de manera prácticamente constante un 20\% de un núcleo de la CPU
+y un 0.3\% de memoria. Al ejecutar un cliente en este mismo
+equipo en el navegador Mozilla Firefox 40.0a1 (Nightly)
+el uso de CPU por parte de este navegador estuvo alrededor
+del 25\%, un 40\% en Google Chrome 41.0.2272.101 (Stable).
 
+Eliminando el elemento canvas donde se grafica el streaming de video
+el uso de CPU se redujo a un 0.5\% en Firefox y 30\% en Google Chrome,
+por lo que aparentemente ese uso de CPU se encuentra relacionado
+con la decodificación y renderizado de video.
 
+\section{Pruebas con la interfaz Javascript}
+
+Estas pruebas llevaron a algunas modificaciones de la interfaz
+web, la API Javascript y el servidor en base a la experiencia de uso,
+por ejemplo:
+\begin{itemize}
+    \item Se incorporó la funcionalidad al servidor que cuando
+        el cliente se desconecta del WebSocket, se liberan todas
+        sus reservas. Esto es una cuestión de gustos, podría
+        mantenerse también la reserva sin problema hasta su
+        vencimiento, pero haciendo pruebas con una cantidad
+        limitada de robots se hizo notorio que un sistema
+        así desperdicia mucho el tiempo ocioso del robot.
+    \item Dado que al cerrar el WebSocket se pierde la reserva
+        se hizo que también se envíe el mensaje \texttt{stop}
+        a cada robot reservado por el usuario, de manera
+        que el robot no se quede en movimiento una vez
+        terminada la reserva.
+    \item Se incorporó una caja con tips debajo de la vista de
+        la cámara, en la misma van rotando una serie de consejos
+        acerca de aspectos de la API Javascript que pueden
+        resultar poco familiares a una persona que no utilize este
+        lenguaje con frecuencia y otros muy específicos
+        del control de los robots con XRemoteBot.
+    \item Se modificó la forma de evaluar el código, para que se
+        ejecute en un contexto donde las funciones
+        \texttt{setInterval()} y \texttt{setTimeout} se encuentran
+        ocultas por otras implementaciones que garantizan que cada
+        vez que se presione el botón ``Ejecutar'' se eliminen
+        todos los timeouts e intervalos previamente creados.
+        De otra manera si el usuario escribe un script que usa
+        estas funciones
+        (cuestión que parece ser conveniente en este entorno)
+        y luego escribe otro, los timeouts e intervalos
+        de la versión anterior se seguirían ejecutando
+        interfiriendo con el comportamiento del script actual.
+\end{itemize}
+
+\subsection{Pruebas de codificación}
+
+Dado el uso de Promises en el diseño de este cliente, fue
+necesario repensar la forma
+de resolver los ejercicios habituales. Por ejemplo en el
+código~\ref{lst:movimientos_js} se ve un script que mueve el
+robot,
+código~\ref{lst:esquivar_js} se ve un algoritmo para que el robot
+avance esquivando obstáculos y en el código~\ref{lst:random_js}
+muestra un script que mueve el robot en direcciones aleatorias.
+
+\begin{lstlisting}[language=C,
+caption={Secuencia de movimientos},
+label=lst:movimientos_js]
+var server = new Server('ws://xremotebot.example:8000/api',
+                        'api_key');
+server.onConnect(function(){
+	server.fetch_robot().then(function(robot_obj){
+		var robot = new Robot(server, robot_obj);
+        robot.forward(50, 5);
+        robot.turnLeft(50, 2);
+        robot.turnRight(50, 2);
+        alert('Hola');
+	});
+});
+\end{lstlisting}
+
+\begin{lstlisting}[language=C,
+caption={Esquivar obstáculos},
+label=lst:esquivar_js]
+var server = new Server('ws://xremotebot.example:8000/api',
+                        'api_key');
+server.onConnect(function(){
+    server.fetch_robot().then(function(robot_obj){
+        var robot = new Robot(server, robot_obj);
+        var esquivar = function(){
+            robot.getObstacle().then(function(obstacle){
+                if (obstacle){
+                    robot.backward(40, 1);
+                    if (Math.random() < 0.5){
+                        robot.turnLeft(40, 1);
+                    }
+                    else{
+                        robot.turnRight(40, 1);
+                    }
+                    robot.forward(40);
+                }
+                setTimeout(esquivar, 500);
+            });
+        };
+        robot.forward(40);
+        setTimeout(esquivar, 500);
+    });
+});
+\end{lstlisting}
+
+Al ejecutar el código~\ref{lst:movimientos_js} se puede ver que la
+función \texttt{alert()} se está ejecutando mucho antes que el
+robot termine de moverse, de hecho lo hace de manera casi instantánea
+al presionar ``Ejecutar''. Esto es porque
+si bien se implementó un mecanismo donde el cliente
+antes de enviar cada mensaje espera a que el servidor conteste el
+anterior para simular una ejecución secuencial y para simular
+funciones bloqueantes que demoran la ejecución del script, realmente
+el cliente no deja de ser asincrónico.
+La ejecución de \texttt{forward()} y cada uno de los
+métodos del robot en realidad solamente instancia y retorna una
+``promesa'', por lo que el tiempo que tardan en ejecutarse
+estos movimientos es insignificante, pero vemos que el robot
+se mueve como si cada uno de estos métodos congelara la ejecución
+del script por este mecanismo que tiene soporte tanto del lado
+del cliente como del lado del servidor que demora la respuesta
+de algunos métodos apropósito.
+
+\begin{lstlisting}[language=C,
+caption={Secuencia de movimientos},
+label=lst:movimientos_then_js]
+var server = new Server('ws://xremotebot.example:8000/api',
+                        'api_key');
+server.onConnect(function(){
+	server.fetch_robot().then(function(robot_obj){
+		var robot = new Robot(server, robot_obj);
+        robot.forward(50, 5).then(function(){
+            robot.turnLeft(50, 2);
+        }).then(function(){
+            robot.turnRight(50, 2);
+        }).then(function(){
+            alert('Hola');
+        });
+	});
+});
+
+Es posible hacer una versión donde \texttt{alert()} se ejecute cuando
+el robot termine de moverse, pero el código de esta versión
+(código~\ref{lst:movimientos_then_js}) es
+un poco más engorroso ya que tiene muchos niveles de anidamiento.
+
+En el código~\ref{lst:esquivar_js} a simple vista se ven diferencias
+significativas de la forma de codificar con esta API en comparación
+con DuinoBot e incluso en comparación con los otros clientes de
+XRemoteBot. Lo más importante es que dado que los métodos retornan
+``promesas'' no se puede usar un \texttt{while} o \texttt{for} para
+repetir una acción por ejemplo mientras no hay obstáculos, por lo que
+hay que recurrir a \texttt{setInterval()} o bien a \texttt{setTimeout()}
+para tener más control.
+
+El código~\ref{lst:random_js} usa la misma estrategia que el ejemplo
+anterior usando \texttt{setInterval()} para realizar una tarea
+que con DuinoBot en Python se haría con un \texttt{while} y además
+accede a la API Math del navegador.
+
+\section{Pruebas con los clientes Python y Ruby}
+Estos clientes tienen una complejidad menor que el cliente Javascript
+por lo que fueron rápidamente probados sin mayores dificultades.
+
+La API de estos clientes se asemeja tanto a la API original de
+DuinoBot que no fue necesario repensar como hacer las actividades
+típicas con los robots como lo fue en la versión Javascript.

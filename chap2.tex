@@ -8,12 +8,15 @@ más destacadas y las más similares a los requerimientos planteados en esta
 propuesta.
 
 
-% FIXME: mmmm NO SE SI ESTO DEBERÍA ESTAR EN UN CAPITULO APARTE.....  LO HABLAMOS LUEGO
-
 \section{Educabot}
 El proyecto Educabot\footnote{\url{http://www.educabot.org/}} tiene por
 objetivo enseñar tecnología a niños y adultos a través
-del uso, programación y construcción de robots. En el sitio del proyecto se ofertan cursos orientados a los distintos niveles y se mencionan actividades realizadas en distintas escuelas de la Ciudad Autónoma de Buenos
+del uso, programación y construcción de robots. En el sitio del proyecto
+se ofertan cursos orientados a los distintos niveles y 
+en la última conferencia de Python de Argentina (Pyconar 2014) uno de
+los cofundadores del proyecto mencionó que se llevan adelante actividades
+con los robots
+en distintas escuelas de la Ciudad Autónoma de Buenos
 Aires\footnote{\url{https://youtu.be/1oCOAtX9OS4}}.
 
 % FIXME: ES ORIGINARIO DE ..... EN ESCUELAS? EN ONGS? DONDE SE LOS USA?
@@ -50,8 +53,13 @@ a los que XRemoteBot se encuentra dirigido.
 
 %FIXME: fijate de poner aunque sea notas al pie con las referencias de los paquetes o protocolos que nmbras... el que no sabe.. se muere...
 
-El servidor web de ``elBrian'' está implementado usando el framework Tornado,
-WebSockets, mjpg-streamer, opencv y JSON. El mismo está diseñado para ejecutarse
+El servidor web de ``elBrian'' está implementado usando el framework
+Tornado\footnote{\url{http://www.tornadoweb.org/}},
+WebSockets\footnote{\url{http://www.websocket.org/}},
+mjpg-streamer\footnote{\url{https://github.com/jacksonliam/mjpg-streamer}},
+opencv\footnote{\url{http://opencv.org/}}
+y JSON\footnote{\url{http://json.org/}}.
+El mismo está diseñado para ejecutarse
 en el robot ya que el mismo está basado en una placa RaspberryPi, la cuál
 cuenta con un procesador ARM perfectamente capaz de ejecutar un sistema
 operativo completo como GNU/Linux y de soportar el intérprete oficial de Python.
@@ -60,8 +68,8 @@ Mientras que este servidor coincide en gran medida en la elección de lenguaje
 y bibliotecas utilizadas, su implementación es específica para el robot ``elBrian''
 y no puede ser portada a robots con menores capacidades de procesamiento
 sin una reescritura significativa. Además el protocolo utilizado no contempla
-el acceso a valores de sensores, los únicos mensajes que permite enviar
-al robot son comandos de movimientos.
+el acceso a valores de sensores siendo los únicos mensajes que permite enviar
+al robot los comandos de movimientos.
 
 \begin{itemize}
     \item Educabot \url{http://www.educabot.org/}
@@ -73,7 +81,7 @@ al robot son comandos de movimientos.
 Gobot\footnote{\url{http://gobot.io}}
 es una biblioteca que permite controlar robots programando en el lenguaje
 Go\footnote{\url{https://golang.org/}}. Esta biblioteca soporta el
-protocolo Firmata\footnote{\url{https://github.com/firmata/protocol}}
+protocolo Firmata\footnote{\url{https://firmata.org}}
 para controlar robots
 conectados directamente a través de una interfaz serial, como es el caso
 de los robots Multiplo N6, y soporta la API
@@ -84,13 +92,108 @@ que permite el acceso a la información y control de robots a través de la Web.
 Gobot además tiene compatibilidad con distintos sensores y robots, además de
 ser compatible con
 placas utilizadas normalmente en la construcción de robots como Arduino,
-Raspberry Pi, Intel Edison y Beaglebone Black.
+Raspberry Pi, Intel Edison y Beaglebone Black%
+\footnote{\url{http://gobot.io/\#platforms}}.
 
 Este proyecto es interesante como base para desarrollar algún proyecto
 similar a XRemoteBot en Go, pero requiere además la reimplementación
 del módulo de Python DuinoBot que controla, a través de una versión
 modificada del protocolo Firmata, a los robots Multiplo N6. Por otro
 lado, los robots Scribbler tampoco aparecen en la lista de robots soportados.
+
+\section{Cylon.js}
+
+Cylon.js es un proyecto hermano de Gobot y soporta la misma variedad
+de dispositivos y también provee una API cppp-io, con la diferencia
+de que la biblioteca provista está escrita en Javascript para NodeJS.
+
+Una característica interesante de Cylon.js es que soporta distintos
+protocolos para su API remota como ser HTTP, socket.io y la capacidad
+de agregar nuevos protocolos con
+plugins\footnote{\url{http://cylonjs.com/}}.
+
+\begin{lstlisting}[caption={Cylon.js controlando 2 robots ``sphero'' usando HTTP},
+label={lst:cylonjs_ejemplo}]
+"use strict";
+
+var Cylon = require("cylon");
+
+// ensure you install the API plugin first:
+// $ npm install cylon-api-http
+Cylon.api({
+  host: "0.0.0.0",
+  port: "8080"
+});
+
+var bots = {
+  "Thelma": "/dev/rfcomm0",
+  "Louise": "/dev/rfcomm1"
+};
+
+Object.keys(bots).forEach(function(name) {
+  var port = bots[name];
+
+  Cylon.robot({
+    name: name,
+
+    connections: {
+      sphero: { adaptor: "sphero", port: port }
+    },
+
+    devices: {
+      sphero: { driver: "sphero" }
+    },
+
+    work: function(my) {
+      every((1).seconds(), function() {
+        console.log(my.name);
+        my.sphero.setRandomColor();
+        my.sphero.roll(60, Math.floor(Math.random() * 360));
+      });
+    }
+  });
+});
+
+Cylon.start();
+\end{lstlisting}
+
+En el código~\ref{lst:cylonjs_ejemplo} se puede ver un ejemplo de
+Cylon.js del lado del servidor exponiendo dos robots de tipo
+\textit{sphero} a través de la API HTTP,
+una vez ejecutado este código en el servidor, a través de la API se
+les podrá enviar un mensaje a los robots
+robots que hará que cambien
+de color
+y se desplacen
+rodando\footnote{Los robots sphero son pequeñas esferas \url{http://www.gosphero.com/}.}.
+
+Si bien en la documentación del proyecto se detalla como habilitar
+un sistema de login para acceder a la API de forma remota, el mismo
+no parece estar diseñado para el acceso concurrente de distintos usuarios
+ya que de la documentación no surge que Cylon.js soporte un sistema
+de reserva de robots o de exclusión mutua en el acceso a los mismos.
+
+\section{VCar}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{figures/vcar}
+    \caption{Interfaz de VCar}
+    \label{fig:vcar}
+\end{figure}
+
+VCar es un auto a control remoto, cuyo control fue modificado para
+se manipulado por software desde  una computadora con GNU/Linux la
+cuál permite controlar el robot de forma remota y verlo
+a través de una cámara de
+video\footnote{\url{http://www.hellspark.com/new/css/vcar/vcar.html}}
+(figura~\ref{fig:vcar}).
+El acceso al robot es público
+aparentemente sin ningún tipo de restricción y la página
+si bien no tiene detalles de todo el hardware y el software utilizados
+provee algunas fotos de la construcción del
+sistema\footnote{\url{http://www.hellspark.com/dm/gallery2/v/projects/robotics/vcar/}}
+
 
 \section{Tele Toyland}
 
@@ -120,13 +223,26 @@ los dispositivos desde un lenguaje de programación.
 %http://www3.uji.es/~pnebot/Files/Articuls/RemoteProgramming.pdf
 %Otro
 %http://telerobot.mech.uwa.edu.au/Telerobot/instructions.html
-\section{DIY}
+\section{Otros proyectos}
 % www.linuxuser.co.uk/tutorials/control-your-raspberry-pi-robot-from-a-web-connected-device
 
 
 
 %FIX ME ESTO QUEDA MUY DESCOLGADO..... yo pondŕia algo como 
 %Bajo la consigna DIY, o ``do it yourself'' y acá poner un par de ref!!!, existen diversas.....y seguir...., 
+
+Existieron otros sistemas similares en el pasado, pero actualmente se
+encuentran fuera de línea por problemas técnicos o bien porque el
+experimento terminó como por ejemplo
+``TU Freiberg Robotics''\footnote{\url{www.informatik.tu-freiberg.de/\~frobots/}}
+que permitía controlar robots en una mini cancha de fútbol,
+``WebTruck''\footnote{\url{http://www.webtruck.org/cinteraction_html}} que
+permitía controlar distintos vehículos.
+
+También existen otros proyectos que requieren instalar software extra
+como ``The UWA Telerobot'' que requiere instalar software propietario
+y crear una cuenta para ser utilizado, este proyecto permite controlar
+un brazo robótico en un taller.
 
 Finalmente en la consigna de ``do it yourself'' existen diversas guías para
 programar servidores que permitan controlar robots o microcontroladores
@@ -138,3 +254,11 @@ embargo estas guías son introductorias y el objetivo es crear un servidor
 muy simple, similar a lo que fue el servidor RemoteBot, pensados para ser
 usados en un ambiente local ya que no proveen autenticación en general.
 
+\section{Conclusiones del capítulo}
+
+Si bien existen proyectos parecidos que brindan al público la posibilidad
+de controlar un robot de manera remota, ninguno de estos es una solución
+completa al problema de enseñar a programar usando
+robots de forma remota y permitiendo a distintos usuarios reservar
+temporalmente distintos
+robots de forma que no haya conflicto en la interacción entre los usuarios.
