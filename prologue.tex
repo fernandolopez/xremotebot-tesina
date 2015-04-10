@@ -5,40 +5,50 @@
 
 Esta tesina se enmarca en el proyecto \proyecto{} y el desarrollo realizado
 es una contribución a dicho proyecto.
-El desarrollo realizado para este trabajo consta del servidor XRemoteBot y tres
+Se implementó un servidor denominado XRemoteBot y tres
 clientes compatibles
-con el mismo escritos en tres lenguajes distintos, el motivo y las elecciones hechas
-en el desarrollo de el servidor y los clientes serán relatados a lo largo de este
+con el mismo escritos en tres lenguajes distintos. El motivo y las elecciones hechas
+en el desarrollo del servidor y los clientes serán relatados a lo largo de este
 trabajo.
 
 A continuación se describe la forma en que se ha organizado este informe y en el CD
-adjunto se entrega tanto una copia del mismo como los fuentes desarrollados, aunque
+adjunto se entrega tanto una copia del mismo como los fuentes desarrollados.
+Aunque
 cabe aclarar todo el trabajo implementado ha sido desarrollado con software libre,
 será liberado bajo licencia
-MIT\footnote{\url{http://opensource.org/licenses/MIT}} y se podrá descargar desde
+MIT\footnote{\url{http://opensource.org/licenses/MIT}} y se puede descargar
+desde GitHub\footnote{%
 \url{https://github.com/fernandolopez/xremotebot} y
-\url{https://github.com/fernandolopez/xremotebot-clients}.
+\url{https://github.com/fernandolopez/xremotebot-clients}}.
 
-El capítulo~\ref{cha:motivacion} relata la motivación para el desarrollo de XRemoteBot
-y las  alternativas similares en existencia en la actualidad.
+El capítulo~\ref{cha:motivacion} relata la motivación para el desarrollo de
+XRemoteBot.
 
-El capítulo~\ref{cha:arte} presenta un relevamiento de desarrollos y proyectos similares.
+El capítulo~\ref{cha:arte} presenta un relevamiento de desarrollos y
+proyectos similares.
 
-El capítulo~\ref{cha:arquitectura} describe las arquitecturas planteadas por las distintas APIs con las que se trabaja: DuinoBot, Myro, RemoteBot y XRemoteBot,  detallando las mejoras propuestas por XRemoteBot.
+El capítulo~\ref{cha:myro_y_duinobot} describe el modo funcionamiento de las
+bibliotecas usadas hasta el momento en el proyecto \proyecto{} para
+interactuar con los robots, estas
+bibliotecas son la base de XRemoteBot.
+
+El capítulo~\ref{cha:xremotebot} describe el modo de funcionamiento y
+tecnologías utilizadas del servidor
+XRemoteBot desarrollado para esta tesina y de su antecesor RemoteBot.
+
+El capítulo~\ref{cha:clientes} describe el modo de uso, modo de
+funcionamiento y
+tecnologías utilizadas en los tres clientes desarrollados para
+XRemoteBot, especialmente el cliente Javascript que es el más complejo
+en su implementación.
 
 El capítulo~\ref{cha:protocolo} describe el protocolo de capa de aplicación diseñado para
 el servidor desarrollado y las modalidades de operación del mismo.
 
-El capítulo~\ref{cha:clientes} describe la implementación de los distintos clientes desarrollado y el modo de uso
-de cada uno, destacando algunas diferencias y decisiones de diseño en la
-implementación en Javascript.
+El capítulo~\ref{cha:pruebas} describe el entorno en el que fue probado
+XRemoteBot, detallando algunas de pruebas realizadas y algunas
+modificaciones
+realizadas al proyecto en base a los resultados de estas pruebas.
 
-%FIXME ALGUNAS PRUEBAS Y CONCLUSOINES
-
-El anexo~\ref{cha:serializacion} muestra las pruebas realizadas para seleccionar un método
-de serialización para el protocolo de capa de aplicación desarrollado.
-
-%FIXME NO SE SI ESTO NO DEBERIA ESTAR DENTRO DEL CAPITULO DONDE SE DESCRIBE LA IMPLEMENTACION.. EN UNA SECCIPON TIPO ANALISIS DE ALTERNATIVAS.. O ALGO ASI
-El anexo~\ref{cha:websockets_y_promises} detalla las características por las cuales se eligió utilizar
-WebSockets y Promises, y las consecuencias de estas elecciones.
-
+El capítulo~\ref{cha:conclusiones} contiene las conclusiones del trabajo
+y el trabajo a futuro.

@@ -451,7 +451,7 @@ reserved.\par\permission}}
 \large
 {\def\baselinestretch{1.2}\Large\bf \choosecase{\@title} \par}
 {\large Tesina de grado de la Licenciatura en Inform\'atica}
-por\par
+\par
 {\Large  \choosecase{\@author}}
 \par
 \choosecase{\@degree}
