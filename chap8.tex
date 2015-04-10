@@ -2,8 +2,9 @@
 
 El servidor se probó con Python 2.7 (portarlo a Python 3 involucraría
 portar DuinoBot, Myro y otros módulos asociados), en entornos creados
-con virtualenv\footnote{FIXME REF} y con una base de datos
-Sqlite\footnote{FIXME REF}
+con virtualenv\footnote{\url{http://www.virtualbox.org/}}
+y con una base de datos
+Sqlite\footnote{\url{http://www.sqlite.org/}}
 sobre
 sistemas Lihuen 5 y 6 beta (basados en Debian Wheezy y Jessie respectivamente).
 Las dependencias se instalaron declarándolas en \texttt{setup.py} e instalandolas
@@ -49,7 +50,7 @@ el servidor XRemoteBot.
 \begin{lstlisting}[language=bash,
 caption={Ejecutar el servidor y procesos asociados},
 label=lst:ejecutar_xremotebot]
-./run.sh
+./run
 \end{lstlisting}
 
 Si hubiese algún robot Scribbler en la configuración el script
@@ -98,7 +99,7 @@ por ejemplo:
         limitada de robots se hizo notorio que un sistema
         así desperdicia mucho el tiempo ocioso del robot.
     \item Dado que al cerrar el WebSocket se pierde la reserva
-        se hizo que también se envíe el mensaje \texttt{stop}
+        se hizo que también se envíe el mensaje \texttt{stop()}
         a cada robot reservado por el usuario, de manera
         que el robot no se quede en movimiento una vez
         terminada la reserva.
@@ -110,7 +111,7 @@ por ejemplo:
         del control de los robots con XRemoteBot.
     \item Se modificó la forma de evaluar el código, para que se
         ejecute en un contexto donde las funciones
-        \texttt{setInterval()} y \texttt{setTimeout} se encuentran
+        \texttt{setInterval()} y \texttt{setTimeout()} se encuentran
         ocultas por otras implementaciones que garantizan que cada
         vez que se presione el botón ``Ejecutar'' se eliminen
         todos los timeouts e intervalos previamente creados.
