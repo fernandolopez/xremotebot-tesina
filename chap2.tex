@@ -1,18 +1,18 @@
 \chapter{Controlando dispositivos de forma remota}\label{cha:arte}
 
 Existen diferentes alternativas para controlar robots o microcontroladores
-de forma remota, muchas de estas se agrupan bajo la denominación
+de forma remota. Muchas de estas se agrupan bajo la denominación
 ``Internet of Things''\footnote{\url{https://www.iotwf.com/resources/1}}.
 En este capítulo se describirán algunas de las
-más destacadas y las más similares a los requerimientos planteados en esta
-propuesta.
+más destacadas entre las más similares a los requerimientos planteados en
+esta propuesta.
 
 
 \section{Educabot}
 El proyecto Educabot\footnote{\url{http://www.educabot.org/}} tiene por
 objetivo enseñar tecnología a niños y adultos a través
 del uso, programación y construcción de robots. En el sitio del proyecto
-se ofertan cursos orientados a los distintos niveles y
+se ofertan cursos orientados a los distintos niveles y 
 en la última conferencia de Python de Argentina (Pyconar 2014) uno de
 los cofundadores del proyecto mencionó que se llevan adelante actividades
 con los robots
@@ -71,9 +71,10 @@ sin una reescritura significativa. Además el protocolo utilizado no contempla
 el acceso a valores de sensores siendo los únicos mensajes que permite enviar
 al robot los comandos de movimientos.
 
+Referencias del proyecto:
 \begin{itemize}
-    \item Educabot \url{http://www.educabot.org/}
-    \item Código fuente de ``elBrian'' \url{https://github.com/educabot/elBraian}
+    \item Página del proyecto: \url{http://www.educabot.org/}
+    \item Código fuente de ``elBrian'': \url{https://github.com/educabot/elBraian}
 \end{itemize}
 
 \section{Gobot con cppp-io}
@@ -81,7 +82,7 @@ al robot los comandos de movimientos.
 Gobot\footnote{\url{http://gobot.io}}
 es una biblioteca que permite controlar robots programando en el lenguaje
 Go\footnote{\url{https://golang.org/}}. Esta biblioteca soporta el
-protocolo Firmata\footnote{\url{https://firmata.org}}
+protocolo Firmata
 para controlar robots
 conectados directamente a través de una interfaz serial, como es el caso
 de los robots Multiplo N6, y soporta la API
@@ -101,6 +102,13 @@ del módulo de Python DuinoBot que controla, a través de una versión
 modificada del protocolo Firmata, a los robots Multiplo N6. Por otro
 lado, los robots Scribbler tampoco aparecen en la lista de robots soportados.
 
+Referencias del proyecto:
+\begin{itemize}
+    \item Página del proyecto: \url{http://gobot.io}.
+    \item Protocolo de su API Web: \url{https://github.com/hybridgroup/cppp-io/}.
+\end{itemize}
+
+
 \section{Cylon.js}
 
 Cylon.js es un proyecto hermano de Gobot y soporta la misma variedad
@@ -110,7 +118,7 @@ de que la biblioteca provista está escrita en Javascript para NodeJS.
 Una característica interesante de Cylon.js es que soporta distintos
 protocolos para su API remota como ser HTTP, socket.io y la capacidad
 de agregar nuevos protocolos con
-plugins\footnote{\url{http://cylonjs.com/}}.
+plugins
 
 \begin{lstlisting}[caption={Cylon.js controlando 2 robots ``sphero'' usando HTTP},
 label={lst:cylonjs_ejemplo}]
@@ -173,6 +181,12 @@ no parece estar diseñado para el acceso concurrente de distintos usuarios
 ya que de la documentación no surge que Cylon.js soporte un sistema
 de reserva de robots o de exclusión mutua en el acceso a los mismos.
 
+Referencias del proyecto:
+\begin{itemize}
+    \item Página del proyecto: \url{http://cylonjs.com/}.
+\end{itemize}
+
+
 \section{VCar}
 
 \begin{figure}
@@ -193,6 +207,12 @@ aparentemente sin ningún tipo de restricción y la página
 si bien no tiene detalles de todo el hardware y el software utilizados
 provee algunas fotos de la construcción del
 sistema\footnote{\url{http://www.hellspark.com/dm/gallery2/v/projects/robotics/vcar/}}
+
+Referencias del proyecto:
+\begin{itemize}
+    \item Página del proyecto: \url{http://www.hellspark.com/new/css/vcar/vcar.html}.
+    \item Galería de fotos: \url{http://www.hellspark.com/dm/gallery2/v/projects/robotics/vcar/}}
+\end{itemize}
 
 
 \section{Tele Toyland}
@@ -217,7 +237,10 @@ manipular, en donde se puede, incluso, configurar una serie de instrucciones a e
 en secuencia. Sin embargo no provee una biblioteca que permita controlar
 los dispositivos desde un lenguaje de programación.
 
-
+Referencias del proyecto:
+\begin{itemize}
+    \item Página del proyecto: \url{http://www.teletoyland.com}.
+\end{itemize}
 % FIXME
 %\section{}
 %http://www3.uji.es/~pnebot/Files/Articuls/RemoteProgramming.pdf
