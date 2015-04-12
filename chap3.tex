@@ -8,11 +8,11 @@
 
 % FIXME: QUIZAS ESTE CAPITULO PODRÍA IR ANTES DEL ANTERIOR... YA QUE SEGURAMENTE VAS A NOMBRAR Y DESCRIBIR VARIAS COSAS QUE LUEGO NOMBRAS ALLÁ... FIJATE
 
-Tanto Remotebot como XRemoteBot tienen arquitecturas complejas que
-dependen de otras librerías y de software instalado en los robots.
+XRemoteBot tiene una arquitectura compleja que
+depende de otras librerías y de software instalado en los robots.
 El objetivo de este capítulo es describir la interacción entre los
 distintos dispositivos y aplicaciones utilizadas, demarcando el límite
-entre el desarrollo realizado para esta tesina (XRemoteBot) con el software ya
+entre el desarrollo realizado para esta tesina con el software ya
 existente con el que interactúa.
 
 \section{Myro}\label{sec:myro}
@@ -20,11 +20,12 @@ existente con el que interactúa.
 Como se mencionó al comienzo de este informe,
 Myro\footnote{\url{http://myro.roboteducation.org/}}
 es la biblioteca utilizada para controlar a los robots
-``Scribbler''\footnote{\url{http://wiki.roboteducation.org/Myro_Hardware}}
+``Scribbler''
 desde un script Python. Esta biblioteca fue desarrollada por
 Institute for Personal Robots in Education (IPRE) y
 y utilizado en el proyecto Robot en la enseñanza de ciencias
-de la computación\footnote{\url{http://www.roboteducation.org}}
+de la computación~\citep{kumar_2009}
+%%\footnote{\url{http://www.roboteducation.org}}
 en distintos niveles
 educativos\footnote{\url{http://www.roboteducation.org/schools.html}}.
 Si bien el proyecto original fue desarrollado por Microsoft Research,
@@ -33,17 +34,17 @@ como GNU/Linux.
 
 Myro puede interactuar con los robots de dos
 formas diferentes: a través de un cable serial (RS323) o bien usando Bluetooth
-con RFCOMM. El funcionamiento de Myro requiere que el robot tenga
+con RFCOMM\footnote{\url{https://developer.bluetooth.org/TechnologyOverview/Pages/RFCOMM.aspx}}.
+El funcionamiento de Myro requiere que el robot tenga
 cargado un firmware determinado que espera las instrucciones desde el puerto
-serial con el que cuenta el robot y una placa llamada IPRE Fluke que se conecta
+serial con el que cuenta el robot, y una placa llamada IPRE Fluke que se conecta
 al puerto serial del robot y cuenta con un adaptador Bluetooth que permite
 enviarle comandos de forma inalámbrica a través de este protocolo.
 
 \begin{figure}
     \centering
     \includegraphics[width=.7\textwidth]{figures/diagrama_myro}
-    \caption{Diagrama de bloques de Myro}
-    \label{fig:diagrama_myro}
+    \caption{Diagrama de bloques de Myro}\label{fig:diagrama_myro}
 \end{figure}
 
 La figura~\ref{fig:diagrama_myro} muestra la interacción entre los componentes
@@ -51,7 +52,7 @@ más importantes de software y hardware desde el script del usuario hasta el
 robot.
 
 Cabe destacar que el código de Myro funciona con Python 2.7 pero no con
-Python 3, posiblemente esto se relacione con la desición del \ipre{}
+Python 3. Posiblemente esto se relacione con la desición del \ipre{}
 de desarrollar una nueva biblioteca para controlar a los robots que funcione
 en distintos lenguajes de
 programación\footnote{\url{http://calicoproject.org/}}. De todas formas se
@@ -61,13 +62,15 @@ con esta librería.
 % FIXME Maybe más adelante
 Lamentablemente el servidor SVN oficial donde se publicaban las
 actualizaciones de Myro a la fecha de escribir este documento
-no se encuentra en funcionamiento, por lo que debí recurrir a una
+no se encuentra en funcionamiento, por lo que se utilizó una
 copia de este repositorio en
 GitHub\footnote{\url{https://github.com/yingted/Myro}} de la cuál
-cree un fork y la reorganicé de forma tal que fuera posible instalar
-esta librería desde un entorno Python con un solo comando y hice
-una pequeña corrección para que el uso de la biblioteca IDLE sea
-opcional ya esa biblioteca sirve para crear interfaces gráficas
+se creó un fork y la reorganizó de forma tal que fuera posible instalar
+esta librería desde un entorno Python con un solo comando.
+Además se hizo
+una pequeña corrección para que el uso del paquete
+IDLE\footnote{\url{https://developer.bluetooth.org/TechnologyOverview/Pages/RFCOMM.aspx}}
+sea opcional ya esa biblioteca sirve para crear interfaces gráficas
 y eso no es necesario para este proyecto.
 
 Esta librería (técnicamente un paquete Python) consta de múltiples
@@ -88,11 +91,11 @@ de becarios del laboratorio LINTI de esta Facultad y la empresa RobotGroup
 cuenta con un modo de operación similar al de Myro, conectándose con
 los robots a través de un dongle XBee (que utiliza el protocolo ZigBee)
 conectado a través de un puerto USB con el dispositivo controlante.
-Para que esta biblioteca pueda controlar a los robots estos últimos
+Para que esta biblioteca pueda controlar a los robots, estos últimos
 deberán tener instalado también un firmware especial: en este caso,
 es un una versión modificada de un firmware que implementa el protocolo
 Firmata de uso amplio para controlar dispositivos Arduino a través de una
-interfaz serial que habitualmente es el puerto USB, pero en este caso
+interfaz serial que habitualmente es el puerto USB. Pero en este caso
 la interfaz serial está conectada a un dongle XBee en el robot, la interacción
 entre las distintas capas de software y hardware se ilustra en la
 figura~\ref{fig:funcionamiento_duinobot_diagrama}.
@@ -121,4 +124,11 @@ fueron utilizados los robots en los cursos del proyecto
 planteadas posteriormente, generalmente además cada alumno controla
 un único robot, el esquema de conexión típico en estos cursos se encuentra
 ilustrado en la figura~\ref{fig:funcionamiento_duinobot_conexion}.
+
+Como material para los cursos dictados como parte del proyecto \proyecto{}
+se escribió un libro de programación con robots que describe por completo
+la API de DuinoBot, además de un conjunto de prácticas y slides que pueden
+ser reutilizados para dictar cursos similares ya que ese encuentran publicados
+con una licencia Creative Commons y disponibles en el sitio del
+proyecto\footnote{\url{http://robots.linti.unlp.edu.ar/material_disponible}}.
 

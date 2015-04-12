@@ -30,7 +30,10 @@
 \usepackage[utf8x]{inputenc} % Codificación del archivo
 \usepackage{hyperref}
 \hypersetup{%
-    colorlinks=true
+    colorlinks=true,
+    urlcolor=black,
+    linkcolor=black,
+    citecolor=black,
 }
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -65,7 +68,17 @@
 \PrerenderUnicode{ñ}
 
 %% Los listings precisan parámetros especiales, sino puede fallar la generación del PDF %%
-\lstset{
+\lstset{%
+    backgroundcolor=\color[gray]{0.95},
+     %breaklines=true,  % Comentado porque también aparecen listings partidos
+                        % en 2 páginas
+    frame=tblr,
+    keywordstyle=[1]\textbf,    % Stil der Keywords
+    keywordstyle=[2]\textbf,    %
+    keywordstyle=[3]\textbf,    %
+    keywordstyle=[4]\textbf,    %
+    showspaces=false,           % Leerzeichen anzeigen ?
+    showtabs=false,             % Tabs anzeigen ?
     numbers=left,
     captionpos=b,
     basicstyle=\ttfamily\footnotesize,

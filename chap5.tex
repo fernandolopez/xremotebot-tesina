@@ -11,7 +11,10 @@ con robots didácticos de forma remota y compartiendo un único enlace
 físico con los robots. Está implementado en Python usando principalmente el
 framework web Tornado, SQLAlchemy para acceder a la base de datos
 y los módulos DuinoBot y Myro para
-la comunicación con los robots. El cliente Javascript se encuentra
+la comunicación con los robots.
+
+Además del servidor se desarrollaron tres clientes para el mismo en distintos
+lenguajes: Javascript, Python y Ruby. El cliente Javascript se encuentra
 integrado con el servidor y la intensión es que sea utilizado desde una
 vista web provista por el mismo, mientras que los clientes Python y Ruby
 son independientes y la intensión es que sean utilizados en programas
@@ -25,16 +28,15 @@ como trabajo práctico para la materia Laboratorio de Software.
 
 \section{Remotebot}\label{sec:remotebot}
 
-La versión original de Remotebot fue presentada como trabajo práctico
+La versión original de Remotebot fue presentada como trabajo final
 de la materia Laboratorio de
 Software\footnote{\url{http://wiki.labmovil.linti.unlp.edu.ar/index.php?title=RemoteBot:_Android_\%2B_Robots}},
-de esta Facultad,
-el objetivo principal del trabajo era desarrollar una aplicación para
+de esta Facultad.
+El objetivo principal del trabajo era desarrollar una aplicación para
 dispositivos Android que accediera a sensores y posiblemente a la red
 wireless usando el lenguaje Java~\citep{queiruga_2013}.
 
-Para este trabajo se implementó
-RemoteBot4Android\footnote{\url{https://github.com/fernandolopez/remotebot4Android}},
+Para este trabajo se implementó RemoteBot4Android,
 una aplicación Android
 que permite controlar robots usando los acelerómetros de los dispositivos
 móviles donde se ejecuta.
@@ -47,20 +49,22 @@ con una botonera provista por la aplicación,
 controlar la velocidad con un barra deslizante y ver la distancia al obstáculo
 más cercano desde la interfaz.
 
-El producto principal de este trabajo para la cátedra de Laboratorio de
+El producto principal del trabajo para la cátedra de Laboratorio de
 Software fue el cliente
-Remotebot4Android pero además del cliente, se desarrolló un
+Remotebot4Android (se puede ver una captura de pantalla de éste
+en la figura~\ref{fig:cliente_remotebot}),
+pero además del cliente, se desarrolló un
 protocolo de comunicaciones
 y un servidor básico que atiende los requerimientos y se los envía al
 robot correspondiente, respondiendo también a peticiones de datos de
 los sensores del
-robot, ésta fue la primer implementación del servidor
-Remotebot\footnote{\url{https://github.com/fernandolopez/remotebot}}
+robot. Esta fue la primer implementación del servidor
+Remotebot
 en cuyo concepto está basado XRemoteBot.
 
 La arquitectura de este servidor se muestra en la
-figura~\ref{fig:arquitectura_remotebot}), y si bien básicamente hacía
-su trabajo
+figura~\ref{fig:arquitectura_remotebot} y, si bien, básicamente hacía
+su trabajo,
 estaba pobremente implementado, ya que no era más que una herramienta auxiliar
 para un cliente muy específico y era meramente un intermediario entre el
 cliente original implementado en Java y el módulo DuinoBot. Este servidor
@@ -68,14 +72,10 @@ estaba severamente limitado
 ya que no era configurable, no contaba con ninguna forma de visualizar a los
 robots de forma remota, no permitía autenticación, no disponía un sistema
 de reserva de robots por lo que un cliente podía interferir en la operación
-de un robot de otro cliente y las operaciones bloqueantes de un cliente
+de un robot utilizado por otro cliente y las operaciones bloqueantes de un
+cliente
 impedían el uso de los robots al resto de los clientes hasta que esa operación
 terminase.
-
-% FIXME: CREO QUE ESTARÍA BUENO QUE ACA PONGAS UNA FIGURA CON LA ARQUITETURA DE REMOTEBOOT
-% Lo puse en otra sección donde se habla más en detalle. Fernando. Armé otra
-% que muestra como se conectan, tengo límite poco claro entre lo que le digo
-% arquitectura y los diagramas de bloque...
 
 \begin{figure}
     \centering
@@ -86,7 +86,7 @@ terminase.
 
 
 Remotebot provee una API JSON a través de HTTP que permite controlar a los
-robots de forma remota, pero si bien es posible poner el servicio público,
+robots de forma remota. Pero si bien es posible poner el servicio público,
 el mismo no cuenta con autenticación, no soporta bien la concurrencia
 y no provee ningún mecanismo de seguridad por lo que es recomendable solamente
 usarlo dentro de ámbito de una red LAN.
@@ -99,23 +99,19 @@ mensajes enviados por los clientes en invocaciones a métodos.
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{0.78\textwidth}
-        \includegraphics[width=.95\textwidth]{figures/diagrama_remotebot}
-        \subcaption{Diagrama de bloques de Remotebot}
-        \label{fig:diagrama_remotebot}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.2\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/cliente_remotebot}
-        \subcaption{Cliente de Remotebot}
-        \label{fig:cliente_remotebot}
-    \end{subfigure}
-    \caption{Diagrama de bloques e imagen del cliente Remotebot}
-    \label{fig:diagrama_y_cliente_remotebot}
+    \includegraphics[width=.5\textwidth]{figures/diagrama_remotebot}
+    \subcaption{Diagrama de bloques de Remotebot}
+    \label{fig:diagrama_remotebot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=.20\textwidth]{figures/cliente_remotebot}
+    \subcaption{Cliente de Remotebot}
+    \label{fig:cliente_remotebot}
 \end{figure}
 
 Si bien el servidor estaba diseñado para ser utilizado desde la
-aplicación Android pedida por la materia
+aplicación Android pedida por la materia,
 se diseñó de forma tal de ser lo más genérico posible, dando acceso
 a algunas caracterísiticas de DuinoBot no utilizadas por el cliente
 Android como los sensores de línea con \texttt{getLine()} y operaciones
@@ -125,20 +121,27 @@ hasta pasado un segundo.
 Como se ve en la figura~\ref{fig:diagrama_remotebot} Remotebot utiliza la
 biblioteca DuinoBot para comunicarse con los robots y el cliente para el cuál
 fue diseñado es una aplicación Android que permite controlar los robots
+Multiplo N6
 y ver los valores del sensor de distancia usando una interfaz con botones,
 además de poder controlar el robot usando los acelerómetros del dispositivo
 (inclinar el dispositivo en una dirección dada hace que el robot se mueva
 en esa dirección).
 
+Tanto el servidor RemoteBot como el cliente Remotebot4Android pueden
+descargarse en
+GitHub~\footnote{\url{https://github.com/fernandolopez/remotebot}}%
+~\footnote{\url{https://github.com/fernandolopez/remotebot4Android}}.
+
 \section{XRemoteBot}\label{sec:xremotebot}
 
-La interacción de XRemoteBot a nivel arquitectura es muy similar a la provista por Remotebot,
-con la salvedad que el primero, además soporta robots Scribbler y puede ser
-ampliado para interactuar con otros robots. Desde el punto de vista del cliente
+La interacción de XRemoteBot a nivel arquitectura es muy similar a la
+provista por Remotebot. La misma fue extendidad para
+soportar robots Scribbler y puede ser
+ampliada para interactuar con otros robots. Desde el punto de vista del cliente
 XRemoteBot tiene varias diferencias, entre ellas la elección del protocolo,
 usándose Websockets en lugar de peticiones HTTP y la definición del protocolo
-de capa de aplicación que si bien es similar, ahora cuenta con un saludo y
-un paso de autenticación a través de una ``API key''.
+de capa de aplicación que si bien es similar ahora posee un sistema de
+autenticación opcional con una ``API key''.
 
 % FIXME acá sé que falta más contenido del func. del servidor... (Fernando)
 
@@ -149,27 +152,63 @@ un paso de autenticación a través de una ``API key''.
 
 \subsection{Configuraciones}
 
-El servidor puede configurarse para uso local deshabilitando la
-autenticación con \textit{API key} configurando la opción
-\texttt{public\_server} en \texttt{False} dentro del archivo
-\textit{configuration.py}.
+El servidor puede configurarse modificando el archivo
+\texttt{xremotebot/configuration.py}. Como su nombre lo indica,
+el archivo de configuración  es un archivo escrito en el lenguaje
+Python por lo cuál cualquier modificación debe hacerse respetando
+la sintaxis de este lenguaje.
 
-También se puede deshabilitar el streaming de video con la opción
-\texttt{disable\_streaming}, o bien configurar una dirección IP y
-puerto arbitrarios lo que permite tener un servidor de streaming
-separado del servidor Web.
+Algunas de las variables de configuración que se pueden encontrar son:
+\begin{itemize}
+    \item \texttt{public\_server}: Es un booleano, si vale \texttt{True}
+        el servidor requiere autenticación con una \textit{API key} para
+        acceder a los robots, en cambio si vale \texttt{False} el servidor
+        permite utilizar los robots sin solicitar una \textit{API key} y
+        no utiliza el sistema de reservas por lo que cualquier usuario
+        puede usar cualquier robot.
+    \item \texttt{disable\_streaming}: Es un booleano, si vale \texttt{True}
+        el servidor no hará streaming de video, ahorrando recursos tanto
+        en el servidor como en los clientes que accedan a la interfaz Web,
+        en cambio si vale
+        \texttt{False} el streaming de video se encontrará habilitado
+        y visible desde la interfaz Web.
+    \item \texttt{robots}: Es un diccionario de Python, las claves
+        deben ser modelos de robots soportados por XRemoteBot y por
+        cada modelo debe tener como valor una lista con los identificadores
+        de cada robot. Esta configuración determina el stock de robots
+        disponibles a los que podrán acceder los usuarios.
+    \item \texttt{hostname}: Es el nombre de dominio del servidor o bien
+        su dirección IP.
+    \item \texttt{port}: El puerto en el que esperará peticiones el
+        servidor.
+    \item \texttt{video\_ws}: Es la dirección y puerto del servidor de
+        streaming de video utilizado. Normalmente la parte de
+        dirección de esta configuración será igual a la variable
+        \texttt{hostname}, pero se puede configurar de forma tal
+        que el servidor de streaming esté en un servidor distinto
+        al que provee la interfaz Web.
+    \item \texttt{api\_key\_expiration}: Es un objeto de tipo fecha
+        (\texttt{timedate}) que determina el tiempo de validez
+        de las \textit{API keys}. Transcurrido este tiempo, el
+        usuario deberá renovar su \textit{API key} para acceder
+        a los robots.
+    \item \texttt{reservation\_expiration}: Es un objeto de tipo
+        fecha que determina la validez de las reservas de los robots.
+        Una vez transcurrido este tiempo desde la reserva de un robot
+        el usuario no podrá seguir usando este robot a menos que lo
+        vuelva a reservarlo.
+    \item \texttt{log\_file}: Es un string con el path donde se
+        guardará el archivo de logs del servidor.
+    \item \texttt{log\_level}: Es un string que determina en nivel
+        de detalle a guardar en los logs. El valor puede ser
+        cualquiera de los soportados por el módulo logging de
+        Python\footnote{\url{https://docs.python.org/2/library/logging.html\#logging-levels}}.
+\end{itemize}
 
-Otra configuración importante es \texttt{robots} cuyo valor
-es un \texttt{dict} de Python, en este \texttt{dict} las
-claves son los modelos de robots soportados y el valor
-es un arreglo con los identificadores correspondients a cada robot,
-esta configuración determina el stock de robots disponibles a los
-que podrán acceder los usuarios.
-
-Esta última configuración está intimamente
+La variable \texttt{robots} está intimamente
 relacionada con la extensibilidad del servidor, ya que si por ejemplo
 se quiere agregar soporte a XRemoteBot para manejar robots ``sphero''
-basta con agregar la clave ``sphero'' a la opción
+basta con agregar la clave ``sphero'' al diccionario
 \texttt{robots}. Si XRemoteBot encuentra la clave ``sphero'' en ``robots''
 intentará cargar un plugin en el path
 ``remotebot/robots/sphero.py'',
@@ -177,7 +216,29 @@ el desarrollador debe implementar en este archivo una clase ``Robot''
 que herede de ``remotebot.robots.abstract\_clases.Robot'' implementando
 los métodos abstractos de esta clase.
 
+Se puede ver un ejemplo de configuración del servidor en el
+código~\ref{lst:config}. En este ejemplo el servidor cuenta
+con cuatro robots utilizables, tres Multiplo N6 y un robot
+Parallax Scribbler.
 
+\begin{lstlisting}[language=python,
+    caption={Configuración de ejemplo de XRemoteBot en
+    \texttt{configuration.py}},
+    label=lst:config]
+tls = False
+hostname = '190.16.204.135'                   # 'xremotebot.example'
+video_ws = 'ws://{}:8084/'.format(hostname)
+log_level = 'DEBUG'
+log_file = 'remotebot.log'
+port = 8000
+public_server = False
+api_key_expiration = days(700)
+reservation_expiration = hours(1)
+robots = {
+    'n6': [13, 12, 11],
+    'scribbler': ['00:1E:19:01:0B:81'],
+}
+\end{lstlisting}
 
 % FIXME: Ampliar
 % \chapter{WebSockets y Promises}\label{cha:websockets_y_promises}
@@ -213,20 +274,21 @@ intercambiados que supondría el uso de HTTP~\citep{wang_2013}, aprovechando al
 mismo tiempo los puertos TCP que abre el servidor Web.
 
 La elección de este protocolo trae como desventaja frente al uso de HTTP la
-necesidad de tener consideraciones de seguridad especiales, para la parte
+necesidad de tener consideraciones de seguridad especiales. Para la parte
 Web del sistema se utiliza autenticación con cookies pero no resulta seguro
 utilizar el mismo mecanismo para la sesión con WebSockets ya que el sistema
 quedaría vulnerable a ataques de tipo CSRF (Cross-Site Request
 Forgery)~\citep{owasp_2014}~\footnote{
 \url{https://www.owasp.org/images/5/52/OWASP_Testing_Guide_v4.pdf}}.
 
-Una de las estrategias recomendadas es verificar el encabezado \texttt{Origin}
+Una de las estrategias recomendadas es verificar el campo \texttt{Origin}
+en los encabezados del hanshake inicial de WebSockets
 desde el servidor, pero esta técnica no es suficiente ya que los
 clientes pueden falsear este campo y solamente si el cliente es un navegador
 envía este encabezado.
 Otra estrategia es tener un mecanismo de autenticación
-separado para la comunicación~\footnote{\url{https://www.christian-schneider.net/CrossSiteWebSocketHijacking.html}},
-esta fue la estrategia elegida para XRemoteBot usando una \textit{API key}
+separado para la comunicación~\footnote{\url{https://www.christian-schneider.net/CrossSiteWebSocketHijacking.html}}.
+Esta fue la estrategia elegida para XRemoteBot usando una \textit{API key}
 para identificar a los usuarios al inicio de la comunicación.
 
 \subsubsection{Otras alternativas a WebSockets}
@@ -238,9 +300,9 @@ servidor\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpR
 
 Este método cuenta con la desventaja de que en cada mensaje es necesario
 enviar y recibir los encabezados HTTP y esto es muy costoso:
-``Each XHR request is a standalone HTTP request, and on average, HTTP incurs
-string~800 bytes of overhead (without HTTP cookies) for request/response
-headers''~\citep{grigorik_2013}.
+``Cada petición XHR es una petición individual HTTP y, en promedio, HTTP
+tiene 800 bytes de sobrecarga (sin cookies HTTP) por cada
+petición/respuesta''~\citep{grigorik_2013}.
 
 Una posible solución a este problema es el uso de \textit{Long Polling},
 uno de los ejemplos del uso de esta técnica es el protocolo \textit{Bayeux}

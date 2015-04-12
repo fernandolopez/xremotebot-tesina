@@ -80,7 +80,7 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
 \begin{figure}
     \centering
     \begin{framed}
-        \begin{tikzpicture}[trim axis left, trim axis right]
+        \begin{tikzpicture}[trim axis left, trim axis right, scale=0.7]
             \begin{axis}[
                     height=10cm,
                     width=10cm,
@@ -117,7 +117,7 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
 \begin{figure}
     \centering
     \begin{framed}
-        \begin{tikzpicture}[trim axis left, trim axis right]
+        \begin{tikzpicture}[trim axis left, trim axis right, scale=0.7]
             \begin{axis}[
                     height=10cm,
                     width=10cm,
@@ -154,7 +154,7 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
 \begin{figure}
     \centering
     \begin{framed}
-        \begin{tikzpicture}[trim axis left, trim axis right]
+        \begin{tikzpicture}[trim axis left, trim axis right, scale=0.7]
             \begin{axis}[
                     height=10cm,
                     width=10cm,
@@ -320,13 +320,13 @@ Los mensajes al servidor son objetos JSON con dos campos obligatorios y dos
 opcionales. Los campos que componen a estos objetos  son:
 
 \begin{description}
-    \item[\texttt{entity}] cuyo valor es un string que describe conceptualmente
+    \item[\texttt{entity}:] cuyo valor es un string que describe conceptualmente
         el receptor del mensaje (obligatorio).
-    \item[\texttt{method}] cuyo valor es un string con el nombre del método a
+    \item[\texttt{method}:] cuyo valor es un string con el nombre del método a
         invocar (obligatorio).
-    \item[\texttt{args}] cuyo valor es un array posiblemente vacío con los
+    \item[\texttt{args}:] cuyo valor es un array posiblemente vacío con los
         argumentos que deben pasarse al método invocado (opcional).
-    \item[\texttt{msg\_id}] si está presente el servidor incorpora este
+    \item[\texttt{msg\_id}:] si está presente el servidor incorpora este
         campo con su valor original en la respuesta. Sirve para identificar a
         qué petición
         corresponde cada respuesta en implementaciones asincrónicas
@@ -340,10 +340,10 @@ abstracción de los robots soportados por XRemoteBot.
 
 La entidad ``global'' soporta los métodos:
 \begin{description}
-    \item[\texttt{authentication\_required}] No recibe argumentos. Retorna el valor 
+    \item[\texttt{authentication\_required}:] No recibe argumentos. Retorna el valor 
         \texttt{true} si el servidor está configurado para requerir
         autenticación y \texttt{false} en caso contrario.
-    \item[\texttt{authenticate}] Recibe un string como argumento. Si el string se corresponde
+    \item[\texttt{authenticate}:] Recibe un string como argumento. Si el string se corresponde
         con la \texttt{api\_key} (una clave generada de forma aleatoria que identifica
         a un usuario específico) de algún usuario
         y esa \texttt{api\_key}  no
@@ -352,33 +352,33 @@ La entidad ``global'' soporta los métodos:
 
 Entre otros la entidad ``robot'' soporta los métodos:
 \begin{description}
-    \item[\texttt{backward}] Recibe un objeto que identifica a un robot
+    \item[\texttt{backward}:] Recibe un objeto que identifica a un robot
         específico, una velocidad y un tiempo en segundos. Mueve el robot hacia
         atrás el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
         Si no se envía el parámetro de tiempo el robot se mueve
         de forma indefinida.
-    \item[\texttt{forward}] Recibe un objeto que identifica a un robot
+    \item[\texttt{forward}:] Recibe un objeto que identifica a un robot
         específico, una velocidad y un tiempo en segundos. Mueve el robot hacia
         adelante el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
         Si no se envía el parámetro de tiempo el robot se mueve
         de forma indefinida.
-    \item[\texttt{turnLeft}] Recibe un objeto que identifica a un robot
+    \item[\texttt{turnLeft}:] Recibe un objeto que identifica a un robot
         específico, una velocidad y un tiempo en segundos. Gira hacia
         la izquierda el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
         Si no se envía el parámetro de tiempo el robot se mueve
         de forma indefinida.
-    \item[\texttt{turnRight}] Recibe un objeto que identifica a un robot
+    \item[\texttt{turnRight}:] Recibe un objeto que identifica a un robot
         específico, una velocidad y un tiempo en segundos. Gira hacia
         la derecha el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
         Si no se envía el parámetro de tiempo el robot se mueve
         de forma indefinida.
-    \item[\texttt{getObstacle}] Recibe un objeto que identifica a un robot y,
+    \item[\texttt{getObstacle}:] Recibe un objeto que identifica a un robot y,
         opcionalmente una distancia. Retorna el valor 
         \texttt{true} si hay un obstáculo a una distancia menor o igual a la
         indicada. Si no se envía la distancia se asume un valor por defecto,
         este valor por defecto depende del modelo de robot usado ya que los
         sensores tienen rangos diferentes.
-    \item[\texttt{getLine}] Recibe un objeto que identifica a un robot y
+    \item[\texttt{getLine}:] Recibe un objeto que identifica a un robot y
         retorna un \texttt{array}
         con los valores de los sensores de línea del robot.
 \end{description}
@@ -395,7 +395,7 @@ Por ejemplo potencialmente
 se podría controlar un sistema que controle la iluminación de un casa,
 supongamos entonces que los métodos serán ``main\_bedroom'', ``children\_bedroom'',
 ``kitchen'', ``living'' y ``garage''. Supongamos que cada uno de estos
-controla la luz de la habitación descripta por su nombre, reciben como
+controla la luz de la habitación descripta por su nombre y reciben como
 argumento la intensidad de luz como un número de 0 a 255. Finalmente
 podemos llamar a la ``entity'' ``houselight''.
 
@@ -460,11 +460,11 @@ los métodos invocados.
 Los campos de los mensajes tipo \texttt{value} son:
 
 \begin{description}
-    \item[\texttt{response}] identifica el tipo de mensaje, en este caso
+    \item[\texttt{response}:] identifica el tipo de mensaje, en este caso
         es un string con el valor \texttt{``value''}.
-    \item[\texttt{value}] el valor retornado por el método (puede ser
+    \item[\texttt{value}:] el valor retornado por el método (puede ser
         cualquier valor soportado por JSON).
-    \item[\texttt{msg\_id}] si la petición contiene el campo \texttt{msg\_id} se
+    \item[\texttt{msg\_id}:] si la petición contiene el campo \texttt{msg\_id} se
         copia el mismo campo, sino este campo se omite.
 \end{description}
 
@@ -483,10 +483,10 @@ ocupados, etc...
 
 Campos de los mensajes \texttt{error}:
 \begin{description}
-    \item[\texttt{response}] identifica el tipo de mensaje, en este caso
+    \item[\texttt{response}:] identifica el tipo de mensaje, en este caso
         es un string con el valor \texttt{``error''}.
-    \item[\texttt{message}] un mensaje de error descriptivo.
-    \item[\texttt{msg\_id}] si la petición tenía \texttt{msg\_id} se
+    \item[\texttt{message}:] un mensaje de error descriptivo.
+    \item[\texttt{msg\_id}:] si la petición tenía \texttt{msg\_id} se
         copia el mismo, sino este campo se omite.
 \end{description}
 

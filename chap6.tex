@@ -42,7 +42,7 @@ utilizando 2 mensajes y la función \texttt{time.wait()} de Python. De esta
 forma
 invocar al método \texttt{robot.forward(100, 1)} se traduce en los mensajes
 de
-la figura~\ref{fig:ejemplo_xremotebot_python_json}. Como todos los métodos
+el código~\ref{lst:ejemplo_xremotebot_python_json}. Como todos los métodos
 de movimiento
 proveen esta funcionalidad de demora, la misma implementada en el
 \textit{decorator}\footnote{Esto es un decorator de Python, no confundir
@@ -174,13 +174,13 @@ La API de WebSockets disponible en los navegadores Web requieren
 redefinir una serie de funciones de la instancia del WebSocket
 para recibir y enviar mensajes~\citep{websocket_2014}, a saber:
 \begin{description}
-    \item[\texttt{WebSocket\#onopen()}] se ejecutará cuando
+    \item[\texttt{WebSocket\#onopen()}:] se ejecutará cuando
     la conexión esté establecida.
-    \item[\texttt{WebSocket\#onerror()}] se ejecutará ante un error en
+    \item[\texttt{WebSocket\#onerror()}:] se ejecutará ante un error en
     la conexión.
-    \item[\texttt{WebSocket\#onclose()}] se ejecutará si la conexión
+    \item[\texttt{WebSocket\#onclose()}:] se ejecutará si la conexión
     se cierra.
-    \item[\texttt{WebSocket\#onmessage()}] se ejecutará al recibir un
+    \item[\texttt{WebSocket\#onmessage()}:] se ejecutará al recibir un
     mensaje desde el servidor, recibe como argumento el mensaje
     enviado por el servidor.
 \end{description}
@@ -242,25 +242,24 @@ robot.getObstacle().then(function(hay_obstaculo){
         console.log("No hay obstáculos");
     }
 });
+\end{lstlisting}
 
-\lstlistinginput{ejemplos/ejemplo_catch.js}[language=C,
+\lstinputlisting[language=C,
     caption={Manejo de errores en XRemoteBot para Javascript},
-    label=lst:promises_catch]
+label=lst:promises_catch]{ejemplos/ejemplo_catch.js}
 
 Esto permite, por ejemplo, obtener el valor del sensor de distancia de un
-robot de forma simple como se ve en el código~\ref{lst:promises_get_obstacle}.
-O bien dejar un script largo enviando mensajes a un robot hasta que se
+robot de forma relativamente simple como se ve en el
+código~\ref{lst:promises_get_obstacle}.
+O bien dejar un script enviando mensajes a un robot hasta que se
 termine la reserva del mismo y cuando esto suceda mostrar un mensaje
 con el error correspondiente como se puede ver en el
-código~\ref{lst:promises_catch}
-
-También
+código~\ref{lst:promises_catch}.
 
 
 Si bien esta interfaz no es idéntica a la de DuinoBot, es lo más parecido
 que se pudo lograr.
 
-\end{lstlisting}
 % FIXME ta antes
 La solución encontrada a este problema fue el uso de
 \textit{Promises}~\citep{ECMA-262},
