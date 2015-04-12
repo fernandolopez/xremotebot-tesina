@@ -1,663 +1,244 @@
-\chapter{Protocolo de capa de aplicación de XRemoteBot}\label{cha:protocolo}
-Siendo una aplicación cliente-servidor XRemoteBot requiere algún método de
-serialización para intercambiar datos entre los clientes y el servidor,
-considerando que el servidor no es más que un servidor web que usa websockets
-como protocolo, el método de serialización más adecuado parece ser JSON
-(Javascript Serialization Object Notation).
+\chapter{Pruebas}\label{cha:pruebas}
 
-JSON cuenta con las siguientes características:
+El servidor se probó con Python 2.7 (portarlo a Python 3 involucraría
+portar DuinoBot, Myro y otros módulos asociados), en entornos creados
+con virtualenv\footnote{\url{http://www.virtualbox.org/}}
+y con una base de datos
+Sqlite\footnote{\url{http://www.sqlite.org/}}
+sobre
+sistemas Lihuen 5 y 6 beta (basados en Debian Wheezy y Jessie respectivamente).
+Las dependencias se instalaron declarándolas en \texttt{setup.py} e instalandolas
+con pip, a excepción de los módulos DuinoBot y Myro que fueron instalados
+desde repositorios Git usando también pip, pero indicando la URL manualmente
+ya que no fué posible declararlos de esta manera en \texttt{setup.py}, el
+código~\ref{lst:instalar_xremotebot} muestra como instalar el servidor
+y los paquetes necesarios para soportar robots Multiplo N6 y Scribbler.
 
-\begin{enumerate}
-    \item Es un formato estandarizado por ECMA~\citep{ecma-404}
-        y está especificado por la rfc-7159~\citep{rfc-7159}.
-    \item Soporta los tipos de datos necesarios para intercambiar mensajes con
-        los datos necesarios para controlar los robots usando un nivel de
-        abstracción adecuado.
-    \item Al ser un formato de texto es simple analizar el tráfico entre los
-        clientes y el servidor para detectar posibles errores.
-    \item Está soportado de forma nativa por los navegadores más
-        utilizados.%~\footnote{\url{http://caniuse.com/#search=json}}.
-\end{enumerate}
-
-Pero también existen otras alternativas cuyos objetivos son serialización
-y de-serialización rápida, y datos serializados más compactos
-como BSON (Binary JSON) y (CBOR Concise Binary Object Representation).
-
-Algunas características de BSON y CBOR son:
-
-\begin{enumerate}
-    \item Codifican la información en formato binario.
-    \item Son tan fáciles de usar como JSON.
-    \item Ambos formatos proveen un superset de los tipos de datos provistos
-        por JSON.
-    \item CBOR está especificado por la rfc-7049~\citep{rfc-7049}.
-    \item BSON tiene una especificación informal pero cuenta una
-        implementación bien conocida siendo la representación de datos primaria en
-        MongoDB~\footnote{\url{http://bsonspec.org/}}.
-    \item Por estar en formato binario decodificar una captura de tráfico
-        para depurar un programa es más laborioso.
-    \item En algunos casos estos formatos binarios generarán mensajes más
-        chicos que JSON, pero no siempre.
-    \item Requieren usar librerías Javascript en los clientes web ya que los
-        navegadores no lo implementan de forma nativa.
-\end{enumerate}
-
-Para tomar un decisión respecto al formato a utilizar se decidió generar
-16 archivos \texttt{JSON} con datos aleatorios, estos archivos se cargaron
-con una cantidad de entradas múltiplo de 1024 desde 1024 hasta 16384, donde
-cada una de estas entradas es un objeto \texttt{JSON} con 5 entradas de tipo
-numérico, 5 strings, 5 objetos (cada uno con una entrada numérica) y 5
-arrays (cada uno con 2 entradas de tipo string).
-
-Estos archivos se cargaron desde scripts similares en Python y Javascript que
-de-serializaron y serializaron estos datos repetidas veces calculando el tiempo
-promedio que llevó hacer cada una de estas acciones para cada formato.
-
-Se eligió hacer las pruebas con Python y Javascript porque el primero es el
-lenguaje de implementación del servidor y del cliente que probablemente tenga
-más uso en un futuro, mientras que Javascript es el lenguaje de implementación
-del cliente que se ejecutará en los navegadores web y que puede servir como
-base para implementaciones con Brython, Skulp, Opal, etc...
-
-Para hacer el experimento repetible la implementación en
-Javascript se ejecutó con el intérprete \textbf{nodejs} basado en
-el motor \textbf{v8} usado por \textbf{Chrome} y además se crearon
-scripts de apoyo para generar los datos de prueba, ejecutar los scripts
-con los distintos formatos de forma automatizada y formatear los datos
-resultantes en archivos csv.
-
-Todas las pruebas se realizaron sobre Lihuen 6 beta (basado en Debian Jessie)
-en una notebook con procesador ``Intel(R) Core(TM) i3 CPU M 370 @ 2.40GHz''
-y 4GB de RAM % NOTA: son 4GB no 4GiB
-usando Python 3.4.2 y NodeJS 0.10.35~\footnote{Se usó NodeJS 0.10.35 ya que
-la versión 0.10.29 distribuida al momento con Debian Jessie tenía un bug que
-generaba un error de memoria al
-deserializar strings largos con \texttt{JSON.load} (CVE-2014-5256)}
-
-De estas pruebas se desprenden las mediciones de las
-figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
-
-\begin{figure}
-    \centering
-    \begin{framed}
-        \begin{tikzpicture}[trim axis left, trim axis right, scale=0.7]
-            \begin{axis}[
-                    height=10cm,
-                    width=10cm,
-                    scaled x ticks = false, % No usar notación exponencial
-                    xlabel=Cantidad de entradas,
-                    ylabel=Segundos,
-                    x tick label style={/pgf/number format/fixed, rotate=45, anchor=north east}, % Las etiquetas son números y rotar 45°
-                    xtick=data, % Generar una etiqueta por punto en los datos
-                    ylabel near ticks, % Poner las etiquetas más o menos cerca de algunos datos
-                    ymin=0, % No hay tiempos negativos
-                    xmin=1024, % La escala empieza en 1024
-                    legend style={legend pos=north west}, % Cuadro de leyendas a la derecha arriba
-                    every axis x label/.style={
-                        at={(axis description cs:0.5,-0.15)}, % Desplazar la descripción del eje x
-                        anchor=north, % El desplazamiento relativo a la parte superior del texto
-                    },
-                    legend cell align=left, % Alineación del texto en la caja de leyendas
-                ]
-                \foreach \s in {json, bson, cbor} {
-                    \addlegendentryexpanded{\s\ dump}
-                    \addplot table [x=entries, y=dump_time, col sep=comma] {data/py-\s.csv};
-
-                    \addlegendentryexpanded{\s\ load}
-                    \addplot table [x=entries, y=load_time, col sep=comma] {data/py-\s.csv};
-                }
-            \end{axis}
-        \end{tikzpicture}
-    \end{framed}
-
-    \caption{Cantidad de entradas versus tiempo de serialización y deserialización en Python}
-    \label{fig:ser-time-py}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \begin{framed}
-        \begin{tikzpicture}[trim axis left, trim axis right, scale=0.7]
-            \begin{axis}[
-                    height=10cm,
-                    width=10cm,
-                    scaled x ticks = false, % No usar notación exponencial
-                    xlabel=Cantidad de entradas,
-                    ylabel=Segundos,
-                    x tick label style={/pgf/number format/fixed, rotate=45, anchor=north east}, % Las etiquetas son números y rotar 45°
-                    xtick=data, % Generar una etiqueta por punto en los datos
-                    ylabel near ticks, % Poner las etiquetas más o menos cerca de algunos datos
-                    ymin=0, % No hay tiempos negativos
-                    xmin=1024, % La escala empieza en 1024
-                    legend style={legend pos=north west}, % Cuadro de leyendas a la derecha arriba
-                    every axis x label/.style={
-                        at={(axis description cs:0.5,-0.15)}, % Desplazar la descripción del eje x
-                        anchor=north, % El desplazamiento relativo a la parte superior del texto
-                    },
-                    legend cell align=left, % Alineación del texto en la caja de leyendas
-                ]
-                \foreach \s in {json, bson, cbor} {
-                    \addlegendentryexpanded{\s\ dump}
-                    \addplot table [x=entries, y=dump_time, col sep=comma] {data/js-\s.csv};
-
-                    \addlegendentryexpanded{\s\ load}
-                    \addplot table [x=entries, y=load_time, col sep=comma] {data/js-\s.csv};
-                }
-            \end{axis}
-        \end{tikzpicture}
-    \end{framed}
-    \caption{Cantidad de entradas versus tiempo de serialización y deserialización en Javascript (nodejs)}
-    \label{fig:ser-time-js}
-\end{figure}
-
-
-\begin{figure}
-    \centering
-    \begin{framed}
-        \begin{tikzpicture}[trim axis left, trim axis right, scale=0.7]
-            \begin{axis}[
-                    height=10cm,
-                    width=10cm,
-                    scaled x ticks = false,
-                    xlabel=Cantidad de entradas,
-                    ylabel=Tamaño en MiB,
-                    x tick label style={/pgf/number format/fixed, rotate=45, anchor=north east},
-                    xtick=data,
-                    ylabel near ticks,
-                    ymin=0,
-                    xmin=1024,
-                    legend style={legend pos=north west},
-                    every axis x label/.style={
-                        at={(axis description cs:0.5,-0.15)},
-                        anchor=north,
-                    },
-                    legend cell align=left
-                ]
-                \foreach \s in {json, bson, cbor} {
-                    \addlegendentryexpanded{\s}
-                    \addplot table [x=entries, y=serialized_size, col sep=comma] {data/js-\s.csv};
-
-                }
-            \end{axis}
-        \end{tikzpicture}
-    \end{framed}
-    \caption{Cantidad de entradas versus tamaño del archivo serializado}
-    \label{fig:ser-size}
-\end{figure}
-
-De la figura~\ref{fig:ser-size} se desprende que los distintos métodos de
-serialización no ofrecen diferencias significativas en el tamaño de los
-strings generados para los volumenes de datos probados. Por otro lado
-se puede observar en la figura~\ref{fig:ser-time-py} que al menos en
-Python y con la librería usada CBOR tiene los mejores tiempos, sin
-embargo en las pruebas con Javascript en la figura~\ref{fig:ser-time-js}
-se puede observar que los mejores tiempos son para el formato JSON,
-esto es entendible ya que este es el único formato procesado de forma
-nativa\footnote{Si bien es posible encontrar parsers nativos para los
-otros formatos y usarlos desde NodeJS no se utilizó esta modalidad porque
-no sería una prueba realista dado que los motores Javascript de los
-navegadores no permiten esto.}.
-
-Teniendo en cuenta que las diferencias de tiempo al procesar los datos
-en Python son, en comparación con la versión en Javascript, marginales
-(apenas alrededor de $0.25$ segundos para $2^{14}$
-entradas entre el mejor y peor tiempo de deserialización) y las diferencias
-en cuanto a tamaño del string generado al
-serializar también son pequeñas (aproximadamente 2MiB de diferencia para
-$2^{14}$ entradas entre el mejor y el peor método).
-
-
-\section{Protocolo diseñado para XRemoteBot}
-
-Como se describió anteriormente XRemoteBot utiliza el protocolo WebSocket como
-protocolo de la capa de transporte y mensajes codificados con JSON como
-protocolo de la capa de aplicación. El propósito de este capítulo es describir
-este protocolo de capa de aplicación y detallar los motivos por los cuales
-se modeló el protocolo de esta manera.
-
-% FIXME agregue
-\subsection{Consideraciones generales}
-
-
-El protocolo fue diseñado pensando que el mismo debería representar los
-distintos comandos enviados a los robots como si fueran mensajes a objetos
-del paradigma de programación orientado a objetos. Este diseño por un lado
-mapea de forma muy directa los mensajes de la API
-con los métodos que un programador utilizaría para controlar a los robots
-usando la biblioteca DuinoBot,  y por otro lado, provee un alto grado de
-flexibilidad a la hora de agregar nuevos tipos de mensajes a la API sin
-necesidad de reescribir grandes porciones de código.
-
-En algunos de los lenguajes orientados a objetos más populares como Python
-o Ruby, al ejecutar un método pueden ocurrir básicamente dos cosas:
-se puede obtener un valor de resultado o bien un error
-en tiempo de ejecución en la forma de una excepción. Para modelar este
-comportamiento el servidor XRemoteBot cuenta con dos tipos de mensajes
-de respuesta:
-
-\begin{itemize}
-    \item El mensaje tipo ``value'' que retorna el valor resultante de
-        ejecutar el método invocado.
-    \item El mensaje tipo ``error'' que representa el error en tiempo
-        de ejecución que típicamente se representa con excepciones.
-\end{itemize}
-
-Los mensajes de error de XRemoteBot tienen como contenido
-un mensaje de texto que describe el error producido. Los clientes
-pueden tomar este mensaje
-de error y mostrarlos en pantalla o usarlos como descripción de una
-excepción como se hace en el cliente Python por ejemplo.
-
-%FIX ME agregue
-\subsection{Alternativas analizadas}
-%ACA PONE ALGO DE SE PODRÍA HABER USADO YML, XML O ALGO DEFINIDO POR VOS.. O LO QUE QUIEAS...
-En definitiva cualquier forma de serialización de datos hubiera
-sido suficiente para este protocolo, se eligió evaluar protocolos
-similares a JSON dada su facilidad de uso, facilidad de lectura
-y la disponibilidad
-de funciones para manipularlo en las bibliotecas estándar
-de los tres lenguajes elegidos. Esto es importante porque es
-la intención del autor que cualquiera con conocimientos básicos
-de programación pueda desarrollar clientes en otros lenguajes.
-
-Estas características no se dan en formatos como YAML que
-son más complejos y no es soportado de forma nativa en
-la mayoría de los lenguajes. Tampoco cumple con las características
-requeridas XML que si bien es posible
-procesarlo en cualquiera de estos lenguajes sin agregar bibliotecas
-externas un posible desarrollador de un cliente tendría más
-problemas para implementar el cliente ya que las API para
-manipular XML suelen
-ser más complejas dada la estructura de estos archivos y además
-la información codificada en XML es más díficil de leer por
-ejemplo en una captura de red.
-
-También se descartó crear un mecanismo de serialización específico
-para este trabajo, ya que de hacerlo debería haber implementado
-todo el protocolo en tres lenguajes distintos y además cualquiera
-que quisiera crear un cliente para XRemoteBot debería también
-implementar el protocolo en el lenguaje deseado, con toda
-la complejidad que tiene validar y extraer información con
-distintos típos de datos de forma correcta y segura.
-
-%FIX ME agregue
-\subsection{El protocolo basado en JSON}
-
-Como se mencionó anteriormente, tanto para los parámetros, como para los valores de respuesta, los tipos
-de datos representables de forma nativa con JSON resultan suficientes para
-implementar una API similar a la de DuinoBot.
-
-Internamente XRemoteBot
-convierte los valores, objetos y arrays de JSON a distintos tipos de
-datos de Python de la forma descripta en la
-tabla~\ref{tbl:rel_json_python}, siguiendo, en general las transformaciones
-realizadas por defecto por las funciones de procesamiento de el módulo
-JSON de la biblioteca estándar de
-Python\footnote{\url{https://docs.python.org/3/library/json.html}}.
-
-\begin{table}
-    \centering
-    \begin{tabu}{l|l}
-        JSON & Python \\
-        \hline
-        \texttt{string} & \texttt{str} \\
-        \texttt{number} & \texttt{int} o \texttt{float}\footnote{Dependiendo
-        del mensaje invocado
-        puede ser interpretado como \texttt{int} o \texttt{float}.}\\
-        \texttt{object} & \texttt{dict} \\
-        \texttt{array}  & \texttt{list} \\
-        \texttt{true}/\texttt{false} & \texttt{True}/\texttt{False} (bool) \\
-        \texttt{null} & \texttt{None} \\
-    \end{tabu}
-    \caption{Relación entre los tipos y valores de JSON y los usados en
-    Python}
-    \label{tbl:rel_json_python}
-\end{table}
-
-\subsection{Mensajes del cliente al servidor}
-
-Los mensajes al servidor son objetos JSON con dos campos obligatorios y dos
-opcionales. Los campos que componen a estos objetos  son:
-
-\begin{description}
-    \item[\texttt{entity}:] cuyo valor es un string que describe conceptualmente
-        el receptor del mensaje (obligatorio).
-    \item[\texttt{method}:] cuyo valor es un string con el nombre del método a
-        invocar (obligatorio).
-    \item[\texttt{args}:] cuyo valor es un array posiblemente vacío con los
-        argumentos que deben pasarse al método invocado (opcional).
-    \item[\texttt{msg\_id}:] si está presente el servidor incorpora este
-        campo con su valor original en la respuesta. Sirve para identificar a
-        qué petición
-        corresponde cada respuesta en implementaciones asincrónicas
-        como la de Javascript.
-\end{description}
-
-En la actual implementación los valores posibles del campo \texttt{entity} son
-\texttt{``global''} y \texttt{``robot''}. El primero
-representa acciones globales como el login y el último representa una
-abstracción de los robots soportados por XRemoteBot.
-
-La entidad ``global'' soporta los métodos:
-\begin{description}
-    \item[\texttt{authentication\_required}:] No recibe argumentos. Retorna el valor 
-        \texttt{true} si el servidor está configurado para requerir
-        autenticación y \texttt{false} en caso contrario.
-    \item[\texttt{authenticate}:] Recibe un string como argumento. Si el string se corresponde
-        con la \texttt{api\_key} (una clave generada de forma aleatoria que identifica
-        a un usuario específico) de algún usuario
-        y esa \texttt{api\_key}  no
-        ha expirado retorna el valor \texttt{true} y \texttt{false} en caso contrario.
-\end{description}
-
-Entre otros la entidad ``robot'' soporta los métodos:
-\begin{description}
-    \item[\texttt{backward}:] Recibe un objeto que identifica a un robot
-        específico, una velocidad y un tiempo en segundos. Mueve el robot hacia
-        atrás el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
-        Si no se envía el parámetro de tiempo el robot se mueve
-        de forma indefinida.
-    \item[\texttt{forward}:] Recibe un objeto que identifica a un robot
-        específico, una velocidad y un tiempo en segundos. Mueve el robot hacia
-        adelante el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
-        Si no se envía el parámetro de tiempo el robot se mueve
-        de forma indefinida.
-    \item[\texttt{turnLeft}:] Recibe un objeto que identifica a un robot
-        específico, una velocidad y un tiempo en segundos. Gira hacia
-        la izquierda el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
-        Si no se envía el parámetro de tiempo el robot se mueve
-        de forma indefinida.
-    \item[\texttt{turnRight}:] Recibe un objeto que identifica a un robot
-        específico, una velocidad y un tiempo en segundos. Gira hacia
-        la derecha el tiempo indicado y luego contesta al cliente un valor \texttt{null}.
-        Si no se envía el parámetro de tiempo el robot se mueve
-        de forma indefinida.
-    \item[\texttt{getObstacle}:] Recibe un objeto que identifica a un robot y,
-        opcionalmente una distancia. Retorna el valor 
-        \texttt{true} si hay un obstáculo a una distancia menor o igual a la
-        indicada. Si no se envía la distancia se asume un valor por defecto,
-        este valor por defecto depende del modelo de robot usado ya que los
-        sensores tienen rangos diferentes.
-    \item[\texttt{getLine}:] Recibe un objeto que identifica a un robot y
-        retorna un \texttt{array}
-        con los valores de los sensores de línea del robot.
-\end{description}
-
-
-Opcionalmente un modelo dado de robot puede soportar otros métodos o retornar
-error en alguno de los métodos anteriores. El protocolo es fácilmente
-extensible ya que simplemente modela un pasaje de mensajes con argumentos,
-para agregar nuevos mensajes basta con enviar distintos strings en el
-campo ``method'' y para soportar nuevos tipos de entidades simplemente
-se puede enviar un string diferente en ``entity''.
-
-Por ejemplo potencialmente
-se podría controlar un sistema que controle la iluminación de un casa,
-supongamos entonces que los métodos serán ``main\_bedroom'', ``children\_bedroom'',
-``kitchen'', ``living'' y ``garage''. Supongamos que cada uno de estos
-controla la luz de la habitación descripta por su nombre y reciben como
-argumento la intensidad de luz como un número de 0 a 255. Finalmente
-podemos llamar a la ``entity'' ``houselight''.
-
-Podríamos controlar las luces con una secuencia de mensajes como
-los mostrados en el código~\ref{lst:houselight}. Por supuesto luego
-habría que agregar soporte para estas funcionalidades en el servidor
-y los clientes pero como veremos más adelante esto tampoco es
-un problema.
-
-\begin{lstlisting}[language=python,
-caption={Ejemplo de una posible extensión al protocolo para controlar
-las luces de una casa},
-label=lst:houselight]
-{
-    "entity": "houselight",
-    "method": "main_bedroom",
-    "args": [60],
-}
-{
-    "entity": "houselight",
-    "method": "garage",
-    "args": [0],
-}
-{
-    "entity": "houselight",
-    "method": "living",
-    "args": [255],
-}
+\begin{lstlisting}[language=bash,
+caption={Instalación de XRemoteBot},
+label=lst:instalar_xremotebot]
+git clone https://github.com/fernandolopez/xremotebot.git
+cd xremotebot
+virtualenv .
+. bin/activate
+pip install -r requirements.txt
+pip install 'git+https://github.com/Robots-Linti/duinobot.git@pygame_opcional'
+pip install 'git+https://github.com/fernandolopez/Myro.git'
 \end{lstlisting}
 
+\begin{lstlisting}[language=bash,
+caption={Instalación del soporte de video para XRemoteBot},
+label=lst:instalar_video]
+apt-get install libav-tools nodejs
+npm install -g ws
+\end{lstlisting}
 
-Los métodos bloqueantes como \texttt{backward} (que con DuinoBot demoran
-la ejecución del proceso hasta que transcurra el tiempo indicado como
-parámetro) son modelados desde el servidor demorando la respuesta al método
-gracias a que el framework Tornado funciona con un ``bucle principal''
-(``main loop'') donde se pueden encolar trabajos para que se ejecuten
-en el futuro.
-Esta funcionalidad no es necesaria para la mayoría de los clientes que
-pueden implementar las demoras de forma local usando la función
-\texttt{sleep()}\footnote{tanto en Ruby como en Python se llama igual.},
-pero es necesario para la implementación en Javascript donde no es posible
-demorar la ejecución del script sin impactar de forma negativa la performance
-del navegador (al menos en la pestaña actual).
+Para soportar el streaming de video además es necesario instalar
+\texttt{avconv}, \texttt{NodeJS} y el paquete \texttt{ws} para NodeJS,
+se pueden instalarde distintas formas dependiendo del sistema operativo
+utilizado, en código~\ref{lst:instalar_video} muestra como instalarlo
+en un sistema basado en Debian GNU/Linux.
 
+Finalmente para ejecutar todo es conveniente utilizar el script
+\texttt{run} provisto con el servidor que se encarga de ejecutar
+avconv, el servidor de jsmpeg y de asociar las MACs de los
+robots Scribbler que hubiera configurados con dispositivos
+\texttt{rfcomm} de manera que queden utilizables para \texttt{Myro}.
+Luego de ejecutar esas tareas el script \texttt{run} ejecuta
+el servidor XRemoteBot.
 
+\begin{lstlisting}[language=bash,
+caption={Ejecutar el servidor y procesos asociados},
+label=lst:ejecutar_xremotebot]
+./run
+\end{lstlisting}
 
-\section{Mensajes del servidor a los clientes}
-
-El servidor responde a los clientes con mensajes que contienen una única
-entrada \texttt{response}. Esta entrada identifica el tipo de respuesta
-que puede ser \texttt{value} o \texttt{error}. Si el cliente envía un
-campo \texttt{msg\_id} en la petición, el servidor incorporará además
-un campo \texttt{msg\_id} idéntico en la respuesta correspondiente
-a esa petición (como se mencionó anteriormente para soportar
-clientes asincrónicos de forma correcta).
-
-\subsection{Mensajes tipo value}
-
-Los mensajes \texttt{value} representan los valores de respuesta de
-los métodos invocados.
-
-Los campos de los mensajes tipo \texttt{value} son:
-
-\begin{description}
-    \item[\texttt{response}:] identifica el tipo de mensaje, en este caso
-        es un string con el valor \texttt{``value''}.
-    \item[\texttt{value}:] el valor retornado por el método (puede ser
-        cualquier valor soportado por JSON).
-    \item[\texttt{msg\_id}:] si la petición contiene el campo \texttt{msg\_id} se
-        copia el mismo campo, sino este campo se omite.
-\end{description}
-
-Para los mensajes que requieren
-un tiempo de demora el servidor contestará con el mensaje \texttt{value}
-una vez transcurrido ese tiempo. Para no demorar la atención de peticiones
-de otros clientes el servidor utiliza las funcionalidades provistas por
-Tornado para atender peticiones de forma asíncrona~\citep{dory_2012}.
-
-\subsection{Mensajes tipo error}
-
-Los mensajes \texttt{error} representan eventos anómalos que
-generalmente en un sistema no distribuido se modelarían utilizando
-excepciones, por ejemplo errores de codificación, peticiones a recursos
-ocupados, etc...
-
-Campos de los mensajes \texttt{error}:
-\begin{description}
-    \item[\texttt{response}:] identifica el tipo de mensaje, en este caso
-        es un string con el valor \texttt{``error''}.
-    \item[\texttt{message}:] un mensaje de error descriptivo.
-    \item[\texttt{msg\_id}:] si la petición tenía \texttt{msg\_id} se
-        copia el mismo, sino este campo se omite.
-\end{description}
+Si hubiese algún robot Scribbler en la configuración el script
+\texttt{run} pedirá la contraseña de administrador para asociar
+su MAC con un dispositivo \texttt{rfcomm}.
 
 
-\section{Ejemplos de interacción entre los clientes y el servidor}
+usando los archivos requirementes.txt
+y requirements-dev.txt, a excepción de los módulos DuinoBot y Myro que se
+instalaron con pip desde Git por lo que no fue posible usar los archivos
 
-Al comenzar la conexión entre el cliente y el servidor, se intercambian
-los primeros mensajes donde el cliente pregunta al servidor si el
-mismo requiere autenticación y si es así envía la \textit{API key}
-correspondiente. En la tabla~\ref{tbl:ej_autenticacion} se detalla
-el intercambio de mensajes entre un cliente y el servidor en un
-caso de autenticación exitoso con un cliente que envía un \texttt{msg\_id},
-como se puede ver el \texttt{msg\_id}
-no tiene por qué ser consecutivo con el del mensaje anterior, incluso
-puede llegar a ser un string, las únicas restricciones sobre el
-\texttt{msg\_id} son que tiene que ser copiado por el servidor
-en las respuestas y que el valor debe poder ser utilizado como
-identificador de un atributo (usando notación con corchetes) en un
-objeto Javascript, es decir puede ser un número o un string
-arbitrario\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property\_Accessors}}.
+\section{Pruebas de uso de recursos}
+Se dejó el servidor ejecutándose durante aproximadamente 24hs en
+un equipo con un procesador
+``AMD Athlon(tm) 64 X2 Dual Core Processor 4600+'' y 2GB de memoria
+RAM. Durante ese tiempo hubo un cliente conectado controlando
+un robot (que recibió energía de una fuente ATX para evitar problemas
+con las pilas) realizando movimientos cada determinada cantidad de
+segundos. Esporádicamente se verificó con la herramienta
+\texttt{htop} el uso de recursos general de XRemoteBot y herramientas
+asociadas. En estas pruebas ni XRemoteBot ni el servidor de jsmpeg
+mostraron valores significativos en el uso de CPU y memoria en
+el sistema, en cambio la herramienta \texttt{avconv} consumió
+de manera prácticamente constante un 20\% de un núcleo de la CPU
+y un 0.3\% de memoria. Al ejecutar un cliente en este mismo
+equipo en el navegador Mozilla Firefox 40.0a1 (Nightly)
+el uso de CPU por parte de este navegador estuvo alrededor
+del 25\%, un 40\% en Google Chrome 41.0.2272.101 (Stable).
 
-\begin{table}
-    \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "global",
-    "method": "authentication_required",
-    "msg_id": 0
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": true,
-    "msg_id": 0
-}
-\end{Verbatim}
-\\
-\hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "global",
-    "method": "authenticate",
-    "args": ["16758efc752c1d97381e6"],
-    "msg_id": 20
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": true,
-    "msg_id": 20
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
-    \caption{Ejemplo de secuencia de autenticación}
-    \label{tbl:ej_autenticacion}
-\end{table}
+Eliminando el elemento canvas donde se grafica el streaming de video
+el uso de CPU se redujo a un 0.5\% en Firefox y 30\% en Google Chrome,
+por lo que aparentemente ese uso de CPU se encuentra relacionado
+con la decodificación y renderizado de video.
 
-Otra secuencia de operaciones típica para XRemoteBot es mover un robot
-y luego pedir los valores de alguno de sus sensores, en la
-tabla~\ref{tbl:ej_movimiento_y_sensor} se puede ver un caso donde se
-mueve el robot hacia adelante durante 1 segundo y luego consulta si
-existe algún obstáculo a 10 centímetros o menos del robot, en el primer
-argumento de los mensajes
-envíados a la entidad \textit{robot} se puede ver el objeto que identifica
-al robot específico a utilizar.
+\section{Pruebas con la interfaz Javascript}
 
-\begin{table}
-    \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-    "method": "forward",
-    "args": [50, 1],
-    "msg_id": 40
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": null,
-    "msg_id": 40
-}
-\end{Verbatim}
-\\
-\hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-    "method": "getObstacle",
-    "args": [{model: "n6", id: 4}, 10],
-    "msg_id": 42
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": false,
-    "msg_id": 42
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
-    \caption{Ejemplo de movimiento y acceso a sensores de un robot}
-    \label{tbl:ej_movimiento_y_sensor}
-\end{table}
+Estas pruebas llevaron a algunas modificaciones de la interfaz
+web, la API Javascript y el servidor en base a la experiencia de uso,
+por ejemplo:
+\begin{itemize}
+    \item Se incorporó la funcionalidad al servidor que cuando
+        el cliente se desconecta del WebSocket, se liberan todas
+        sus reservas. Esto es una cuestión de gustos, podría
+        mantenerse también la reserva sin problema hasta su
+        vencimiento, pero haciendo pruebas con una cantidad
+        limitada de robots se hizo notorio que un sistema
+        así desperdicia mucho el tiempo ocioso del robot.
+    \item Dado que al cerrar el WebSocket se pierde la reserva
+        se hizo que también se envíe el mensaje \texttt{stop()}
+        a cada robot reservado por el usuario, de manera
+        que el robot no se quede en movimiento una vez
+        terminada la reserva.
+    \item Se incorporó una caja con tips debajo de la vista de
+        la cámara, en la misma van rotando una serie de consejos
+        acerca de aspectos de la API Javascript que pueden
+        resultar poco familiares a una persona que no utilize este
+        lenguaje con frecuencia y otros muy específicos
+        del control de los robots con XRemoteBot.
+    \item Se modificó la forma de evaluar el código, para que se
+        ejecute en un contexto donde las funciones
+        \texttt{setInterval()} y \texttt{setTimeout()} se encuentran
+        ocultas por otras implementaciones que garantizan que cada
+        vez que se presione el botón ``Ejecutar'' se eliminen
+        todos los timeouts e intervalos previamente creados.
+        De otra manera si el usuario escribe un script que usa
+        estas funciones
+        (cuestión que parece ser conveniente en este entorno)
+        y luego escribe otro, los timeouts e intervalos
+        de la versión anterior se seguirían ejecutando
+        interfiriendo con el comportamiento del script actual.
+\end{itemize}
 
-Por último en la tabla~\ref{tbl:ej_error} se puede ver un mensaje de error
-típico cuando el cliente envía una petición mal formada donde no existe
-el campo \textit{method} obligatorio, notar que este mensaje a diferencia
-de los anteriores no tiene un campo \textit{msg\_id} pero esto no causaría
-ningún error ya que este campo no es obligatorio, el único error en la
-petición es la ausencia de \textit{method}.
+\subsection{Pruebas de codificación}
 
-\begin{table}
-    \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "error",
-    "message": "\"entity\" and \"method\"
-                are mandatory fields"
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
-    \caption{Ejemplo de un mensaje de error ante una petición mal formada}
-    \label{tbl:ej_error}
-\end{table}
+Dado el uso de Promises en el diseño de este cliente, fue
+necesario repensar la forma
+de resolver los ejercicios habituales. Por ejemplo en el
+código~\ref{lst:movimientos_js} se ve un script que mueve el
+robot,
+código~\ref{lst:esquivar_js} se ve un algoritmo para que el robot
+avance esquivando obstáculos y en el código~\ref{lst:random_js}
+muestra un script que mueve el robot en direcciones aleatorias.
 
-\section{Modalidades del servidor}
+\begin{lstlisting}[language=C,
+caption={Secuencia de movimientos},
+label=lst:movimientos_js]
+var server = new Server('ws://xremotebot.example:8000/api',
+                        'api_key');
+server.onConnect(function(){
+	server.fetch_robot().then(function(robot_obj){
+		var robot = new Robot(server, robot_obj);
+        robot.forward(50, 5);
+        robot.turnLeft(50, 2);
+        robot.turnRight(50, 2);
+        alert('Hola');
+	});
+});
+\end{lstlisting}
 
-A fin de hacer que el servidor pueda exponerse al público se cuenta con
-un sistema con autenticación por \textit{API key}, pero estas claves
-son largas resultando díficil recordarlas y escribirlas sin errores. En
-ámbitos locales como puede ser una red wifi en un aula este mecanismo
-de autenticación puede resultar molesto e innecesario, por lo que el
-servidor es configurable de forma tal que se puede deshabilitar este
-sistema de autenticación. Para que el servidor opere sin requerir
-una \textit{API key} a los clientes basta con configurar la opción
-\texttt{public\_server} en \texttt{False} dentro del archivo
-\textit{configuration.py}.
+\begin{lstlisting}[language=C,
+caption={Esquivar obstáculos},
+label=lst:esquivar_js]
+var server = new Server('ws://xremotebot.example:8000/api',
+                        'api_key');
+server.onConnect(function(){
+    server.fetch_robot().then(function(robot_obj){
+        var robot = new Robot(server, robot_obj);
+        var esquivar = function(){
+            robot.getObstacle().then(function(obstacle){
+                if (obstacle){
+                    robot.backward(40, 1);
+                    if (Math.random() < 0.5){
+                        robot.turnLeft(40, 1);
+                    }
+                    else{
+                        robot.turnRight(40, 1);
+                    }
+                    robot.forward(40);
+                }
+                setTimeout(esquivar, 500);
+            });
+        };
+        robot.forward(40);
+        setTimeout(esquivar, 500);
+    });
+});
+\end{lstlisting}
 
-Dado que existe esta modalidad el protocolo cuenta con un mensaje
-para preguntar si es necesario proseguir con la authenticación
-(\texttt{authentication\_required}), con lo cuál se pueden crear
-scritps que se adapten a ambos escenarios.
+Al ejecutar el código~\ref{lst:movimientos_js} se puede ver que la
+función \texttt{alert()} se está ejecutando mucho antes que el
+robot termine de moverse, de hecho lo hace de manera casi instantánea
+al presionar ``Ejecutar''. Esto es porque
+si bien se implementó un mecanismo donde el cliente
+antes de enviar cada mensaje espera a que el servidor conteste el
+anterior para simular una ejecución secuencial y para simular
+funciones bloqueantes que demoran la ejecución del script, realmente
+el cliente no deja de ser asincrónico.
+La ejecución de \texttt{forward()} y cada uno de los
+métodos del robot en realidad solamente instancia y retorna una
+``promesa'', por lo que el tiempo que tardan en ejecutarse
+estos movimientos es insignificante, pero vemos que el robot
+se mueve como si cada uno de estos métodos congelara la ejecución
+del script por este mecanismo que tiene soporte tanto del lado
+del cliente como del lado del servidor que demora la respuesta
+de algunos métodos apropósito.
 
+\begin{lstlisting}[language=C,
+caption={Secuencia de movimientos},
+label=lst:movimientos_then_js]
+var server = new Server('ws://xremotebot.example:8000/api',
+                        'api_key');
+server.onConnect(function(){
+	server.fetch_robot().then(function(robot_obj){
+		var robot = new Robot(server, robot_obj);
+        robot.forward(50, 5).then(function(){
+            robot.turnLeft(50, 2);
+        }).then(function(){
+            robot.turnRight(50, 2);
+        }).then(function(){
+            alert('Hola');
+        });
+	});
+});
+\end{lstlisting}
+
+Es posible hacer una versión donde \texttt{alert()} se ejecute cuando
+el robot termine de moverse, pero el código de esta versión
+(código~\ref{lst:movimientos_then_js}) es
+un poco más engorroso ya que tiene muchos niveles de anidamiento.
+
+En el código~\ref{lst:esquivar_js} a simple vista se ven diferencias
+significativas de la forma de codificar con esta API en comparación
+con DuinoBot e incluso en comparación con los otros clientes de
+XRemoteBot. Lo más importante es que dado que los métodos retornan
+``promesas'' no se puede usar un \texttt{while} o \texttt{for} para
+repetir una acción por ejemplo mientras no hay obstáculos, por lo que
+hay que recurrir a \texttt{setInterval()} o bien a \texttt{setTimeout()}
+para tener más control.
+
+El código~\ref{lst:random_js} usa la misma estrategia que el ejemplo
+anterior usando \texttt{setInterval()} para realizar una tarea
+que con DuinoBot en Python se haría con un \texttt{while} y además
+accede a la API Math del navegador.
+
+\section{Pruebas con los clientes Python y Ruby}
+Estos clientes tienen una complejidad menor que el cliente Javascript
+por lo que fueron rápidamente probados sin mayores dificultades.
+
+La API de estos clientes se asemeja tanto a la API original de
+DuinoBot que no fue necesario repensar como hacer las actividades
+típicas con los robots como lo fue en la versión Javascript.
