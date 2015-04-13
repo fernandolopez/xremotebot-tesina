@@ -1,12 +1,15 @@
 \chapter{Protocolo de capa de aplicación de XRemoteBot}\label{cha:protocolo}
 Siendo una aplicación cliente-servidor XRemoteBot requiere algún método de
-serialización para intercambiar datos entre los clientes y el servidor,
-considerando que el servidor no es más que un servidor web que usa websockets
-como protocolo, el método de serialización más adecuado parece ser JSON
-(Javascript Serialization Object Notation).
+serialización para intercambiar datos entre los clientes y el servidor.
+Considerando que el servidor no es más que un servidor web que usa websockets
+como protocolo, el método de serialización propuesto es JSON
+(Javascript Serialization Object Notation). En la sección~\ref{sec:alternativas}
+se describen algunas alternativas consideradas antes de tomar la desición de
+evaluar JSON, BSON y CBOR en profundidad.
+
+\section{Comparación entre JSON, BSON y CBOR}\label{sec:serializacion}
 
 JSON cuenta con las siguientes características:
-
 \begin{enumerate}
     \item Es un formato estandarizado por ECMA~\citep{ecma-404}
         y está especificado por la rfc-7159~\citep{rfc-7159}.
@@ -20,7 +23,7 @@ JSON cuenta con las siguientes características:
 \end{enumerate}
 
 Pero también existen otras alternativas cuyos objetivos son serialización
-y de-serialización rápida, y datos serializados más compactos
+y de-serialización rápida de datos
 como BSON (Binary JSON) y (CBOR Concise Binary Object Representation).
 
 Algunas características de BSON y CBOR son:
@@ -28,8 +31,8 @@ Algunas características de BSON y CBOR son:
 \begin{enumerate}
     \item Codifican la información en formato binario.
     \item Son tan fáciles de usar como JSON.
-    \item Ambos formatos proveen un superset de los tipos de datos provistos
-        por JSON.
+    \item Ambos formatos pueden codificar y decodificar los mismos tipos de datos
+        que JSON, además de soportar otros tipos de datos adicionales.
     \item CBOR está especificado por la rfc-7049~\citep{rfc-7049}.
     \item BSON tiene una especificación informal pero cuenta una
         implementación bien conocida siendo la representación de datos primaria en
@@ -43,7 +46,7 @@ Algunas características de BSON y CBOR son:
 \end{enumerate}
 
 Para tomar un decisión respecto al formato a utilizar se decidió generar
-16 archivos \texttt{JSON} con datos aleatorios, estos archivos se cargaron
+16 archivos \texttt{JSON} con datos aleatorios. Estos archivos se cargaron
 con una cantidad de entradas múltiplo de 1024 desde 1024 hasta 16384, donde
 cada una de estas entradas es un objeto \texttt{JSON} con 5 entradas de tipo
 numérico, 5 strings, 5 objetos (cada uno con una entrada numérica) y 5
@@ -56,8 +59,11 @@ promedio que llevó hacer cada una de estas acciones para cada formato.
 Se eligió hacer las pruebas con Python y Javascript porque el primero es el
 lenguaje de implementación del servidor y del cliente que probablemente tenga
 más uso en un futuro, mientras que Javascript es el lenguaje de implementación
-del cliente que se ejecutará en los navegadores web y que puede servir como
-base para implementaciones con Brython, Skulp, Opal, etc...
+del cliente que se ejecutará en los navegadores Web y que puede servir como
+base para implementaciones, por ejemplo, con
+Brython\footnote{\url{http://www.brython.info/}},
+Skulp\footnote{\url{http://www.skulpt.org/}} u
+Opal\footnote{\url{http://opalrb.org/}}.
 
 Para hacer el experimento repetible la implementación en
 Javascript se ejecutó con el intérprete \textbf{nodejs} basado en
@@ -74,8 +80,14 @@ la versión 0.10.29 distribuida al momento con Debian Jessie tenía un bug que
 generaba un error de memoria al
 deserializar strings largos con \texttt{JSON.load} (CVE-2014-5256)}
 
-De estas pruebas se desprenden las mediciones de las
-figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
+En estas pruebas se tomaron mediciones de los tiempos de serialización y deserialización
+en Python para las 3 alternativas en relación a la cantidad de entradas
+(figura~\ref{fig:ser-time-py}), los tiempos de serialización y deserialización en
+Javascript para las 3 alternativas también en relación a la cantidad de entradas
+(figura~\ref{fig:ser-time-js}) y finalmente la relación entre la cantidad de
+entradas y el tamaño de los strings generados al serializar los mismos datos en los 3 formatos
+evaluados
+(figura~\ref{fig:ser-size}).
 
 \begin{figure}
     \centering
@@ -187,13 +199,13 @@ figuras~\ref{fig:ser-time-py}, \ref{fig:ser-time-js} y \ref{fig:ser-size}.
 
 De la figura~\ref{fig:ser-size} se desprende que los distintos métodos de
 serialización no ofrecen diferencias significativas en el tamaño de los
-strings generados para los volumenes de datos probados. Por otro lado
+strings generados para los volumenes de datos probados. Por otro lado,
 se puede observar en la figura~\ref{fig:ser-time-py} que al menos en
-Python y con la librería usada CBOR tiene los mejores tiempos, sin
+Python y con la librería usada CBOR tiene los mejores tiempos. Sin
 embargo en las pruebas con Javascript en la figura~\ref{fig:ser-time-js}
-se puede observar que los mejores tiempos son para el formato JSON,
-esto es entendible ya que este es el único formato procesado de forma
-nativa\footnote{Si bien es posible encontrar parsers nativos para los
+se puede observar que los mejores tiempos son para el formato JSON.
+Esto es entendible ya que este es el único formato (entre los evaluados) procesado de forma
+nativa en este lenguaje\footnote{Si bien es posible encontrar parsers nativos para los
 otros formatos y usarlos desde NodeJS no se utilizó esta modalidad porque
 no sería una prueba realista dado que los motores Javascript de los
 navegadores no permiten esto.}.
@@ -204,12 +216,16 @@ en Python son, en comparación con la versión en Javascript, marginales
 entradas entre el mejor y peor tiempo de deserialización) y las diferencias
 en cuanto a tamaño del string generado al
 serializar también son pequeñas (aproximadamente 2MiB de diferencia para
-$2^{14}$ entradas entre el mejor y el peor método).
+$2^{14}$ entradas entre el mejor y el peor método). Se eligió implementar
+el protocolo de XRemoteBot con JSON, que en estas pruebas cuenta con los
+mejores tiempos de serialización y deserialización en Javascript, además
+de estar soportado en los 3 lenguajes sin necesidad de utilizar bibliotecas
+externas.
 
 
 \section{Protocolo diseñado para XRemoteBot}
 
-Como se describió anteriormente XRemoteBot utiliza el protocolo WebSocket como
+Como se describió anteriormente, XRemoteBot utiliza el protocolo WebSocket como
 protocolo de la capa de transporte y mensajes codificados con JSON como
 protocolo de la capa de aplicación. El propósito de este capítulo es describir
 este protocolo de capa de aplicación y detallar los motivos por los cuales
@@ -248,24 +264,22 @@ pueden tomar este mensaje
 de error y mostrarlos en pantalla o usarlos como descripción de una
 excepción como se hace en el cliente Python por ejemplo.
 
-%FIX ME agregue
-\subsection{Alternativas analizadas}
-%ACA PONE ALGO DE SE PODRÍA HABER USADO YML, XML O ALGO DEFINIDO POR VOS.. O LO QUE QUIEAS...
+\subsection{Alternativas analizadas}\label{sec:alternativas}
 En definitiva cualquier forma de serialización de datos hubiera
-sido suficiente para este protocolo, se eligió evaluar protocolos
+sido suficiente para este protocolo. Se eligió evaluar protocolos
 similares a JSON dada su facilidad de uso, facilidad de lectura
 y la disponibilidad
-de funciones para manipularlo en las bibliotecas estándar
+de funciones para manipular JSON en las bibliotecas estándar
 de los tres lenguajes elegidos. Esto es importante porque es
 la intención del autor que cualquiera con conocimientos básicos
 de programación pueda desarrollar clientes en otros lenguajes.
 
 Estas características no se dan en formatos como YAML que
-son más complejos y no es soportado de forma nativa en
-la mayoría de los lenguajes. Tampoco cumple con las características
+son más complejos y solamente no está soportado por la biblioteca
+estándar de Python ni por Javascript. Tampoco cumple con las características
 requeridas XML que si bien es posible
 procesarlo en cualquiera de estos lenguajes sin agregar bibliotecas
-externas un posible desarrollador de un cliente tendría más
+externas, un posible desarrollador de un cliente tendría más
 problemas para implementar el cliente ya que las API para
 manipular XML suelen
 ser más complejas dada la estructura de estos archivos y además
@@ -391,19 +405,20 @@ para agregar nuevos mensajes basta con enviar distintos strings en el
 campo ``method'' y para soportar nuevos tipos de entidades simplemente
 se puede enviar un string diferente en ``entity''.
 
-Por ejemplo potencialmente
-se podría controlar un sistema que controle la iluminación de un casa,
-supongamos entonces que los métodos serán ``main\_bedroom'', ``children\_bedroom'',
-``kitchen'', ``living'' y ``garage''. Supongamos que cada uno de estos
-controla la luz de la habitación descripta por su nombre y reciben como
-argumento la intensidad de luz como un número de 0 a 255. Finalmente
-podemos llamar a la ``entity'' ``houselight''.
+Por ejemplo, si se requiriese implementar
+un sistema que controle la iluminación de un casa,
+se podrían definir los métodos ``main\_bedroom'', ``children\_bedroom'',
+``kitchen'', ``living'' y ``garage''. Si cada uno de éstos
+controla la luz de la habitación descripta por su nombre y podría recibir
+como
+argumento la intensidad de luz deseada como un número de 0 a 255. Finalmente
+podemos agrupar estos métodos en una ``entity'' ``houselight''.
 
 Podríamos controlar las luces con una secuencia de mensajes como
-los mostrados en el código~\ref{lst:houselight}. Por supuesto luego
+los mostrados en el código~\ref{lst:houselight}. Por supuesto, luego
 habría que agregar soporte para estas funcionalidades en el servidor
 y los clientes pero como veremos más adelante esto tampoco es
-un problema.
+un problema significativo.
 
 \begin{lstlisting}[language=python,
 caption={Ejemplo de una posible extensión al protocolo para controlar
@@ -430,12 +445,15 @@ label=lst:houselight]
 Los métodos bloqueantes como \texttt{backward} (que con DuinoBot demoran
 la ejecución del proceso hasta que transcurra el tiempo indicado como
 parámetro) son modelados desde el servidor demorando la respuesta al método
-gracias a que el framework Tornado funciona con un ``bucle principal''
+gracias a que el framework Web Tornado (usado para dar soporte al servidor
+para los protocolos HTTP y WebSockets, entre otras utilidades)
+funciona con un ``bucle principal''
 (``main loop'') donde se pueden encolar trabajos para que se ejecuten
 en el futuro.
 Esta funcionalidad no es necesaria para la mayoría de los clientes que
 pueden implementar las demoras de forma local usando la función
-\texttt{sleep()}\footnote{tanto en Ruby como en Python se llama igual.},
+\texttt{sleep()}\footnote{tanto en Ruby como en Python la función \texttt{sleep()} detiene
+el hilo actual la cantidad de segundos que indique su único parámetro.},
 pero es necesario para la implementación en Javascript donde no es posible
 demorar la ejecución del script sin impactar de forma negativa la performance
 del navegador (al menos en la pestaña actual).
@@ -460,7 +478,7 @@ los métodos invocados.
 Los campos de los mensajes tipo \texttt{value} son:
 
 \begin{description}
-    \item[\texttt{response}:] identifica el tipo de mensaje, en este caso
+    \item[\texttt{response}:] identifica el tipo de mensaje. En este caso
         es un string con el valor \texttt{``value''}.
     \item[\texttt{value}:] el valor retornado por el método (puede ser
         cualquier valor soportado por JSON).
@@ -498,14 +516,14 @@ los primeros mensajes donde el cliente pregunta al servidor si el
 mismo requiere autenticación y si es así envía la \textit{API key}
 correspondiente. En la tabla~\ref{tbl:ej_autenticacion} se detalla
 el intercambio de mensajes entre un cliente y el servidor en un
-caso de autenticación exitoso con un cliente que envía un \texttt{msg\_id},
-como se puede ver el \texttt{msg\_id}
+caso de autenticación exitoso con un cliente que envía un \texttt{msg\_id}.
+Como se puede ver el \texttt{msg\_id}
 no tiene por qué ser consecutivo con el del mensaje anterior, incluso
 puede llegar a ser un string, las únicas restricciones sobre el
 \texttt{msg\_id} son que tiene que ser copiado por el servidor
 en las respuestas y que el valor debe poder ser utilizado como
 identificador de un atributo (usando notación con corchetes) en un
-objeto Javascript, es decir puede ser un número o un string
+objeto Javascript. Es decir puede ser un número o un string
 arbitrario\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property\_Accessors}}.
 
 \begin{table}
@@ -610,7 +628,7 @@ al robot específico a utilizar.
     \label{tbl:ej_movimiento_y_sensor}
 \end{table}
 
-Por último en la tabla~\ref{tbl:ej_error} se puede ver un mensaje de error
+Por último, en la tabla~\ref{tbl:ej_error} se puede ver un mensaje de error
 típico cuando el cliente envía una petición mal formada donde no existe
 el campo \textit{method} obligatorio, notar que este mensaje a diferencia
 de los anteriores no tiene un campo \textit{msg\_id} pero esto no causaría
@@ -648,7 +666,7 @@ petición es la ausencia de \textit{method}.
 A fin de hacer que el servidor pueda exponerse al público se cuenta con
 un sistema con autenticación por \textit{API key}, pero estas claves
 son largas resultando díficil recordarlas y escribirlas sin errores. En
-ámbitos locales como puede ser una red wifi en un aula este mecanismo
+ámbitos locales, como puede ser una red wifi en un aula, este mecanismo
 de autenticación puede resultar molesto e innecesario, por lo que el
 servidor es configurable de forma tal que se puede deshabilitar este
 sistema de autenticación. Para que el servidor opere sin requerir

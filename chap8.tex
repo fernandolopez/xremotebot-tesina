@@ -13,8 +13,8 @@
 
 El objetivo general de esta tesina de implementar un servicio Web que permita
 manipular y visualizar en tiempo real los robots Multiplo N6 del proyecto
-\proyecto{} se logró con una implementación usando el lenguaje Python con
-las bibliotecas:
+\proyecto{} se logró con una implementación usando el lenguaje Python
+que integra varias bibliotecas:
 
 \begin{itemize}
     \item Tornado como framework Web y soporte de WebSockets del lado del
@@ -58,7 +58,7 @@ uso de CPU tanto del servidor como de los clientes se hizo un estudio con
 múltiples pruebas en Python y Javascript con los mecanismos de serialización
 JSON, CBOR y BSON (el primero de texto plano y soportado de forma nativa en los
 tres clientes implementados y el resto binarios). Estas pruebas se presentan
-en el anexo~\ref{cha:serializacion}, las mismas apuntan a que el uso de JSON
+en la sección~\ref{sec:serializacion}, las mismas apuntan a que el uso de JSON
 no genera mensajes significativamente más grandes que las otras alternativas
 (incluso son ligeramente más pequeños que los generados con BSON), a la vez
 que el tiempo de para codificar y decodificar los mensajes con JSON en
@@ -99,3 +99,15 @@ para un nuevo robot.
         nombre de la entidad y como segundo argumento una instancia
         de una clase que herede de ``remotebot.models.entity.Entity''.
 \end{itemize}
+
+Es importante destacar que este trabajo contribuye un aporte importante a
+un proyecto de extensión de la Facultad que tiene una amplia demanda
+por parte de escuelas de la región y de otros puntos geográficos, por
+lo cuál este desarrollo resulta muy adecuado para ayudar a satisfacer
+esta demanda.
+
+Todos los desarrollos implementados se han publicado con una licencia
+MIT y pueden ser descargados desde el sitio
+GitHub\footnote{\url{http://github.com/fernandolopez/xremotebot}}%
+M
+\footnote{\url{http://github.com/fernandolopez/xremotebot-clients}}.

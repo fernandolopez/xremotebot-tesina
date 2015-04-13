@@ -1,11 +1,14 @@
 all: clean figures
-	latexmk  -jobname="main-moficando" -pdf main.tex
+	#latexmk  -jobname="main-modificando" -pdf main.tex
+	latexmk -pdf main.tex
 
 clean:
-	rm -f *.aux *.bbl *.out *.toc *.blg  *.lof *.lot *.fdb_latexmk
+	latexmk -c
+	#rm -f *.aux *.bbl *.out *.toc *.blg  *.lof *.lot *.fdb_latexmk
 
 reallyclean: clean
-	rm -f main.pdf main.dvi
+	latexmk -C
+	#rm -f main.pdf main.dvi
 
 figures:
 	make -C figures

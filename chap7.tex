@@ -6,10 +6,20 @@ con virtualenv\footnote{\url{http://www.virtualbox.org/}}
 y con una base de datos
 Sqlite\footnote{\url{http://www.sqlite.org/}}
 sobre
-sistemas Lihuen 5 y 6 beta (basados en Debian Wheezy y Jessie respectivamente).
-Las dependencias se instalaron declarándolas en \texttt{setup.py} e instalandolas
-con pip, a excepción de los módulos DuinoBot y Myro que fueron instalados
-desde repositorios Git usando también pip, pero indicando la URL manualmente
+sistemas Lihuen 5 y 6 beta\footnote{\url{http://lihuen.linti.unlp.edu.ar}}
+(basados en Debian Wheezy y Jessie\footnote{\url{http://debian.org}}
+respectivamente).
+Las dependencias se instalaron declarándolas en
+\texttt{setup.py}\footnote{\texttt{setup.py} es el archivo donde se definen los
+datos y dependencias los paquetes Python}
+e instalandolas
+con pip\footnote{\texttt{pip} es uno de los instaladores de paquetes Python
+más útilizados y permite instalar paquetes desde repositorios remotos
+con solo indicar los nombres de los mismos
+\url{https://pip.pypa.io/en/latest/user_guide.html}},
+a excepción de los módulos DuinoBot y Myro que fueron instalados
+desde repositorios Git\footnote{\url{http://git-scm.com/}}
+usando también pip, pero indicando la URL manualmente
 ya que no fué posible declararlos de esta manera en \texttt{setup.py}, el
 código~\ref{lst:instalar_xremotebot} muestra como instalar el servidor
 y los paquetes necesarios para soportar robots Multiplo N6 y Scribbler.
@@ -34,8 +44,14 @@ npm install -g ws
 \end{lstlisting}
 
 Para soportar el streaming de video además es necesario instalar
-\texttt{avconv}, \texttt{NodeJS} y el paquete \texttt{ws} para NodeJS,
-se pueden instalarde distintas formas dependiendo del sistema operativo
+\texttt{avconv}\footnote{\url{https://libav.org/}} para capturar
+y codificar el vídeo,
+\texttt{NodeJS}\footnote{\url{https://nodejs.org/}} para ejecutar
+el script que transmite el vídeo
+y el paquete
+\texttt{ws}\footnote{\url{https://www.npmjs.com/package/ws}}
+que es una dependencia de este script,
+se pueden instalar de distintas formas dependiendo del sistema operativo
 utilizado, en código~\ref{lst:instalar_video} muestra como instalarlo
 en un sistema basado en Debian GNU/Linux.
 
@@ -56,11 +72,6 @@ label=lst:ejecutar_xremotebot]
 Si hubiese algún robot Scribbler en la configuración el script
 \texttt{run} pedirá la contraseña de administrador para asociar
 su MAC con un dispositivo \texttt{rfcomm}.
-
-
-usando los archivos requirementes.txt
-y requirements-dev.txt, a excepción de los módulos DuinoBot y Myro que se
-instalaron con pip desde Git por lo que no fue posible usar los archivos
 
 \section{Pruebas de uso de recursos}
 Se dejó el servidor ejecutándose durante aproximadamente 24hs en
@@ -151,7 +162,7 @@ server.onConnect(function(){
 \end{lstlisting}
 
 \begin{lstlisting}[language=C,
-caption={Esquivar obstáculos},
+caption={Ante un obstáculo el robot lo esquiva girando en un dirección aleatoria},
 label=lst:esquivar_js]
 var server = new Server('ws://xremotebot.example:8000/api',
                         'api_key');
@@ -179,9 +190,43 @@ server.onConnect(function(){
 });
 \end{lstlisting}
 
+\begin{lstlisting}[language=C,
+caption={El robot se mueve en direcciones aleatorias},
+label=lst:random_js]
+var server = new Server('ws://190.16.204.135:8000/api',
+                        '8d4ae089-443b-4bda-bd04-6601d664dd96');
+server.onConnect(function(){
+    server.get_robots().then(function(robots){
+        println(robots);
+    });
+
+
+    server.fetch_robot().then(function(robot_obj){
+        println(robot_obj);
+        var robot = new Robot(server, robot_obj);
+        setInterval(function(){
+            var rand = Math.random();
+            if (rand < 0.25){
+                robot.forward(50, 1);
+            }
+            else if (rand < 0.5){
+                robot.backward(50, 1);
+            }
+            else if (rand < 0.75){
+                robot.turnLeft(50, 1);
+            }
+            else{
+                robot.turnRight(50, 1);
+            }
+        }, 10000);
+    });
+});
+\end{lstlisting}
+
+
 Al ejecutar el código~\ref{lst:movimientos_js} se puede ver que la
 función \texttt{alert()} se está ejecutando mucho antes que el
-robot termine de moverse, de hecho lo hace de manera casi instantánea
+robot termine de moverse. De hecho lo hace de manera casi instantánea
 al presionar ``Ejecutar''. Esto es porque
 si bien se implementó un mecanismo donde el cliente
 antes de enviar cada mensaje espera a que el servidor conteste el
@@ -198,7 +243,7 @@ del cliente como del lado del servidor que demora la respuesta
 de algunos métodos apropósito.
 
 \begin{lstlisting}[language=C,
-caption={Secuencia de movimientos},
+caption={Secuencia de movimientos usando \texttt{Promise\#then()}},
 label=lst:movimientos_then_js]
 var server = new Server('ws://xremotebot.example:8000/api',
                         'api_key');
