@@ -4,7 +4,7 @@ El servidor se probó con Python 2.7 (portarlo a Python 3 involucraría
 portar DuinoBot, Myro y otros módulos asociados), en entornos creados
 con virtualenv\footnote{\url{http://www.virtualbox.org/}}
 y con una base de datos
-Sqlite\footnote{\url{http://www.sqlite.org/}}
+SQLite\footnote{\url{http://www.sqlite.org/}}
 sobre
 sistemas Lihuen 5 y 6 beta\footnote{\url{http://lihuen.linti.unlp.edu.ar}}
 (basados en Debian Wheezy y Jessie\footnote{\url{http://debian.org}}
@@ -12,15 +12,15 @@ respectivamente).
 Las dependencias se instalaron declarándolas en
 \texttt{setup.py}\footnote{\texttt{setup.py} es el archivo donde se definen los
 datos y dependencias los paquetes Python}
-e instalandolas
+e instalándolas
 con pip\footnote{\texttt{pip} es uno de los instaladores de paquetes Python
-más útilizados y permite instalar paquetes desde repositorios remotos
+más utilizados y permite instalar paquetes desde repositorios remotos
 con solo indicar los nombres de los mismos
 \url{https://pip.pypa.io/en/latest/user_guide.html}},
 a excepción de los módulos DuinoBot y Myro que fueron instalados
 desde repositorios Git\footnote{\url{http://git-scm.com/}}
 usando también pip, pero indicando la URL manualmente
-ya que no fué posible declararlos de esta manera en \texttt{setup.py}, el
+ya que no fue posible declararlos de esta manera en \texttt{setup.py}, el
 código~\ref{lst:instalar_xremotebot} muestra como instalar el servidor
 y los paquetes necesarios para soportar robots Multiplo N6 y Scribbler.
 
@@ -91,7 +91,7 @@ equipo en el navegador Mozilla Firefox 40.0a1 (Nightly)
 el uso de CPU por parte de este navegador estuvo alrededor
 del 25\%, un 40\% en Google Chrome 41.0.2272.101 (Stable).
 
-Eliminando el elemento canvas donde se grafica el streaming de video
+Eliminando el elemento canvas donde se gráfica el streaming de video
 el uso de CPU se redujo a un 0.5\% en Firefox y 30\% en Google Chrome,
 por lo que aparentemente ese uso de CPU se encuentra relacionado
 con la decodificación y renderizado de video.
@@ -117,7 +117,7 @@ por ejemplo:
     \item Se incorporó una caja con tips debajo de la vista de
         la cámara, en la misma van rotando una serie de consejos
         acerca de aspectos de la API Javascript que pueden
-        resultar poco familiares a una persona que no utilize este
+        resultar poco familiares a una persona que no utiliza este
         lenguaje con frecuencia y otros muy específicos
         del control de los robots con XRemoteBot.
     \item Se modificó la forma de evaluar el código, para que se
@@ -151,13 +151,13 @@ label=lst:movimientos_js]
 var server = new Server('ws://xremotebot.example:8000/api',
                         'api_key');
 server.onConnect(function(){
-	server.fetch_robot().then(function(robot_obj){
-		var robot = new Robot(server, robot_obj);
+    server.fetch_robot().then(function(robot_obj){
+        var robot = new Robot(server, robot_obj);
         robot.forward(50, 5);
         robot.turnLeft(50, 2);
         robot.turnRight(50, 2);
         alert('Hola');
-	});
+    });
 });
 \end{lstlisting}
 
@@ -240,7 +240,7 @@ estos movimientos es insignificante, pero vemos que el robot
 se mueve como si cada uno de estos métodos congelara la ejecución
 del script por este mecanismo que tiene soporte tanto del lado
 del cliente como del lado del servidor que demora la respuesta
-de algunos métodos apropósito.
+de algunos métodos a propósito.
 
 \begin{lstlisting}[language=C,
 caption={Secuencia de movimientos usando \texttt{Promise\#then()}},
@@ -248,8 +248,8 @@ label=lst:movimientos_then_js]
 var server = new Server('ws://xremotebot.example:8000/api',
                         'api_key');
 server.onConnect(function(){
-	server.fetch_robot().then(function(robot_obj){
-		var robot = new Robot(server, robot_obj);
+    server.fetch_robot().then(function(robot_obj){
+        var robot = new Robot(server, robot_obj);
         robot.forward(50, 5).then(function(){
             robot.turnLeft(50, 2);
         }).then(function(){
@@ -257,7 +257,7 @@ server.onConnect(function(){
         }).then(function(){
             alert('Hola');
         });
-	});
+    });
 });
 \end{lstlisting}
 

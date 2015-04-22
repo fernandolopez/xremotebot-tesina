@@ -1,19 +1,16 @@
-\chapter{Controlando dispositivos de forma remota}\label{cha:arte}
+\chapter{Controlar dispositivos de forma remota}\label{cha:arte}
 
 Existen diferentes alternativas para controlar robots o microcontroladores
-de forma remota. Muchas de estas se agrupan bajo la denominación
+de forma remota. Muchas de éstas se agrupan bajo la denominación
 ``Internet of Things''\footnote{\url{https://www.iotwf.com/resources/1}}.
-En este capítulo se describirán algunas de las
-más destacadas entre las más similares a los requerimientos planteados en
-esta propuesta.
-
+En este capítulo se describirán algunas iniciativas similares a XRemoteBot.
 
 \section{Educabot}
 El proyecto Educabot tiene por
 objetivo enseñar tecnología a niños y adultos a través
 del uso, programación y construcción de robots. En el sitio del proyecto
 se ofertan cursos orientados a los distintos niveles y 
-en la última conferencia de Python de Argentina (Pyconar 2014) uno de
+en la última conferencia de Python de Argentina (PyConAr 2014) uno de
 los cofundadores del proyecto mencionó que se llevan adelante actividades
 con los robots
 en distintas escuelas de la Ciudad Autónoma de Buenos
@@ -25,10 +22,10 @@ Aires\footnote{\url{https://youtu.be/1oCOAtX9OS4}}.
 % FIXME: En el sitio no mencionan nada de los cursos en escuelas lo único
 % que encontré es lo de youtube que es una charla en la Pycon del fundador
 
-En la parte de construcción, este proyecto plantea un modelo de robot
-denominado
-``Rolo'' para los jóvenes de más de 10 años, mientras que para los más chicos
-se plantean actividades con el robot ``elBrian'' que incluyen
+En la parte de construcción de robots, este proyecto plantea un modelo
+de robot denominado
+``Rolo'' orientado a niños de más de 10 años, mientras que para los más
+chicos se plantean actividades con el robot ``elBrian'' que incluyen
 controlarlo a través de una interfaz web que muestra las imágenes emitidas
 por la cámara incorporada en este robot y además permite controlarlo con
 botones en pantalla que determinan en qué dirección debe moverse el robot
@@ -57,12 +54,13 @@ El servidor web de ``elBrian'' está implementado usando el framework
 Tornado\footnote{\url{http://www.tornadoweb.org/}},
 WebSockets\footnote{\url{http://www.websocket.org/}},
 mjpg-streamer\footnote{\url{https://github.com/jacksonliam/mjpg-streamer}},
-opencv\footnote{\url{http://opencv.org/}}
+OpenCV\footnote{\url{http://opencv.org/}}
 y JSON\footnote{\url{http://json.org/}}.
-El mismo está diseñado para ejecutarse
-en el robot ya que el mismo está basado en una placa RaspberryPi, la cuál
+Este servidor está diseñado para ejecutarse
+en el robot ya que el mismo se basa en una placa Raspberry Pi, la cuál
 cuenta con un procesador ARM perfectamente capaz de ejecutar un sistema
-operativo completo como GNU/Linux y de soportar el intérprete oficial de Python.
+operativo completo como GNU/Linux y dar soporte al intérprete oficial de
+Python.
 
 Mientras que este servidor coincide en gran medida en la elección de lenguaje
 y bibliotecas utilizadas, su implementación es específica para el robot ``elBrian''
@@ -92,11 +90,12 @@ que permite el acceso a la información y control de robots a través de la Web.
 
 Gobot además tiene compatibilidad con distintos sensores y robots, además de
 ser compatible con
-placas utilizadas normalmente en la construcción de robots como Arduino,
+placas utilizadas normalmente en la construcción de robots como
+pueden ser Arduino,
 Raspberry Pi, Intel Edison y Beaglebone Black%
 \footnote{\url{http://gobot.io/\#platforms}}.
 
-Este proyecto es interesante como base para desarrollar algún proyecto
+Este proyecto es interesante como base para desarrollar un proyecto
 similar a XRemoteBot en Go, pero requiere, además la reimplementación
 del módulo de Python DuinoBot que controla, a través de una versión
 modificada del protocolo Firmata, a los robots Multiplo N6. Por otro
@@ -105,7 +104,7 @@ lado, los robots Scribbler tampoco aparecen en la lista de robots soportados.
 Referencias del proyecto:
 \begin{itemize}
     \item Página del proyecto: \url{http://gobot.io}.
-    \item Protocolo de su API Web: \url{https://github.com/hybridgroup/cppp-io/}.
+    \item Protocolo de su API web: \url{https://github.com/hybridgroup/cppp-io/}.
 \end{itemize}
 
 
@@ -114,7 +113,7 @@ Referencias del proyecto:
 Cylon.js es un proyecto hermano de Gobot y soporta la misma variedad
 de dispositivos y también provee una API cppp-io, con la diferencia
 de que la biblioteca provista está escrita en Javascript para
-NodeJS\footnote{\url{https://nodejs.org/}}.
+``Node.js''\footnote{\url{https://nodejs.org/}}.
 
 Una característica interesante de Cylon.js es que soporta distintos
 protocolos para su API remota como ser
@@ -207,7 +206,7 @@ VCar es un auto a control remoto, cuyo control fue modificado para
 se manipulado por software desde  una computadora con GNU/Linux la
 cuál permite controlar el robot de forma remota y verlo
 a través de una cámara de
-video\footnote{\url{http://www.hellspark.com/new/css/vcar/vcar.html}}
+video
 (figura~\ref{fig:vcar}).
 El acceso al robot es público
 aparentemente sin ningún tipo de restricción y la página
@@ -224,7 +223,7 @@ Referencias del proyecto:
 
 \section{Tele Toyland}
 
-Tele Toyland\footnote{\url{http://www.teletoyland.com}} es un sitio que provee acceso a varios dispositivos a través de una interfaz
+Tele Toyland es un sitio que provee acceso a varios dispositivos a través de una interfaz
 web. Por ejemplo, es posible controlar un cabezal con una punta que dibuja sobre
 una caja de arena. Basta con hacer clic sobre las posiciones sobre las cuales
 se quiere que pase la punta y presionar el botón ``go'' para que el cabezal
@@ -248,31 +247,17 @@ Referencias del proyecto:
 \begin{itemize}
     \item Página del proyecto: \url{http://www.teletoyland.com}.
 \end{itemize}
-% FIXME
-%\section{}
-%http://www3.uji.es/~pnebot/Files/Articuls/RemoteProgramming.pdf
-%Otro
-%http://telerobot.mech.uwa.edu.au/Telerobot/instructions.html
-\section{Otros proyectos}
-% www.linuxuser.co.uk/tutorials/control-your-raspberry-pi-robot-from-a-web-connected-device
 
 
+\section{Algunas reflexiones}
 
-%FIX ME ESTO QUEDA MUY DESCOLGADO..... yo pondŕia algo como 
-%Bajo la consigna DIY, o ``do it yourself'' y acá poner un par de ref!!!, existen diversas.....y seguir...., 
-
-Existieron otros sistemas similares en el pasado, pero actualmente se
-encuentran fuera de línea por problemas técnicos o bien porque el
-experimento terminó como por ejemplo
-``TU Freiberg Robotics''\footnote{\url{www.informatik.tu-freiberg.de/\~frobots/}}
-que permitía controlar robots en una mini cancha de fútbol,
-``WebTruck''\footnote{\url{http://www.webtruck.org/cinteraction_html}} que
-permitía controlar distintos vehículos.
-
-También existen otros proyectos que requieren instalar software extra
-como ``The UWA Telerobot'' que requiere instalar software propietario
-y crear una cuenta para ser utilizado, este proyecto permite controlar
-un brazo robótico en un taller.
+Del relevamiento realizado se puede observar que existen diferentes
+proyectos que permiten controlar un robot u otro dispositivo de
+manera remota. Sin embargo ninguno de éstos es una solución completa
+al problema de
+enseñar a programar usando robots de forma remota y permitiendo a distintos
+usuarios reservar temporalmente robots de forma que no haya conflicto en la
+interacción entre los usuarios.
 
 Finalmente en la consigna de ``do it yourself'' existen diversas guías para
 programar servidores que permitan controlar robots o microcontroladores
@@ -286,12 +271,10 @@ en el la sección~\ref{sec:remotebot},
 pensados para ser
 usados en un ambiente local ya que no proveen autenticación en general.
 
-\section{Algunas reflexiones}
+XRemoteBot aportará una solución novedosa al problema planteado, facilitando
+la programación de robots de forma remota. Además XRemoteBot es extensible,
+posibilitando, el soporte de nuevos robots y de otros dispositivos.
 
-Si bien existen proyectos parecidos que brindan al público la posibilidad
-de controlar un robot u otro dispositivo de manera remota, ninguno de
-éstos es una solución
-completa al problema de enseñar a programar usando
-robots de forma remota y permitiendo a distintos usuarios reservar
-temporalmente distintos
-robots de forma que no haya conflicto en la interacción entre los usuarios.
+XRemoteBot es un proyecto de software libre que contribuirá como herramienta
+didáctica a la incorporación de la enseñanza de la programación en la
+escuela.

@@ -462,9 +462,9 @@ reserved.\par\permission}}
 \par
 \vfill
 {\Large
-\raggedleft{Directora}\hfill \raggedright{Claudia Banchoff (Licenciada en Inform\'atica)}
+\raggedleft{Directoras:}\hfill \raggedright{Claudia Banchoff}
 
-\raggedleft{Directora}\hfill \raggedright{Claudia Queiruga (Licenciada en Inform\'atica)}}
+\hfill \raggedright{Claudia Queiruga}}
 \vfill
 \end{titlepage}}
 

@@ -4,7 +4,6 @@ server.onConnect(function(){
 		println(robots);
 	});
 
-
 	server.fetch_robot().then(function(robot_obj){
 		println(robot_obj);
 		var robot = new Robot(server, robot_obj);
@@ -23,6 +22,6 @@ server.onConnect(function(){
             robot.turnRight(50, 1);
           }
         }, 10000);
-	});
+    });
 });
 

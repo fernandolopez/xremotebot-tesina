@@ -1,5 +1,5 @@
 %\chapter{Arquitecturas}\label{cha:arquitectura}
-\chapter{Myro y Duinobot: Las bases de la propuesta}\label{cha:myro_y_duinobot}
+\chapter{Myro y DuinoBot: Las bases de la propuesta}\label{cha:myro_y_duinobot}
 
 %FIX ME: yo pondría como titulo: Myro y DuinoBot: LAS BASES DE LA PROPUESTAS
 
@@ -52,7 +52,7 @@ más importantes de software y hardware desde el script del usuario hasta el
 robot.
 
 Cabe destacar que el código de Myro funciona con Python 2.7 pero no con
-Python 3. Posiblemente esto se relacione con la desición del \ipre{}
+Python 3. Posiblemente esto se relacione con la decisión del \ipre{}
 de desarrollar una nueva biblioteca para controlar a los robots que funcione
 en distintos lenguajes de
 programación\footnote{\url{http://calicoproject.org/}}. De todas formas se
@@ -69,13 +69,13 @@ se creó un fork y la reorganizó de forma tal que fuera posible instalar
 esta librería desde un entorno Python con un solo comando.
 Además se hizo
 una pequeña corrección para que el uso del paquete
-IDLE\footnote{\url{https://developer.bluetooth.org/TechnologyOverview/Pages/RFCOMM.aspx}}
+IDLE\footnote{\url{https://docs.python.org/2/library/idle.html}}
 sea opcional ya esa biblioteca sirve para crear interfaces gráficas
 y eso no es necesario para este proyecto.
 
 Esta librería (técnicamente un paquete Python) consta de múltiples
 módulos y requiere de otros para contar con funcionalidades opcionales
-como el soporte de Joysticks, una interfaz gráfica para mostrar
+como el soporte de joysticks, una interfaz gráfica para mostrar
 los valores de los sensores en un diálogo y soporte para manipulación
 de imágenes para poder sacar fotos con el robot y manipularlas. Sin
 embargo para el alcance de este trabajo con el acceso a las funcionalidades
@@ -89,14 +89,15 @@ DuinoBot\footnote{\url{https://github.com/Robots-Linti/duinobot}}
 desarrollada en conjunto entre un grupo
 de becarios del laboratorio LINTI de esta Facultad y la empresa RobotGroup
 cuenta con un modo de operación similar al de Myro, conectándose con
-los robots a través de un dongle XBee (que utiliza el protocolo ZigBee)
+los robots a través de una placa XBee (que utiliza el protocolo ZigBee)
 conectado a través de un puerto USB con el dispositivo controlante.
 Para que esta biblioteca pueda controlar a los robots, estos últimos
 deberán tener instalado también un firmware especial: en este caso,
 es un una versión modificada de un firmware que implementa el protocolo
 Firmata de uso amplio para controlar dispositivos Arduino a través de una
 interfaz serial que habitualmente es el puerto USB. Pero en este caso
-la interfaz serial está conectada a un dongle XBee en el robot, la interacción
+la interfaz serial está conectada a una placa XBee en el robot,
+la interacción
 entre las distintas capas de software y hardware se ilustra en la
 figura~\ref{fig:funcionamiento_duinobot_diagrama}.
 
@@ -117,7 +118,7 @@ figura~\ref{fig:funcionamiento_duinobot_diagrama}.
 \end{figure}
 
 La modalidad de uso esperada con DuinoBot consiste en que cada usuario
-debe contar con una computadora, conectada por USB a un dongle XBee,
+debe contar con una computadora, conectada por USB a una placa XBee,
 y desde esa computadora puede controlar uno o más robots. Con esa modalidad
 fueron utilizados los robots en los cursos del proyecto
 ``Programando con robots y software libre'' y en actividades similares
@@ -127,7 +128,7 @@ ilustrado en la figura~\ref{fig:funcionamiento_duinobot_conexion}.
 
 Como material para los cursos dictados como parte del proyecto \proyecto{}
 se escribió un libro de programación con robots que describe por completo
-la API de DuinoBot, además de un conjunto de prácticas y slides que pueden
+la API de DuinoBot, además de un conjunto de prácticas y diapositivas que pueden
 ser reutilizados para dictar cursos similares ya que ese encuentran publicados
 con una licencia Creative Commons y disponibles en el sitio del
 proyecto\footnote{\url{http://robots.linti.unlp.edu.ar/material_disponible}}.

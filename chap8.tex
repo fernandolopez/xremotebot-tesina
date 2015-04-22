@@ -1,5 +1,5 @@
 
-\chapter{Conclusiones}\label{cha:conclusiones}
+\chapter{Conclusiones y trabajo a futuro}\label{cha:conclusiones}
 
 % El objetivo general de esta tesina es implementar un servicio web que permita manipular y visualizar en tiempo real los robots Múltiplo N6 del proyecto “Programando con robots y software libre”.
 %
@@ -11,15 +11,15 @@
 % Evaluar la API generada desde distintas plataformas.
 
 
-El objetivo general de esta tesina de implementar un servicio Web que permita
+El objetivo general de esta tesina de implementar un servicio web que permita
 manipular y visualizar en tiempo real los robots Multiplo N6 del proyecto
 \proyecto{} se logró con una implementación usando el lenguaje Python
 que integra varias bibliotecas:
 
 \begin{itemize}
-    \item Tornado como framework Web y soporte de WebSockets del lado del
+    \item Tornado como framework web y soporte de WebSockets del lado del
     servidor.
-    \item SqlAlchemy para el acceso a la base de datos.
+    \item SQLAlchemy para el acceso a la base de datos.
     \item DuinoBot para controlar los robots ``N6''.
     \item Myro para controlar los robots ``Scribbler''.
     \item Sniffer\footnote{\url{https://pypi.python.org/pypi/sniffer}} y
@@ -38,16 +38,16 @@ en profundidad por lo que no se presenta una comparativa entre las distintas
 alternativas en este documento sino que se mencionan las características propias
 del mecanismo elegido que es el protocolo y API WebSockets. Este protocolo fue
 elegido ya que está estandarizado y su uso se está popularizando cada vez más,
-y si bien la API WebSockets está en proceso de estándarización es soportada
+y si bien la API WebSockets está en proceso de estandarización es soportada
 por los navegadores más usados en la actualidad.
 
-De forma similar la comparación entre frameworks Web se realizó rápidamente
+De forma similar la comparación entre frameworks web se realizó rápidamente
 dado que el primer framework probado (Tornado) tenía soporte para todas
 las funcionalidades requeridas o deseables para este trabajo (principalmente
 soporte de WebSockets, asincronismo, renderizado de templates).
 A la vez Tornado no impone
 una modalidad de trabajo, como puede hacer un framework más orientado al
-desarrollo de aplicaciones Web utilizando patrón Model View Controler
+desarrollo de aplicaciones web utilizando patrón Model View Controler
 como por ejemplo Django que puede llegar a ser más adecuado para el desarrollo
 de aplicaciones que dependan más del acceso a una base de datos que el
 trabajo presente. Por esto de la misma forma que con los WebSockets se mencionan
@@ -62,7 +62,7 @@ en la sección~\ref{sec:serializacion}, las mismas apuntan a que el uso de JSON
 no genera mensajes significativamente más grandes que las otras alternativas
 (incluso son ligeramente más pequeños que los generados con BSON), a la vez
 que el tiempo de para codificar y decodificar los mensajes con JSON en
-Javascript es menor que las otras anternativas y en Python no presenta
+Javascript es menor que las otras alternativas y en Python no presenta
 diferencias significativas para mensajes relativamente pequeños como los utilizado
 por XRemoteBot.
 
@@ -84,9 +84,9 @@ naturalmente usando \textit{Promises} en lugar de excepciones.
 
 El sistema resultante es fácilmente extensible en tres aspectos:
 \begin{itemize}
-    \item Dada su sencilles protocolo es fácilmente extensible.
+    \item Dada su sencillez protocolo es fácilmente extensible.
     \item Definiendo un script en ``remotebot/robots/<nombre>.py''
-en el servidor y agregand ``<nombre>'' en la opción ``robots''
+en el servidor y agregando ``<nombre>'' en la opción ``robots''
 de la configuración es suficiente para agregar soporte
 para un nuevo robot.
     \item Si se requiere controlar un dispositivo tan distinto de los
@@ -111,3 +111,37 @@ MIT y pueden ser descargados desde el sitio
 GitHub\footnote{\url{http://github.com/fernandolopez/xremotebot}}%
 M
 \footnote{\url{http://github.com/fernandolopez/xremotebot-clients}}.
+
+Algunos aspectos mejorables del proyecto que pueden abordarse en un futuro
+son:
+\begin{itemize}
+    \item El soporte de streaming de video: jsmpeg, si bien cuenta con
+        ventajas como no precisar un plugin en el navegador, funciona
+        bien cuando la conexión entre los clientes y el servidor es
+        lenta o cuando los clientes no tienen suficientes recursos como
+        para graficar cada frame. En estos casos jsmpeg, en lugar de
+        descartar frames, intenta graficar todo y el video se desfasa
+        cada vez más. Resulta conveniente buscar otra solución para el
+        streaming de video.
+    \item El cliente Ruby precisa más trabajo para soportar conexiones
+        con cifradas con TLS.
+    \item En la interfaz web sería posible agregar implementaciones
+        de Python y Ruby que se ejecuten en el navegador como
+        Brython u Opal.
+    \item También en la interfaz web sería bueno tener un campo de entrada
+        para escribir código que se evalúe de forma interactiva, línea
+        a línea, al presionar la tecla \texttt{Enter}.
+    \item Los dispositivos con los cuales el servidor se conectará a
+        los robots, en este momento, no son configurables. En algunas
+        configuraciones de hardware esto puede llevar a conflictos,
+        sería relativamente sencillo agregar una configuración para
+        esto. En este trabajo no se consideró ya que en las configuraciones
+        de hardware más comunes no existen tales conflictos.
+    \item El archivo de configuración se puede implementar en otro formato
+        que no sea evaluado como código directamente por el intérprete, como
+        ser JSON o con el formato soportado por el módulo
+        \texttt{ConfigParser}\footnote{\url{https://docs.python.org/2/library/configparser.html}}
+        de Python. Esto haría que la configuración sea más prolija y
+        que la aplicación pueda controlar e informar en los logs o en la
+        pantalla cualquier error de configuración.
+\end{itemize}

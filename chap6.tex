@@ -1,10 +1,10 @@
 \chapter{Protocolo de capa de aplicación de XRemoteBot}\label{cha:protocolo}
 Siendo una aplicación cliente-servidor XRemoteBot requiere algún método de
 serialización para intercambiar datos entre los clientes y el servidor.
-Considerando que el servidor no es más que un servidor web que usa websockets
+Considerando que el servidor no es más que un servidor web que usa WebSockets
 como protocolo, el método de serialización propuesto es JSON
 (Javascript Serialization Object Notation). En la sección~\ref{sec:alternativas}
-se describen algunas alternativas consideradas antes de tomar la desición de
+se describen algunas alternativas consideradas antes de tomar la decisión de
 evaluar JSON, BSON y CBOR en profundidad.
 
 \section{Comparación entre JSON, BSON y CBOR}\label{sec:serializacion}
@@ -59,7 +59,7 @@ promedio que llevó hacer cada una de estas acciones para cada formato.
 Se eligió hacer las pruebas con Python y Javascript porque el primero es el
 lenguaje de implementación del servidor y del cliente que probablemente tenga
 más uso en un futuro, mientras que Javascript es el lenguaje de implementación
-del cliente que se ejecutará en los navegadores Web y que puede servir como
+del cliente que se ejecutará en los navegadores web y que puede servir como
 base para implementaciones, por ejemplo, con
 Brython\footnote{\url{http://www.brython.info/}},
 Skulp\footnote{\url{http://www.skulpt.org/}} u
@@ -199,7 +199,7 @@ evaluados
 
 De la figura~\ref{fig:ser-size} se desprende que los distintos métodos de
 serialización no ofrecen diferencias significativas en el tamaño de los
-strings generados para los volumenes de datos probados. Por otro lado,
+strings generados para los volúmenes de datos probados. Por otro lado,
 se puede observar en la figura~\ref{fig:ser-time-py} que al menos en
 Python y con la librería usada CBOR tiene los mejores tiempos. Sin
 embargo en las pruebas con Javascript en la figura~\ref{fig:ser-time-js}
@@ -283,7 +283,7 @@ externas, un posible desarrollador de un cliente tendría más
 problemas para implementar el cliente ya que las API para
 manipular XML suelen
 ser más complejas dada la estructura de estos archivos y además
-la información codificada en XML es más díficil de leer por
+la información codificada en XML es más difícil de leer por
 ejemplo en una captura de red.
 
 También se descartó crear un mecanismo de serialización específico
@@ -292,7 +292,7 @@ todo el protocolo en tres lenguajes distintos y además cualquiera
 que quisiera crear un cliente para XRemoteBot debería también
 implementar el protocolo en el lenguaje deseado, con toda
 la complejidad que tiene validar y extraer información con
-distintos típos de datos de forma correcta y segura.
+distintos tipos de datos de forma correcta y segura.
 
 %FIX ME agregue
 \subsection{El protocolo basado en JSON}
@@ -445,7 +445,7 @@ label=lst:houselight]
 Los métodos bloqueantes como \texttt{backward} (que con DuinoBot demoran
 la ejecución del proceso hasta que transcurra el tiempo indicado como
 parámetro) son modelados desde el servidor demorando la respuesta al método
-gracias a que el framework Web Tornado (usado para dar soporte al servidor
+gracias a que el framework web Tornado (usado para dar soporte al servidor
 para los protocolos HTTP y WebSockets, entre otras utilidades)
 funciona con un ``bucle principal''
 (``main loop'') donde se pueden encolar trabajos para que se ejecuten
@@ -455,7 +455,7 @@ pueden implementar las demoras de forma local usando la función
 \texttt{sleep()}\footnote{tanto en Ruby como en Python la función \texttt{sleep()} detiene
 el hilo actual la cantidad de segundos que indique su único parámetro.},
 pero es necesario para la implementación en Javascript donde no es posible
-demorar la ejecución del script sin impactar de forma negativa la performance
+demorar la ejecución del script sin impactar de forma negativa el rendimiento
 del navegador (al menos en la pestaña actual).
 
 
@@ -514,7 +514,7 @@ Campos de los mensajes \texttt{error}:
 Al comenzar la conexión entre el cliente y el servidor, se intercambian
 los primeros mensajes donde el cliente pregunta al servidor si el
 mismo requiere autenticación y si es así envía la \textit{API key}
-correspondiente. En la tabla~\ref{tbl:ej_autenticacion} se detalla
+correspondiente. En la figura~\ref{fig:ej_autenticacion} se detalla
 el intercambio de mensajes entre un cliente y el servidor en un
 caso de autenticación exitoso con un cliente que envía un \texttt{msg\_id}.
 Como se puede ver el \texttt{msg\_id}
@@ -526,156 +526,60 @@ identificador de un atributo (usando notación con corchetes) en un
 objeto Javascript. Es decir puede ser un número o un string
 arbitrario\footnote{\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property\_Accessors}}.
 
-\begin{table}
+\begin{figure}
     \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "global",
-    "method": "authentication_required",
-    "msg_id": 0
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": true,
-    "msg_id": 0
-}
-\end{Verbatim}
-\\
-\hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "global",
-    "method": "authenticate",
-    "args": ["16758efc752c1d97381e6"],
-    "msg_id": 20
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": true,
-    "msg_id": 20
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
+    \includegraphics[scale=0.3]{figures/mensajes}
     \caption{Ejemplo de secuencia de autenticación}
-    \label{tbl:ej_autenticacion}
-\end{table}
+    \label{fig:ej_autenticacion}
+\end{figure}
 
 Otra secuencia de operaciones típica para XRemoteBot es mover un robot
 y luego pedir los valores de alguno de sus sensores, en la
-tabla~\ref{tbl:ej_movimiento_y_sensor} se puede ver un caso donde se
+figura~\ref{fig:ej_movimiento_y_sensor} se puede ver un caso donde se
 mueve el robot hacia adelante durante 1 segundo y luego consulta si
 existe algún obstáculo a 10 centímetros o menos del robot, en el primer
 argumento de los mensajes
-envíados a la entidad \textit{robot} se puede ver el objeto que identifica
+enviados a la entidad \textit{robot} se puede ver el objeto que identifica
 al robot específico a utilizar.
 
-\begin{table}
+\begin{figure}
     \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-    "method": "forward",
-    "args": [50, 1],
-    "msg_id": 40
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": null,
-    "msg_id": 40
-}
-\end{Verbatim}
-\\
-\hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-    "method": "getObstacle",
-    "args": [{model: "n6", id: 4}, 10],
-    "msg_id": 42
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "value",
-    "value": false,
-    "msg_id": 42
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
+    \includegraphics[scale=0.3]{figures/mensajes_robot}
     \caption{Ejemplo de movimiento y acceso a sensores de un robot}
-    \label{tbl:ej_movimiento_y_sensor}
-\end{table}
+    \label{fig:ej_movimiento_y_sensor}
+\end{figure}
 
-Por último, en la tabla~\ref{tbl:ej_error} se puede ver un mensaje de error
+Por último, en la figura~\ref{fig:ej_error} se puede ver un mensaje de error
 típico cuando el cliente envía una petición mal formada donde no existe
 el campo \textit{method} obligatorio, notar que este mensaje a diferencia
 de los anteriores no tiene un campo \textit{msg\_id} pero esto no causaría
 ningún error ya que este campo no es obligatorio, el único error en la
 petición es la ausencia de \textit{method}.
 
-\begin{table}
+\begin{figure}
     \centering
-    \begin{tabular}{|m{.49\textwidth}|m{.49\textwidth}|}
-        \hline
-        \textit{Petición del cliente} & \textit{Respuesta del servidor} \\
-        \hline
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "entity": "robot",
-}
-\end{Verbatim}
-&
-\begin{Verbatim}[fontsize=\footnotesize]
-{
-    "response": "error",
-    "message": "\"entity\" and \"method\"
-                are mandatory fields"
-}
-\end{Verbatim}
-\\
-\hline
-    \end{tabular}
+    \includegraphics[scale=0.3]{figures/mensajes_error}
     \caption{Ejemplo de un mensaje de error ante una petición mal formada}
-    \label{tbl:ej_error}
-\end{table}
+    \label{fig:ej_error}
+\end{figure}
 
 \section{Modalidades del servidor}
 
 A fin de hacer que el servidor pueda exponerse al público se cuenta con
 un sistema con autenticación por \textit{API key}, pero estas claves
-son largas resultando díficil recordarlas y escribirlas sin errores. En
+son largas resultando difícil recordarlas y escribirlas sin errores. En
 ámbitos locales, como puede ser una red wifi en un aula, este mecanismo
 de autenticación puede resultar molesto e innecesario, por lo que el
 servidor es configurable de forma tal que se puede deshabilitar este
 sistema de autenticación. Para que el servidor opere sin requerir
 una \textit{API key} a los clientes basta con configurar la opción
-\texttt{public\_server} en \texttt{False} dentro del archivo
-\textit{configuration.py}.
+\texttt{public\_server} en \texttt{False} como se indica en la
+sección~\ref{sec:configuraciones}. Esto también deshabilita
+el sistema de reservas, por lo que cualquier usuario puede usar
+cualquier robot en este modo.
 
 Dado que existe esta modalidad el protocolo cuenta con un mensaje
-para preguntar si es necesario proseguir con la authenticación
+para preguntar si es necesario proseguir con la autenticación
 (\texttt{authentication\_required}), con lo cuál se pueden crear
-scritps que se adapten a ambos escenarios.
+scripts que se adapten a ambos escenarios.
 

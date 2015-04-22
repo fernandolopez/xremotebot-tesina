@@ -5,7 +5,6 @@ server.onConnect(function(){
         println(robots);
     });
 
-
     server.fetch_robot().then(function(robot_obj){
         println(robot_obj);
         var robot = new Robot(server, robot_obj);
