@@ -49,11 +49,13 @@
 \usepackage{fancyvrb}
 \usepackage{listings}
 \usepackage{wrapfig}  % Figuras con texto alrededor
-%\usepackage{draftwatermark}
-%\SetWatermarkText{DRAFT}
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkText{\includegraphics{figures/g4}}
+\SetWatermarkAngle{0}
+%\SetWatermarkLightness{0.8}
 %\SetWatermarkScale{5}
 %\SetWatermarkColor[rgb]{0.97,0.97,0.97}
-
+\usepackage{pdfpages}
 
 %% La tipografía tiene que soportar tildes, no todas lo hacen %%
 \usepackage{courier}    % Courier para tipografía monoespaciada
@@ -111,7 +113,7 @@
 \pagestyle{plain}
 
 \begin{document}
-
+%\includepdf[pages={1}]{portada.pdf}
 \include{cover}
 % Some departments (e.g. 5) require an additional signature page.  See
 % signature.tex for more information and uncomment the following line if

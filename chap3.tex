@@ -9,7 +9,7 @@
 % FIXME: QUIZAS ESTE CAPITULO PODRÍA IR ANTES DEL ANTERIOR... YA QUE SEGURAMENTE VAS A NOMBRAR Y DESCRIBIR VARIAS COSAS QUE LUEGO NOMBRAS ALLÁ... FIJATE
 
 XRemoteBot tiene una arquitectura compleja que
-depende de otras librerías y de software instalado en los robots.
+depende de otras bibliotecas y de software instalado en los robots.
 El objetivo de este capítulo es describir la interacción entre los
 distintos dispositivos y aplicaciones utilizadas, demarcando el límite
 entre el desarrollo realizado para esta tesina con el software ya
@@ -22,9 +22,8 @@ Myro\footnote{\url{http://myro.roboteducation.org/}}
 es la biblioteca utilizada para controlar a los robots
 ``Scribbler''
 desde un script Python. Esta biblioteca fue desarrollada por
-Institute for Personal Robots in Education (IPRE) y
-y utilizado en el proyecto Robot en la enseñanza de ciencias
-de la computación~\citep{kumar_2009}
+Institute for Personal Robots in Education (IPRE)
+para su uso en cursos de computación introductorios~\citep{kumar_2009}
 %%\footnote{\url{http://www.roboteducation.org}}
 en distintos niveles
 educativos\footnote{\url{http://www.roboteducation.org/schools.html}}.
@@ -57,7 +56,7 @@ de desarrollar una nueva biblioteca para controlar a los robots que funcione
 en distintos lenguajes de
 programación\footnote{\url{http://calicoproject.org/}}. De todas formas se
 decidió seguir con Myro por la experiencia del autor de esta tesina
-con esta librería.
+con esta biblioteca.
 
 % FIXME Maybe más adelante
 Lamentablemente el servidor SVN oficial donde se publicaban las
@@ -66,14 +65,14 @@ no se encuentra en funcionamiento, por lo que se utilizó una
 copia de este repositorio en
 GitHub\footnote{\url{https://github.com/yingted/Myro}} de la cuál
 se creó un fork y la reorganizó de forma tal que fuera posible instalar
-esta librería desde un entorno Python con un solo comando.
+esta biblioteca desde un entorno Python con un solo comando.
 Además se hizo
 una pequeña corrección para que el uso del paquete
 IDLE\footnote{\url{https://docs.python.org/2/library/idle.html}}
 sea opcional ya esa biblioteca sirve para crear interfaces gráficas
 y eso no es necesario para este proyecto.
 
-Esta librería (técnicamente un paquete Python) consta de múltiples
+Esta biblioteca (técnicamente un paquete Python) consta de múltiples
 módulos y requiere de otros para contar con funcionalidades opcionales
 como el soporte de joysticks, una interfaz gráfica para mostrar
 los valores de los sensores en un diálogo y soporte para manipulación

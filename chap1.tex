@@ -67,7 +67,7 @@ de fabricación nacional de
 la empresa RobotGroup, mostrados en la figura~\ref{fig:robots_usados_n6}.
 Tanto el software necesario para controlar estos robots como sus
 especificaciones se distribuyen bajo una licencia
-abierta~\footnote{\url{https://www.kickstarter.com/projects/1689254125/multiplo-create-your-own-robot/description}}.
+abierta\footnote{\url{https://www.kickstarter.com/projects/1689254125/multiplo-create-your-own-robot/description}}.
 
 Los robots Multiplo N6 están basados en
 Arduino\footnote{\url{http://www.arduino.cc/}}
@@ -76,7 +76,7 @@ usando el IDE Arduino en C++. Además RobotGroup ofrece el entorno de programaci
 MiniBloq que permite programar el robot de forma gráfica usando bloques.
 Dado que estas modalidades no se adecuaban a las propuestas del proyecto
 se pidió a la empresa una versión modificada del robot para controlarlo de forma
-inalámbrica (ya que no es posible ejecutar un intérprete cPython en una
+inalámbrica (ya que no es posible ejecutar un intérprete CPython en una
 placa de esas características) y se
 desarrolló
 una biblioteca Python que permite la programación del robot en dicho lenguaje. Este
@@ -237,7 +237,7 @@ ZigBee\footnote{\url{http://www.digi.com/xbee/}}, la modificación de
 un firmware basado en una implementación existente para Arduino del protocolo
 de control \texttt{Firmata}\footnote{\url{http://firmata.org/}} y el
 desarrollo
-del módulo Python \texttt{Duinobot} para controlar a los robots usando
+del módulo Python \texttt{DuinoBot} para controlar a los robots usando
 este protocolo, el
 cuál fue adaptado por los miembros del proyecto \proyecto{}
 para soportar nuevas funcionalidades y proveer una
@@ -247,10 +247,10 @@ API similar a la de la biblioteca
 Básicamente los robots Multiplo N6 utilizados en el proyecto \proyecto{}
 contienen un
 firmware basado en Firmata, modificado para soportar
-las características propias del robot, que recibe instrucciones desde
+las características propias del robot. Este firmware recibe instrucciones desde
 un un puerto serie conectado a una placa XBee y envía las respuestas
-al mismo utilizando una variación del protocolo Firmata. Desde el lado
-de la computadora controlante, el módulo Duinobot provee una interfaz
+a la misma utilizando una variación del protocolo Firmata. Desde el lado
+de la computadora controlante, el módulo DuinoBot provee una interfaz
 de alto nivel para los alumnos, donde cada instrucción para el robot
 programada
 en Python se convierte a una secuencia de bytes del protocolo Firmata
@@ -282,7 +282,7 @@ que el robot posteriormente ejecute el programa de forma autónoma.
 Pero los robots usados en el proyecto antes mencionado no requieren
 cables ya que son controlados a través de señales
 inalámbricas, lo que permite controlarlos en tiempo real y utilizando
-un intérprete Python estándar (cPython) instalado en el dispositivo
+un intérprete Python estándar (CPython) instalado en el dispositivo
 controlante.
 
 Dado el costo y fragilidad de los robots habitualmente los alumnos interactúan
@@ -341,7 +341,8 @@ a un XBee por robot más un único adaptador USB a XBee conectado al servidor.
 Como consecuencia de estos requerimientos el servidor
 debe tener una interfaz web y proveer acceso concurrente, con relativa
 baja latencia, para permitir a múltiples alumnos acceder a múltiples robots
-al mismo tiempo. Si bien el objetivo del proyecto \proyecto{} es enseñar
+al mismo tiempo desde distintos dispositivos.
+Si bien el objetivo del proyecto \proyecto{} es enseñar
 programación usando el lenguaje Python, por lo que sería suficiente
 que XRemoteBot tenga un cliente Python, tener un servidor web basado en
 protocolos estándares hace que sea relativamente sencillo desarrollar
@@ -373,4 +374,4 @@ Scribbler se encuentran desarrolladas en Python y dada la experiencia del autor
 tanto en el uso de estas bibliotecas como en el uso del lenguaje Python en general,
 éste es el lenguaje elegido para el desarrollo del servidor. En particular la
 versión 2.7 de Python ya que utilizar la versión 3 requeriría extensivas
-modificaciones a estas bibliotecas y otras relacionadas~\cite{lutz_2014}.
+modificaciones a estas bibliotecas y otras relacionadas~\citep{lutz_2014}.

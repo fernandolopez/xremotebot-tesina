@@ -448,6 +448,7 @@ reserved.\par\permission}}
 %% `upcase' documentclass option: \choosecase is defined either as a dummy or
 %% a macro to change the (expanded) argument to uppercase.
 \def\maketitle{\begin{titlepage}
+\vfill
 \large
 {\def\baselinestretch{1.2}\Large\bf \choosecase{\@title} \par}
 {\large Tesina de grado de la Licenciatura en Inform\'atica}

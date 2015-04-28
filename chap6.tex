@@ -1,25 +1,26 @@
 \chapter{Protocolo de capa de aplicación de XRemoteBot}\label{cha:protocolo}
 Siendo una aplicación cliente-servidor XRemoteBot requiere algún método de
 serialización para intercambiar datos entre los clientes y el servidor.
-Considerando que el servidor no es más que un servidor web que usa WebSockets
-como protocolo, el método de serialización propuesto es JSON
-(Javascript Serialization Object Notation). En la sección~\ref{sec:alternativas}
-se describen algunas alternativas consideradas antes de tomar la decisión de
-evaluar JSON, BSON y CBOR en profundidad.
+Considerando que el servidor de XRemoteBot es un servidor web que usa WebSockets
+como protocolo de comunicación, el método de serialización propuesto es JSON
+(Javascript Serialization Object Notation).
+%En la sección~\ref{sec:alternativas}
+%se describen algunas alternativas consideradas antes de tomar la decisión de
+%evaluar JSON, BSON y CBOR en profundidad.
 
 \section{Comparación entre JSON, BSON y CBOR}\label{sec:serializacion}
 
 JSON cuenta con las siguientes características:
 \begin{enumerate}
     \item Es un formato estandarizado por ECMA~\citep{ecma-404}
-        y está especificado por la rfc-7159~\citep{rfc-7159}.
+        y está especificado por la RFC-7159~\citep{rfc-7159}.
     \item Soporta los tipos de datos necesarios para intercambiar mensajes con
         los datos necesarios para controlar los robots usando un nivel de
         abstracción adecuado.
     \item Al ser un formato de texto es simple analizar el tráfico entre los
         clientes y el servidor para detectar posibles errores.
     \item Está soportado de forma nativa por los navegadores más
-        utilizados.%~\footnote{\url{http://caniuse.com/#search=json}}.
+        utilizados.%\footnote{\url{http://caniuse.com/#search=json}}.
 \end{enumerate}
 
 Pero también existen otras alternativas cuyos objetivos son serialización
@@ -33,15 +34,15 @@ Algunas características de BSON y CBOR son:
     \item Son tan fáciles de usar como JSON.
     \item Ambos formatos pueden codificar y decodificar los mismos tipos de datos
         que JSON, además de soportar otros tipos de datos adicionales.
-    \item CBOR está especificado por la rfc-7049~\citep{rfc-7049}.
+    \item CBOR está especificado por la RFC-7049~\citep{rfc-7049}.
     \item BSON tiene una especificación informal pero cuenta una
         implementación bien conocida siendo la representación de datos primaria en
-        MongoDB~\footnote{\url{http://bsonspec.org/}}.
+        MongoDB\footnote{\url{http://bsonspec.org/}}.
     \item Por estar en formato binario decodificar una captura de tráfico
         para depurar un programa es más laborioso.
     \item En algunos casos estos formatos binarios generarán mensajes más
         chicos que JSON, pero no siempre.
-    \item Requieren usar librerías Javascript en los clientes web ya que los
+    \item Requieren usar bibliotecas Javascript en los clientes web ya que los
         navegadores no lo implementan de forma nativa.
 \end{enumerate}
 
@@ -65,17 +66,17 @@ Brython\footnote{\url{http://www.brython.info/}},
 Skulp\footnote{\url{http://www.skulpt.org/}} u
 Opal\footnote{\url{http://opalrb.org/}}.
 
-Para hacer el experimento repetible la implementación en
+Para hacer el experimento repetible, la implementación en
 Javascript se ejecutó con el intérprete \textbf{nodejs} basado en
 el motor \textbf{v8} usado por \textbf{Chrome} y además se crearon
 scripts de apoyo para generar los datos de prueba, ejecutar los scripts
 con los distintos formatos de forma automatizada y formatear los datos
-resultantes en archivos csv.
+resultantes en archivos CSV.
 
 Todas las pruebas se realizaron sobre Lihuen 6 beta (basado en Debian Jessie)
 en una notebook con procesador ``Intel(R) Core(TM) i3 CPU M 370 @ 2.40GHz''
 y 4GB de RAM % NOTA: son 4GB no 4GiB
-usando Python 3.4.2 y NodeJS 0.10.35~\footnote{Se usó NodeJS 0.10.35 ya que
+usando Python 3.4.2 y NodeJS 0.10.35\footnote{Se usó NodeJS 0.10.35 ya que
 la versión 0.10.29 distribuida al momento con Debian Jessie tenía un bug que
 generaba un error de memoria al
 deserializar strings largos con \texttt{JSON.load} (CVE-2014-5256)}
@@ -200,8 +201,8 @@ evaluados
 De la figura~\ref{fig:ser-size} se desprende que los distintos métodos de
 serialización no ofrecen diferencias significativas en el tamaño de los
 strings generados para los volúmenes de datos probados. Por otro lado,
-se puede observar en la figura~\ref{fig:ser-time-py} que al menos en
-Python y con la librería usada CBOR tiene los mejores tiempos. Sin
+se puede observar en la figura~\ref{fig:ser-time-py} que, al menos en
+Python y con la biblioteca usada, CBOR tiene los mejores tiempos. Sin
 embargo en las pruebas con Javascript en la figura~\ref{fig:ser-time-js}
 se puede observar que los mejores tiempos son para el formato JSON.
 Esto es entendible ya que este es el único formato (entre los evaluados) procesado de forma
@@ -304,12 +305,12 @@ implementar una API similar a la de DuinoBot.
 Internamente XRemoteBot
 convierte los valores, objetos y arrays de JSON a distintos tipos de
 datos de Python de la forma descripta en la
-tabla~\ref{tbl:rel_json_python}, siguiendo, en general las transformaciones
+figura~\ref{tbl:rel_json_python}, siguiendo, en general las transformaciones
 realizadas por defecto por las funciones de procesamiento de el módulo
 JSON de la biblioteca estándar de
 Python\footnote{\url{https://docs.python.org/3/library/json.html}}.
 
-\begin{table}
+\begin{figure}
     \centering
     \begin{tabu}{l|l}
         JSON & Python \\
@@ -326,7 +327,7 @@ Python\footnote{\url{https://docs.python.org/3/library/json.html}}.
     \caption{Relación entre los tipos y valores de JSON y los usados en
     Python}
     \label{tbl:rel_json_python}
-\end{table}
+\end{figure}
 
 \subsection{Mensajes del cliente al servidor}
 
@@ -406,19 +407,19 @@ campo ``method'' y para soportar nuevos tipos de entidades simplemente
 se puede enviar un string diferente en ``entity''.
 
 Por ejemplo, si se requiriese implementar
-un sistema que controle la iluminación de un casa,
-se podrían definir los métodos ``main\_bedroom'', ``children\_bedroom'',
+un sistema que controle la iluminación de una casa,
+se podrían definir los métodos: ``main\_bedroom'', ``children\_bedroom'',
 ``kitchen'', ``living'' y ``garage''. Si cada uno de éstos
-controla la luz de la habitación descripta por su nombre y podría recibir
+controla la luz de la habitación descripta por su nombre, podrían recibir
 como
 argumento la intensidad de luz deseada como un número de 0 a 255. Finalmente
-podemos agrupar estos métodos en una ``entity'' ``houselight''.
+podemos agrupar estos métodos en una ``entity'' con el nombre``houselight''.
 
 Podríamos controlar las luces con una secuencia de mensajes como
 los mostrados en el código~\ref{lst:houselight}. Por supuesto, luego
 habría que agregar soporte para estas funcionalidades en el servidor
-y los clientes pero como veremos más adelante esto tampoco es
-un problema significativo.
+y los clientes pero esto tampoco es
+un problema significativo en XRemoteBot.
 
 \begin{lstlisting}[language=python,
 caption={Ejemplo de una posible extensión al protocolo para controlar
@@ -452,7 +453,7 @@ funciona con un ``bucle principal''
 en el futuro.
 Esta funcionalidad no es necesaria para la mayoría de los clientes que
 pueden implementar las demoras de forma local usando la función
-\texttt{sleep()}\footnote{tanto en Ruby como en Python la función \texttt{sleep()} detiene
+\texttt{sleep()}\footnote{Tanto en Ruby como en Python la función \texttt{sleep()} detiene
 el hilo actual la cantidad de segundos que indique su único parámetro.},
 pero es necesario para la implementación en Javascript donde no es posible
 demorar la ejecución del script sin impactar de forma negativa el rendimiento
@@ -583,3 +584,25 @@ para preguntar si es necesario proseguir con la autenticación
 (\texttt{authentication\_required}), con lo cuál se pueden crear
 scripts que se adapten a ambos escenarios.
 
+%Por otro lado, si los robots se encuentran en el mismo lugar
+%que los usuarios, puede deshabilitarse el streaming de video
+%con la opción \texttt{disable\_streaming}.
+%
+%De esta manera, si el servidor se encuentra disponible al público
+%a través de Internet, es recomendable usar la configuración mostrada
+%en el código~\ref{lst:conf-internet}. En cambio si el servidor es
+%utilizado en una red local, es recomendable usar la configuración
+%mostrada en el código~\ref{lst:conf-lan}.
+%
+%\begin{lstlisting}[language=Python,
+%caption={Configuración recomendada para servidores públicos},
+%label=lst:conf-internet]
+%authentication_required = True
+%disable_streaming = False
+%\end{lstlisting}
+%\begin{lstlisting}[language=Python,
+%caption={Configuración recomendada para servidores locales},
+%label=lst:conf-lan]
+%authentication_required = False
+%disable_streaming = True
+%\end{lstlisting}

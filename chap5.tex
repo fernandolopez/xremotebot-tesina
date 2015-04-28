@@ -27,9 +27,9 @@ de Python: el módulo para acceso a WebSockets
 \textit{websocket-client}\footnote{\url{https://pypi.python.org/pypi/websocket-client}}
 que cuenta, con una interfaz asincrónica y con una interfaz de ``bajo nivel''
 sincrónica similar a la interfaz tradicional de
-Sockets\footnote{\url{http://pubs.opengroup.org/onlinepubs/7908799/xns/syssocket.h.html}},
-lo que hace más
-natural imitar una biblioteca como DuinoBot.
+Sockets\footnote{\url{http://pubs.opengroup.org/onlinepubs/7908799/xns/syssocket.h.html}}.
+Esta última resulta la más adecuada para
+imitar el comportamiento de una biblioteca como DuinoBot.
 
 \begin{lstlisting}[language=Python,
 caption={Ejemplo con XRemoteBot para Python},label=lst:ejemplo_xremotebot_python]
@@ -90,7 +90,7 @@ asincrónica que no es adecuada para este proyecto.
 Por esto originalmente se analizó incorporar el código del proyecto
 \textit{web-socket-ruby}\footnote{\url{https://github.com/gimite/web-socket-ruby}}
 al cliente Ruby de XRemoteBot. Este proyecto no ese encuentra empaquetado en
-forma de gema, pero provee una API sincrónica que permiría implementar el
+forma de gema, pero provee una API sincrónica que permitiría implementar el
 cliente Ruby de XRemoteBot
 con una interfaz similar a la biblioteca DuinoBot original.
 Sin embargo este proyecto no funciona
@@ -173,7 +173,7 @@ a Javascript ya que demoran la ejecución del programa
 1 y 2 segundos respectivamente, esto es imposible de implementar en
 Javascript en el entorno de un navegador sin utilizar la técnica de ``busy
 waiting'' o modificar el código para usar la función de Javascript
-\texttt{setTimeout()}. La línea 12 tampoco puede transladarse a Javascript
+\texttt{setTimeout()}. La línea 12 tampoco puede trasladarse a Javascript
 sin grandes modificaciones, ya que requiere enviar un mensaje al servidor
 para pedirle los datos del sensor, esperar la respuesta y retornarla, todo
 esto no es posible con WebSockets en el navegador ya que su API es asincrónica.
@@ -186,7 +186,9 @@ el uso de \texttt{setTimeout()} puede servir para implementar las líneas
 de respuesta del servidor.
 
 Como se menciona en el la sección~\ref{sec:websockets}, el servidor
-utiliza WebSockets como protocolo de transporte.
+utiliza WebSockets como protocolo de transporte. Por esto XRemoteBot
+para Javascript debe utilizar la API de WebSockets provista por
+los navegadores.
 La API de WebSockets disponible en los navegadores web es asincrónica y
 está basada en el uso de ``callbacks''
 que se ejecutan ante distintos eventos~\citep{wang_2013}.
@@ -207,15 +209,11 @@ WebSocket~\citep{websocket_2014}:
     enviado por el servidor.
 \end{description}
 
-Para proveer una interfaz lo más parecida posible a la de DuinoBot,
-para implementar
-las demoras al invocar a mensajes como \texttt{Robot\#forward()} y
-\texttt{Robot\#backward()}, y para implementar mensajes que dependen
-del valor de respuesta del servidor como \texttt{Robot\#getObstacle()}
-se utilizó el objeto de Javascript \texttt{Promise} en conjunto con
-algunas modificaciones en el servidor y en el protocolo que proveen
-una solución de alto nivel en comparación con el uso directo de
-la API de WebSockets. Esto se describe en la sección~\ref{sec:promises}.
+
+Con el objetivo de ocultar los detalles de implementación a los
+usuarios que desean controlar los robots usando XRemoteBot para
+Javascript, se utilizará un objeto \texttt{Promise} como se
+describe en la siguiente sección.
 
 \subsection{Promises}\label{sec:promises}
 
@@ -236,18 +234,20 @@ los robots en Javascript con una interfaz idéntica a la usada al programar
 los robots con la biblioteca DuinoBot, pero es relativamente fácil de
 utilizar y ante la imposibilidad de demorar la ejecución del código
 Javascript provee una alternativa
-relativamente simple en comparación con el uso directo de la interfaz
+simple en comparación con el uso directo de la interfaz
 de los objetos \texttt{WebSocket}.
 
 Los objetos \textit{Promise} se instancian pasándoles como argumento una
 función que a su vez recibe 2 argumentos: \texttt{resolve} y \texttt{reject}.
-El primer argumento ``cumple'' o ``resuelve'' la promesa y el segundo la
+Estos argumentos son funciones, invocar al primero
+``cumple'' o ``resuelve'' la promesa e invocar al segundo la
 ``rechaza''.
 Las ``promesas'' tienen dos métodos: \texttt{then} y \texttt{catch} que se
 ejecutan cuando la promesa se ``cumple'' o se ``rechaza'' respectivamente.
 
 \subsubsection{Una primer implementación}
-Usando esta API se implementó una primer versión de XRemoteBot para Javascript
+Usando la API \texttt{Promise} se implementó una primer versión de XRemoteBot
+para Javascript
 donde cada mensaje enviado al servidor retorna una instancia de \textit{Promise}.
 El código~\ref{lst:ejemplo_xremotebot_javascript} muestra una implementación
 en Javascript del ejemplo visto en el código~\ref{lst:ejemplo_duinobot}.
@@ -354,7 +354,7 @@ server.onConnect(function(){
 });
 \end{lstlisting}
 
-El atributo \texttt{Server\#delayed} en \texttt{xremotebot.js} mantiene la cola
+El atributo \texttt{Server.delayed} en \texttt{xremotebot.js} mantiene la cola
 de mensajes demorados.
 Cuando el servidor contesta un mensaje previo se toma otro mensaje
 de la cola (si lo hubiere) y se lo envía al servidor. De esta manera,
@@ -378,7 +378,7 @@ controlada por el flujo de mensajes a través de la conexión con WebSockets.
 Además de agregar complejidad, este tipo de intérpretes no accede a un entorno
 completo como lo hace el intérprete incorporado en los navegadores y puede
 tener incompatibilidades o funcionalidades no implementadas, en este caso
-por ejemplo JS-Interpreter no soporta interrupciones y no puede interactuar
+por ejemplo JS-Interpreter no soporta excepciones y no puede interactuar
 directamente con DOM. Otra opción es
 Hypnotic\footnote{\url{http://coolwanglu.github.io/hypnotic/web/demo.html}}
 que utiliza el intérprete Narcissus y provee una función \texttt{sleep()} que
@@ -425,12 +425,12 @@ server.onConnect(function(){
     \caption{Resultado de la ejecución del código~\ref{lst:ejemplo_dom_title}}
     \label{fig:ejemplo_web_sensor}
 \end{figure}
-
+\newpage % FIXME layout
 \begin{lstlisting}[language=C,
 caption={Implementación de \texttt{getObstacle()} con ``promesas''},
 label=lst:promises_get_obstacle]
 robot.getObstacle().then(function(hay_obstaculo){
-    if (hay_obstaculo.value){
+    if (hay_obstaculo){
         console.log("Hay un obstáculo al frente");
     }
     else {
@@ -459,20 +459,19 @@ Este ejemplo combina el acceso
 a las funciones del navegador como \texttt{alert()} y \texttt{setInterval()},
 el uso de JQuery y la manipulación del árbol DOM.
 
-\noindent \begin{minipage}{0.75\textwidth}
-    \hskip 1.5em En un ejemplo más avanzado de uso de DOM y JQuery podría plantearse como
-    actividad agregar una botonera para controlar a los robots haciendo clic.
-    El código~\ref{lst:botones} muestra una posible solución a esa actividad,
-    agregando los botones debajo del área de streaming de video y la
-    figura~\ref{fig:botones} muestra el resultado de ejecutar este código.
-\end{minipage}
-\begin{minipage}{0.25\textwidth}
+\begin{figure}
         \centering
-        \includegraphics[width=\textwidth]{figures/botones}
-        \captionof{figure}{Botonera creada en el código~\ref{lst:botones}}
+        \includegraphics[width=0.25\textwidth]{figures/botones}
+        \caption{Botonera creada en el código~\ref{lst:botones}}
         \label{fig:botones}
-        \vspace{1em}
-\end{minipage}
+\end{figure}
+
+En un ejemplo más avanzado de uso de DOM y JQuery podría plantearse como
+actividad, para enseñar programación en Javascript, agregar una botonera para
+controlar a los robots haciendo clic.
+El código~\ref{lst:botones} muestra una posible solución a esa actividad,
+agregando los botones debajo del área de streaming de video y la
+figura~\ref{fig:botones} muestra el resultado de ejecutar este código.
 
 \lstinputlisting[language=C,
     caption={Agregar botones debajo del área de video usando JQuery},
@@ -490,29 +489,29 @@ clave alfanumérica única por cada usuario denominada \textit{API key} que
 permite reservar y controlar los robots sin la necesidad de exponer el nombre
 de usuario y contraseña, y una página que permite ver los robots en vivo por
 video opcionalmente controlándolos con un script Javascript
-(figura~\ref{fig:interfaz_web}),
+(figura~\ref{fig:interfaz_web}).
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{subfigure}[m]{0.55\textwidth}
         \includegraphics[width=1\textwidth]{figures/xremotebot_gui}
     \end{subfigure}\hskip 0.5em%
     \begin{subfigure}[m]{0.4\textwidth}
         \begin{description}
-            \item[A:] área de texto para codificar.
-            \item[B:] área que simula una consola. Los programas
+            \item[A:] Area de texto para codificar.
+            \item[B:] Area que simula una consola. Los programas
                 puedan imprimir texto en este área.
-            \item[C:] transmisión
+            \item[C:] Transmisión
                 de video. Muestra los robots en tiempo real.
-            \item[D:] caja de ``tips'' o consejos.
+            \item[D:] Caja de ``tips'' o consejos.
         \end{description}
     \end{subfigure}
     \caption{Interfaz web de XRemoteBot}
     \label{fig:interfaz_web}
 \end{figure}
 
-Esta interfaz provee un sistema para crear usuarios nuevos, obtener las
-API key y acceso a la documentación básica para trabajar con XRemoteBot
+Esta interfaz provee además
+acceso a la documentación básica para trabajar con XRemoteBot
 desde cualquiera de los tres clientes implementados.
 
 La interfaz web fue pensada principalmente para ser utilizada en conjunto
@@ -536,9 +535,21 @@ se pueden ver mensajes de log generados con la función
 Ambas funciones pueden imprimir, además de cadenas de texto, objetos. Estos últimos
 se convierten a cadenas de texto usando la función \texttt{JSON.stringify()}.
 
-Un área de video destinada a emisiones en vivo que muestren la posición
-del robot, el mismo no requiere ningún plugin ya que se utilizó
+Un área de video destinada a emisiones en vivo que muestra la posición
+del robot. La emisión de video no requiere ningún plugin ya que se utilizó
 \texttt{jsmpeg}\footnote{\url{https://github.com/phoboslab/jsmpeg}}
 que permite emitir video en vivo usando WebSockets y renderizarlo
 en el navegador en un elemento Canvas, de esta manera se logró tener
 video en vivo utilizando características estándar de HTML5.
+
+En la página ``datos del usuario'', que se puede acceder desde el
+menú en la parte derecha de la pantalla, se puede visualizar la
+API key, se la puede renovar y se puede cambiar la contraseña del usuario
+(figura~\ref{fig:user_data}).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/user_data}
+    \caption{Página ``datos del usuario''}
+    \label{fig:user_data}
+\end{figure}

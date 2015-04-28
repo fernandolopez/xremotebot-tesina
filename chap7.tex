@@ -32,7 +32,8 @@ cd xremotebot
 virtualenv .
 . bin/activate
 pip install -r requirements.txt
-pip install 'git+https://github.com/Robots-Linti/duinobot.git@pygame_opcional'
+pip install\
+  'git+https://github.com/Robots-Linti/duinobot.git@pygame_opcional'
 pip install 'git+https://github.com/fernandolopez/Myro.git'
 \end{lstlisting}
 
@@ -89,9 +90,12 @@ de manera prácticamente constante un 20\% de un núcleo de la CPU
 y un 0.3\% de memoria. Al ejecutar un cliente en este mismo
 equipo en el navegador Mozilla Firefox 40.0a1 (Nightly)
 el uso de CPU por parte de este navegador estuvo alrededor
-del 25\%, un 40\% en Google Chrome 41.0.2272.101 (Stable).
+del 25\% y al realizar la misma actividad
+en Google Chrome 41.0.2272.101 (Stable) el uso de CPU por parte
+del navegador fue de alrededor del 40\%.
 
-Eliminando el elemento canvas donde se gráfica el streaming de video
+Eliminando el elemento \textit{canvas} usado para
+mostrar el streaming de video
 el uso de CPU se redujo a un 0.5\% en Firefox y 30\% en Google Chrome,
 por lo que aparentemente ese uso de CPU se encuentra relacionado
 con la decodificación y renderizado de video.
@@ -140,7 +144,7 @@ Dado el uso de Promises en el diseño de este cliente, fue
 necesario repensar la forma
 de resolver los ejercicios habituales. Por ejemplo en el
 código~\ref{lst:movimientos_js} se ve un script que mueve el
-robot,
+robot, en el
 código~\ref{lst:esquivar_js} se ve un algoritmo para que el robot
 avance esquivando obstáculos y en el código~\ref{lst:random_js}
 muestra un script que mueve el robot en direcciones aleatorias.
@@ -225,7 +229,7 @@ server.onConnect(function(){
 
 
 Al ejecutar el código~\ref{lst:movimientos_js} se puede ver que la
-función \texttt{alert()} se está ejecutando mucho antes que el
+función \texttt{alert()} se ejecuta mucho antes que el
 robot termine de moverse. De hecho lo hace de manera casi instantánea
 al presionar ``Ejecutar''. Esto es porque
 si bien se implementó un mecanismo donde el cliente
@@ -239,7 +243,7 @@ métodos del robot en realidad solamente instancia y retorna una
 estos movimientos es insignificante, pero vemos que el robot
 se mueve como si cada uno de estos métodos congelara la ejecución
 del script por este mecanismo que tiene soporte tanto del lado
-del cliente como del lado del servidor que demora la respuesta
+del cliente como del lado del servidor y que demora la respuesta
 de algunos métodos a propósito.
 
 \begin{lstlisting}[language=C,

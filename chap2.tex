@@ -6,10 +6,13 @@ de forma remota. Muchas de éstas se agrupan bajo la denominación
 En este capítulo se describirán algunas iniciativas similares a XRemoteBot.
 
 \section{Educabot}
-El proyecto Educabot tiene por
+El proyecto Educabot es una iniciativa de Diego Ramírez con el apoyo de
+la Fundación Nahual y la organización
+El Galpón del Banquito\footnote{\url{http://minimalart.org/blog/presentando-educabot}}.
+Educabot tiene por
 objetivo enseñar tecnología a niños y adultos a través
 del uso, programación y construcción de robots. En el sitio del proyecto
-se ofertan cursos orientados a los distintos niveles y 
+se ofertan cursos orientados a los distintos niveles y
 en la última conferencia de Python de Argentina (PyConAr 2014) uno de
 los cofundadores del proyecto mencionó que se llevan adelante actividades
 con los robots
@@ -88,7 +91,15 @@ cppp-io\footnote{\url{https://github.com/hybridgroup/cppp-io/}}
 que define una API JSON
 que permite el acceso a la información y control de robots a través de la Web.
 
-Gobot además tiene compatibilidad con distintos sensores y robots, además de
+El proyecto Gobot surge como una iniciativa de la compañía ``The Hybrid Group''.
+El objetivo de este proyecto es facilitar la programación de
+dispositivos como las placas Arduino y los robots
+Sphero
+a personas que no sean expertas en la programación de microcontroladores%
+\footnote{\url{http://www.wired.com/2015/04/internet-anything-time-everyone-able-hack-robots/}}.
+
+
+Gobot tiene compatibilidad con distintos sensores y robots, además de
 ser compatible con
 placas utilizadas normalmente en la construcción de robots como
 pueden ser Arduino,
@@ -110,18 +121,25 @@ Referencias del proyecto:
 
 \section{Cylon.js}
 
-Cylon.js es un proyecto hermano de Gobot y soporta la misma variedad
+Cylon.js es un proyecto hermano de Gobot, también es desarrollado
+por ``The Hybrid Group'',
+y soporta la misma variedad
 de dispositivos y también provee una API cppp-io, con la diferencia
 de que la biblioteca provista está escrita en Javascript para
 ``Node.js''\footnote{\url{https://nodejs.org/}}.
 
+Los objetivos de Cylon.js son los mismos que los del proyecto Gobot,
+pero trasladados al lenguaje de programación Javascript, en lugar
+del lenguaje de programación Go.
+
 Una característica interesante de Cylon.js es que soporta distintos
 protocolos para su API remota como ser
-HTTP~\footnote{\url{http://tools.ietf.org/html/rfc2616}},
-socket.io~\footnote{\url{http://socket.io/}}
+HTTP\footnote{\url{http://tools.ietf.org/html/rfc2616}},
+socket.io\footnote{\url{http://socket.io/}}
 y la capacidad de agregar nuevos protocolos con plugins.
 
-\begin{lstlisting}[caption={Cylon.js controlando 2 robots ``sphero'' usando HTTP},
+\begin{lstlisting}[caption={Cylon.js controlando 2 robots ``sphero''
+usando HTTP (extraído del sitio oficial del proyecto)},
 label={lst:cylonjs_ejemplo}]
 "use strict";
 
@@ -208,11 +226,29 @@ cuál permite controlar el robot de forma remota y verlo
 a través de una cámara de
 video
 (figura~\ref{fig:vcar}).
-El acceso al robot es público
-aparentemente sin ningún tipo de restricción y la página
+
+Este proyecto fue creado por David Mc Anulty con el objetivo de
+aprender a ``traducir código en movimientos reales''
+(el objetivo no se encuentra
+expresado de forma explícita en el sitio web  de VCar, pero se contactó
+al autor del proyecto que proporcionó esta información).
+Originalmente
+este proyecto consistía de un motor paso a paso que permitía mover
+una cámara de video de forma remota, eventualmente ante el éxito
+del proyecto entre sus amigos, el desarrollador comenzó a investigar
+distintas formas de interactuar con la cámara (actualmente se puede
+controlar el zoom de la cámara desde la interfaz de VCar) y
+finalmente agregó un auto a control remoto similar al que se puede
+ver hoy en día en el sitio del proyecto.
+
+La interfaz de VCar posee una botonera que permite mover el robot,
+controlar el zoom de la cámara de video y controlar el color
+de los LEDs que iluminan al robot.
+El acceso al robot es público,
+sin ningún tipo de restricción y la página
 si bien no tiene detalles de todo el hardware y el software utilizados
 provee algunas fotos de la construcción del
-sistema\footnote{\url{http://www.hellspark.com/dm/gallery2/v/projects/robotics/vcar/}}
+sistema\footnote{\url{http://www.hellspark.com/dm/gallery2/v/projects/robotics/vcar/}}.
 
 Referencias del proyecto:
 \begin{itemize}
@@ -223,13 +259,28 @@ Referencias del proyecto:
 
 \section{Tele Toyland}
 
-Tele Toyland es un sitio que provee acceso a varios dispositivos a través de una interfaz
-web. Por ejemplo, es posible controlar un cabezal con una punta que dibuja sobre
+Tele Toyland es un sitio que provee acceso a varios dispositivos a través
+de una interfaz web. Este proyecto es una iniciativa personal de Carl
+Sutter que surgió en 2006 basado en experiencias anteriores, en las que
+Sutter participó, como
+el primer robot conectado a la web
+``Mercury Project''
+y ``TeleGarden''~\citep{golberg_2010}.
+El objetivo del proyecto es mostrar una serie de dispositivos
+creados por el autor del sitio con el fin de inspirar a la gente (especialmente
+a chicos) a realizar proyectos similares (el objetivo no se encuentra
+expresado de forma explícita en el sitio web  de Tele Toyland, pero se contactó
+al autor del proyecto que proporcionó esta información).
+
+
+Desde la interfaz de Tele Toyland, es posible controlar un cabezal con una
+punta que dibuja sobre
 una caja de arena. Basta con hacer clic sobre las posiciones sobre las cuales
 se quiere que pase la punta y presionar el botón ``go'' para que el cabezal
 empiece a moverse dibujando lo pedido. En éste y el resto de los experimentos
 disponibles en el sitio, los resultados se pueden ver a través de un streaming
 de video.
+
 
 Entre los proyectos con los que permite interactuar Tele Toyland
 se encuentran  2 areneros como el descripto
@@ -259,7 +310,7 @@ enseñar a programar usando robots de forma remota y permitiendo a distintos
 usuarios reservar temporalmente robots de forma que no haya conflicto en la
 interacción entre los usuarios.
 
-Finalmente en la consigna de ``do it yourself'' existen diversas guías para
+Finalmente en la consigna de ``hágalo usted mismo'' existen diversas guías para
 programar servidores que permitan controlar robots o microcontroladores
 en general, se puede encontrar un caso muy bien explicado en el sitio
 de Adafruit\footnote{\url{https://learn.adafruit.com/wifi-controlled-mobile-robot/building-the-web-interface}},
