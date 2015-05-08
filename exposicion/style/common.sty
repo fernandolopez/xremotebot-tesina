@@ -1,0 +1,46 @@
+\usepackage{pgf}
+% Basado en: http://www.tjansson.dk/?p=82
+
+\usepackage[utf8x]{inputenc}
+
+\definecolor{kugreen}{RGB}{89,111,197}
+\definecolor{kugreenlys}{RGB}{132,158,139}
+\definecolor{kugreenlyslys}{RGB}{173,190,177}
+\definecolor{kugreenlyslyslys}{RGB}{214,223,216}
+\setbeamercovered{transparent}
+
+\usepackage{listings}
+\usepackage{upquote}
+\usepackage{xcolor}
+\lstset {
+    basicstyle=\footnotesize, showstringspaces=no, frame=single,
+    % Listings en español y con comillas simples copiables
+    extendedchars=\true,
+    inputencoding=utf8x,
+    upquote=true,
+    literate={á}{{\'a}}1
+    {é}{{\'e}}1
+    {í}{{\'i}}1
+    {ó}{{\'o}}1
+    {ú}{{\'u}}1
+    {ñ}{{\~n}}1
+}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+    language=C,
+    upquote=true,
+    breaklines=true
+}
+
+% Para que funcione la inclusión de hyperref con utf8x
+\PrerenderUnicode{á}
+\PrerenderUnicode{é}
+\PrerenderUnicode{í}
+\PrerenderUnicode{ó}
+\PrerenderUnicode{ú}
+
+\newcommand{\includecode}[1]{\lstinputlisting[caption=#1,basicstyle=\footnotesize,frame=none]{#1}}

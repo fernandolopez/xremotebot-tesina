@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+if which convert; then
+    convert "$1" "$2"
+elif which rsvg-convert; then
+    rsvg-convert -f pdf -o "$2" "$1"
+else
+    inkscape -z -f "$1" --export-pdf="$2"
+fi

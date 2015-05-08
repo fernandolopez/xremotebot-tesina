@@ -1,0 +1,31 @@
+\pdfminorversion=4
+\documentclass{beamer}[10]
+\usepackage{beamerthemesplit}
+\mode<presentation>
+\usepackage{style/common}
+
+\usetheme[numbers,totalnumber,compress,sidebarshades]{PaloAlto}
+
+% Con número de página, o con footbar
+%\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{footline}[frame]
+
+
+\useinnertheme{circles}
+\usefonttheme[onlymath]{serif}
+\setbeamercovered{transparent}
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+\usecolortheme[named=kugreen]{structure}
+\logo{\includegraphics[width=1.5cm]{style/logo-unlp}}
+
+% Ocultar barra de navegación
+\beamertemplatenavigationsymbolsempty
+
+\lstset{
+    commentstyle=\color{mygreen},
+    keywordstyle=\color{blue},
+    stringstyle=\color{mymauve}
+}
+
+\input{\jobname}
