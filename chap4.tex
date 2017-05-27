@@ -1,14 +1,9 @@
 \chapter{XRemoteBot: eXtended RemoteBot}\label{cha:xremotebot}
-%fizxme NO EMPEZARIA CON ESTO... SINO CON UNA FUNDAMENTACION .. LA DESCRIPCION QUE HACES ACA LA PASARIA A LA SECCION DONDE EXPLICAS TU DESARROLLO
-
 Como parte de esta tesina se desarrolló XRemoteBot, cuyo objetivo
 es permitir la enseñanza de programación en distintos lenguajes usando
 robots de forma remota. XRemoteBot está compuesto por un servidor
 escrito en el lenguaje de programación Python y tres clientes escritos
 en distintos lenguajes de programación.
-
-%El producto de esta tesina es el servidor XRemoteBot y tres
-%bibliotecas para implementar clientes compatibles con el mismo.
 
 XRemoteBot es un servidor web que provee una API JSON para interactuar
 con robots didácticos de forma remota y compartiendo un único enlace
@@ -179,13 +174,6 @@ los recursos disponibles.
     \caption{Esquema de conexión de XRemoteBot}\label{fig:esquema_xremotebot}
 \end{figure}
 
-% FIXME acá sé que falta más contenido del func. del servidor... (Fernando)
-
-% FIXME donde estará el gráfico de esto?.
-% me falta completar con la parte técnica de los módulos python
-% usados, creo que algo de esto está escrito en otro capítulo
-% lo tengo que pasar acá Fernando
-
 \subsection{Configuraciones}\label{sec:configuraciones}
 
 XRemoteBot puede configurarse modificando el archivo \texttt{configuration.py}
@@ -275,24 +263,6 @@ robots = {
     'scribbler': ['00:1E:19:01:0B:81'],
 }
 \end{lstlisting}
-
-% FIXME: Ampliar
-% \chapter{WebSockets y Promises}\label{cha:websockets_y_promises}
-% 
-% Para el desarrollo de este trabajo decidió utilizar dos tecnologías
-% que aún están en proceso de estandarización pero ya son ampliamente
-% soportadas por distintos navegadores
-% Web%
-% \footnote{\url{http://caniuse.com/\#feat=websockets}}%
-% \footnote{\url{http://caniuse.com/\#feat=promises}}
-% como son la API
-% \textit{WebSocket}\footnote{La API en proceso de estandarización por la W3C,
-% pero el protocolo ya fue estandarizado por IETF.}
-% y la API \textit{Promise}\footnote{En proceso de estandarización para
-% ECMAScript 6 (Harmony).}.
-% 
-% En este capítulo se presenta una breve reseña de ambos y los motivos
-% por los cuales fueron elegidos.
 
 \subsection{WebSockets}\label{sec:websockets}
 
