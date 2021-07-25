@@ -4,7 +4,7 @@ EPS=$(patsubst %.dia,%.eps,$(wildcard *.dia))
 all: $(DOCUMENTS) $(EPS)
 
 %.pdf: %.svg
-	inkscape -z -A $@ $<
+	inkscape --export-filename=$@ $<
 
 %.eps: %.dia
 	dia -e $@ $<
